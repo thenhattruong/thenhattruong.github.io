@@ -2,27 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta http-equiv="refresh" content="0; url=./">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Page Not Found</title>
     <script>
         (function () {
-            var path = window.location.pathname;
-            var parts = path.split("/").filter(Boolean);
-            var base = [];
-            var index = parts.indexOf("zenG");
+            var parts = window.location.pathname.split("/").filter(Boolean);
+            var target = "/";
 
-            if (index !== -1) {
-                base = parts.slice(0, index);
-            } else if (window.location.hostname.endsWith(".github.io") && parts.length > 0) {
-                base = [parts[0]];
+            if (window.location.hostname.endsWith(".github.io") && parts.length > 0) {
+                target = "/" + parts[0] + "/";
             }
 
-            var target = "/" + base.concat(["zenG", ""]).join("/");
             window.location.replace(target + window.location.search + window.location.hash);
         })();
     </script>
 </head>
 <body>
-    <p>Page not found. Continue to <a href="./zenG/">the portfolio site</a>.</p>
+    <p>Page not found. Continue to <a href="./">the portfolio site</a>.</p>
 </body>
 </html>
