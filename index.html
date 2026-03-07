@@ -8,7 +8,7 @@
     <!-- Basic Page Needs -->
     <meta charset="utf-8">
     <!--[if IE ]><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/><![endif]-->
-    <title>Truong T.Nhat - Personal Portfolio Resume Theme</title>
+    <title>Truong The Nhat - Personal Portfolio Resume Theme</title>
 
 
 
@@ -36,12 +36,16 @@
     <link rel="apple-touch-icon-precomposed" href="images/logo/favicon.svg">
 </head>
 
-<body>
+<body data-language="en">
     <!-- wrapper -->
     <div id="wrapper" class="counter-scroll bg_dark">
 
-        <div class="body-overlay d-block">
-            <div class="bg-shape"></div>
+        <div class="body-overlay video-overlay d-block">
+            <div class="bg-shape">
+                <video class="bg-video" autoplay muted loop playsinline preload="auto">
+                    <source src="video/Particles-Slowly-Moving-In-Cyberspace.mp4" type="video/mp4">
+                </video>
+            </div>
         </div>
 
 
@@ -53,7 +57,7 @@
                             <img src="images/user/avatar-2.webp" width="68" height="68" alt="avatar">
                         </div>
                         <div class="info">
-                            <h6 class="font-4 mb_4">Truong T.Nhat</h6>
+                            <h6 class="font-4 mb_4">Truong The Nhat</h6>
                             <div class="text-label text-uppercase fw-6 text_primary-color font-3  letter-spacing-1">
                                 Multimedia Design</div>
                         </div>
@@ -61,57 +65,60 @@
                     <ul class="nav-menu style-1 xl-hide">
                         <li class="text-menu text_white has-child">
                             <a href="#" class="nav_link toggle splitting link link-no-action text-button font-3 fw-6">
-                                <span class="text" data-splitting>Demos</span>
-                                <span class="text" data-splitting>Demos</span>
+                                <span class="text" data-splitting data-i18n="menu.demos">Demos</span>
+                                <span class="text" data-splitting data-i18n="menu.demos">Demos</span>
                             </a>
                             <ul class="submenu">
-                                <li class="active"><a href="index.html">Home Default</a></li>
+                                <li class="active"><a href="index.html" data-i18n="menu.home_default">Home Default</a></li>
                             </ul>
                         </li>
                         <li class="text-menu text_white">
                             <a href="#about" class="nav_link toggle splitting link link-no-action text-button font-3 fw-6">
-                                <span class="text" data-splitting>About</span>
-                                <span class="text" data-splitting>About</span>
+                                <span class="text" data-splitting data-i18n="menu.about">About</span>
+                                <span class="text" data-splitting data-i18n="menu.about">About</span>
                             </a>
                         </li>
                         <li class="text-menu text_white">
                             <a href="#resume" class="nav_link toggle splitting link link-no-action text-button font-3 fw-6">
-                                <span class="text" data-splitting>Resume</span>
-                                <span class="text" data-splitting>Resume</span>
+                                <span class="text" data-splitting data-i18n="menu.resume">Resume</span>
+                                <span class="text" data-splitting data-i18n="menu.resume">Resume</span>
                             </a>
                         </li>
                         <li class="text-menu text_white">
                             <a href="#services"
                                 class="nav_link toggle splitting link link-no-action text-button font-3 fw-6">
-                                <span class="text" data-splitting>Services</span>
-                                <span class="text" data-splitting>Services</span>
+                                <span class="text" data-splitting data-i18n="menu.services">Services</span>
+                                <span class="text" data-splitting data-i18n="menu.services">Services</span>
                             </a>
                         </li>
                         <li class="text-menu text_white">
                             <a href="#portfolio"
                                 class="nav_link toggle splitting link link-no-action text-button font-3 fw-6">
-                                <span class="text" data-splitting>Portfolio</span>
-                                <span class="text" data-splitting>Portfolio</span>
+                                <span class="text" data-splitting data-i18n="menu.portfolio">Portfolio</span>
+                                <span class="text" data-splitting data-i18n="menu.portfolio">Portfolio</span>
                             </a>
                         </li>
                         <li class="text-menu text_white">
                             <a href="#pricing"
                                 class="nav_link toggle splitting link link-no-action text-button font-3 fw-6">
-                                <span class="text" data-splitting>Pricing</span>
-                                <span class="text" data-splitting>Pricing</span>
+                                <span class="text" data-splitting data-i18n="menu.pricing">Pricing</span>
+                                <span class="text" data-splitting data-i18n="menu.pricing">Pricing</span>
                             </a>
                         </li>
                         <li class="text-menu text_white">
                             <a href="#contact"
                                 class="nav_link toggle splitting link link-no-action text-button font-3 fw-6">
-                                <span class="text" data-splitting>Contact</span>
-                                <span class="text" data-splitting>Contact</span>
+                                <span class="text" data-splitting data-i18n="menu.contact">Contact</span>
+                                <span class="text" data-splitting data-i18n="menu.contact">Contact</span>
                             </a>
                         </li>
                     </ul>
                     <div class="d-flex gap_12 align-items-center">
+                        <div class="toggle-switch-mode header-mode-toggle"><i class="icon-Sun"></i></div>
+                        <button type="button" class="lang-switch-mode header-lang-toggle font-3 fw-6"
+                            aria-label="Switch language">EN</button>
                         <a href="#contact" class="tf-btn style-1 animate-hover-btn sm-hide">
-                            <span>
+                            <span data-i18n="cta.hire_me">
                                 Hire Me
                             </span>
                         </a>
@@ -123,53 +130,54 @@
                     <ul class="nav-menu style-3 ">
                         <li class="menu-item menu-item-has-children-mobile active">
                             <a href="#dropdown-menu-one" class="item-menu-mobile collapsed text-button font-3 fw-6"
-                                data-bs-toggle="collapse" aria-expanded="true" aria-controls="dropdown-menu-one">
+                                data-bs-toggle="collapse" aria-expanded="true" aria-controls="dropdown-menu-one"
+                                data-i18n="menu.demos">
                                 Demos
                             </a>
                             <div id="dropdown-menu-one" class="collapse" data-bs-parent="#menu-mobile-menu">
                                 <ul class="sub-mobile">
-                                    <li class="active"><a href="index.html">Home Default</a></li>
+                                    <li class="active"><a href="index.html" data-i18n="menu.home_default">Home Default</a></li>
                                 </ul>
                             </div>
                         </li>
                         <li class="text-menu text_white">
                             <a href="#about" class="nav_link toggle splitting link link-no-action text-button font-3 fw-6">
-                                <span class="text" data-splitting>About</span>
-                                <span class="text" data-splitting>About</span>
+                                <span class="text" data-splitting data-i18n="menu.about">About</span>
+                                <span class="text" data-splitting data-i18n="menu.about">About</span>
                             </a>
                         </li>
                         <li class="text-menu text_white">
                             <a href="#resume" class="nav_link toggle splitting link link-no-action text-button font-3 fw-6">
-                                <span class="text" data-splitting>Resume</span>
-                                <span class="text" data-splitting>Resume</span>
+                                <span class="text" data-splitting data-i18n="menu.resume">Resume</span>
+                                <span class="text" data-splitting data-i18n="menu.resume">Resume</span>
                             </a>
                         </li>
                         <li class="text-menu text_white">
                             <a href="#services"
                                 class="nav_link toggle splitting link link-no-action text-button font-3 fw-6">
-                                <span class="text" data-splitting>Services</span>
-                                <span class="text" data-splitting>Services</span>
+                                <span class="text" data-splitting data-i18n="menu.services">Services</span>
+                                <span class="text" data-splitting data-i18n="menu.services">Services</span>
                             </a>
                         </li>
                         <li class="text-menu text_white">
                             <a href="#portfolio"
                                 class="nav_link toggle splitting link link-no-action text-button font-3 fw-6">
-                                <span class="text" data-splitting>Portfolio</span>
-                                <span class="text" data-splitting>Portfolio</span>
+                                <span class="text" data-splitting data-i18n="menu.portfolio">Portfolio</span>
+                                <span class="text" data-splitting data-i18n="menu.portfolio">Portfolio</span>
                             </a>
                         </li>
                         <li class="text-menu text_white">
                             <a href="#pricing"
                                 class="nav_link toggle splitting link link-no-action text-button font-3 fw-6">
-                                <span class="text" data-splitting>Pricing</span>
-                                <span class="text" data-splitting>Pricing</span>
+                                <span class="text" data-splitting data-i18n="menu.pricing">Pricing</span>
+                                <span class="text" data-splitting data-i18n="menu.pricing">Pricing</span>
                             </a>
                         </li>
                         <li class="text-menu text_white">
                             <a href="#contact"
                                 class="nav_link toggle splitting link link-no-action text-button font-3 fw-6">
-                                <span class="text" data-splitting>Contact</span>
-                                <span class="text" data-splitting>Contact</span>
+                                <span class="text" data-splitting data-i18n="menu.contact">Contact</span>
+                                <span class="text" data-splitting data-i18n="menu.contact">Contact</span>
                             </a>
                         </li>
                     </ul>
@@ -191,7 +199,7 @@
                                             height="314" alt="feature post">
                                     </div>
                                     <div class="info">
-                                        <div class="name font-2 text_white mb_8">Truong T.Nhat</div>
+                                        <div class="name font-2 text_white mb_8">Truong The Nhat</div>
                                         <div
                                             class="text-label text-uppercase fw-6 text_primary-color font-3 mb_16 letter-spacing-1">
                                             Multimedia Design</div>
@@ -217,11 +225,11 @@
                                         About
                                     </div>
                                     <div class="title-border-shape">
-                                        <h4 class="animationtext clip ">Hello! I'm <span
+                                        <h4 class="animationtext clip "><span class="about-intro-prefix" data-i18n="about.intro_prefix">Hello! I'm</span> <span
                                                 class="tf-text s1 cd-words-wrapper text_primary-color">
-                                                <span class="item-text is-visible">Multimedia Design</span>
+                                                <span class="item-text is-visible" data-i18n="about.role_word_1">Multimedia Design</span>
                                                 
-                                                <span class="item-text is-hidden">UI/UX Developer</span>
+                                                <span class="item-text is-hidden" data-i18n="about.role_word_2">UI/UX Developer</span>
                                             </span> </h4>
                                         <div class="shape">
                                             <span class="shape-1"></span>
@@ -237,10 +245,10 @@
                                         </div>
                                     </div>
                                 </div>
-                                <h1 class="title mb_16 split-text effect-blur-fade">
+                                <h1 class="title mb_16 about-title-follow" data-i18n="about.title">
                                     Designing Visual Experiences
                                 </h1>
-                                <p class="text_muted-color font-3 mb_43 split-text split-lines-transform">Hello! I'm Truong T.Nhat, a Multimedia Designer with 3+ years of experience in video editing, motion graphics, and digital design, creating impactful visual content for brands and digital platforms.</p>
+                                <p class="text_muted-color font-3 mb_43 split-text split-lines-transform">Hello! I'm Truong The Nhat, a Multimedia Designer with 3+ years of experience in video editing, motion graphics, and digital design, creating impactful visual content for brands and digital platforms.</p>
                                 <div class="wrap-counter tf-grid-layout md-col-3">
                                     <div class="counter-item bs-light-mode">
                                         <div class="counter-number h2 text_white mb_7">
@@ -557,7 +565,7 @@
                                         <div class="icon">
                                             <i class="icon-quote"></i>
                                         </div>
-                                        <p class="text-body-2 text_white mb_21">"Working with Truong T.Nhat was a great experience. The video editing and visual design were professional, engaging, and perfectly matched our brand identity."</p>
+                                        <p class="text-body-2 text_white mb_21">"Working with Truong The Nhat was a great experience. The video editing and visual design were professional, engaging, and perfectly matched our brand identity."</p>
                                     </div>
                                     <div class="athor">
                                         <h5 class="name text_white mb_4 font-4"> <a href="#" class="link">Kevin Pham</a>
@@ -576,7 +584,7 @@
                                         <div class="icon">
                                             <i class="icon-quote"></i>
                                         </div>
-                                        <p class="text-body-2 text_white mb_21">"Truong T.Nhat brought fresh creative ideas to our project. The visuals and video editing were modern, engaging, and perfectly suited for our marketing campaign."</p>
+                                        <p class="text-body-2 text_white mb_21">"Truong The Nhat brought fresh creative ideas to our project. The visuals and video editing were modern, engaging, and perfectly suited for our marketing campaign."</p>
                                     </div>
                                     <div class="athor">
                                         <h5 class="name text_white mb_4 font-4"> <a href="#" class="link">Jessica Tran</a>
@@ -842,8 +850,8 @@
 
                 <!-- section-contact-->
                 <div id="contact" class="section-contact style-1 section spacing-6">
-                    <div class="row">
-                        <div class="col-xl-5">
+                    <div class="row contact-row">
+                        <div class="col-12 col-xl-5">
                             <div class="heading-section mb_44">
                                 <div class="tag-heading text-uppercase text-label font-3 letter-spacing-1 mb_33">
                                     Contact
@@ -873,7 +881,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-xl-7">
+                        <div class="col-12 col-xl-7">
                             <form class="form-contact bs-light-mode">
                                 <div class="d-grid gap_24  mb_24">
                                     <fieldset class="">
@@ -913,17 +921,36 @@
                             </form>
                         </div>
                     </div>
-                    <p class="font-3 text_secondary-color text-center">© 2025 Truong T.Nhat. All rights reserved.</p>
+                    <p class="font-3 text_secondary-color text-center">© 2025 Truong The Nhat. All rights reserved.</p>
                 </div>
                 <!-- End section-contact -->
+
+                <aside class="quick-contact-floating bs-light-mode" aria-label="Quick contact links">
+                    <ul class="quick-contact-icons">
+                        <li>
+                            <a class="quick-contact-link" href="https://www.facebook.com/TTN.Use/" target="_blank"
+                                rel="noopener noreferrer" aria-label="Facebook" title="Facebook">
+                                <i class="icon-Facebook"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="quick-contact-link" href="mailto:thenhattruong@gmail.com"
+                                aria-label="Email" title="Email">
+                                <i class="icon-EnvelopeSimple"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="quick-contact-link" href="#" aria-label="Zalo" title="Zalo">
+                                <i class="icon-Zalo"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </aside>
 
             </div>
 
             <div class="right-bar style-1 d-flex flex-column align-items-center">
                 <ul class="list-icon menu-option d-flex flex-column gap_8">
-                    <li>
-                        <div class="toggle-switch-mode"><i class="icon-Sun"></i></div>
-                    </li>
                     <li><a data-bs-toggle="offcanvas" href="#setting-menu" role="button" aria-controls="setting-menu"><i
                                 class="icon-GearSix"></i></a></li>
                 </ul>

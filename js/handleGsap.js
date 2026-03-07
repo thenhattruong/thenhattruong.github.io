@@ -1,9 +1,32 @@
 gsap.registerPlugin(ScrollTrigger);
 
 (function ($) {
+    let splitTextInstances = [];
+    let splitTextTweens = [];
+
+    const clearSplitTextAnimations = () => {
+        splitTextTweens.forEach((tween) => {
+            if (!tween) return;
+            if (tween.scrollTrigger) {
+                tween.scrollTrigger.kill();
+            }
+            tween.kill();
+        });
+        splitTextTweens = [];
+
+        splitTextInstances.forEach((instance) => {
+            if (instance && typeof instance.revert === "function") {
+                instance.revert();
+            }
+        });
+        splitTextInstances = [];
+    };
+
     /* animation_text
   -------------------------------------------------------------------------*/
     var animation_text = function () {
+        clearSplitTextAnimations();
+
         if ($(".split-text").length > 0) {
             var st = $(".split-text");
             if (st.length === 0) return;
@@ -18,6 +41,7 @@ gsap.registerPlugin(ScrollTrigger);
                     lineThreshold: 0.5,
                     linesClass: "split-line",
                 });
+                splitTextInstances.push(pxl_split);
                 let split_type_set = pxl_split.chars;
                 gsap.set($target, { perspective: 400 });
 
@@ -72,7 +96,7 @@ gsap.registerPlugin(ScrollTrigger);
                             index * 0.01
                         );
                     });
-                    gsap.to(split_type_set, {
+                    const tween = gsap.to(split_type_set, {
                         scrollTrigger: {
                             trigger: el,
                             start: "top 86%",
@@ -81,10 +105,11 @@ gsap.registerPlugin(ScrollTrigger);
                         scale: 1,
                         opacity: 1,
                     });
+                    splitTextTweens.push(tween);
                 } else if (hasClass("effect-blur-fade")) {
                     pxl_split.split({ type: "words" });
                     split_type_set = pxl_split.words;
-                    gsap.fromTo(
+                    const tween = gsap.fromTo(
                         split_type_set,
                         { opacity: 0, filter: "blur(10px)", y: 20 },
                         {
@@ -101,12 +126,21 @@ gsap.registerPlugin(ScrollTrigger);
                             },
                         }
                     );
+                    splitTextTweens.push(tween);
                 } else {
-                    gsap.from(split_type_set, settings);
+                    const tween = gsap.from(split_type_set, settings);
+                    splitTextTweens.push(tween);
                 }
             });
         }
     };
+
+    const refreshSplitTextAnimations = () => {
+        animation_text();
+        ScrollTrigger.refresh();
+    };
+
+    window.refreshSplitTextAnimations = refreshSplitTextAnimations;
 
     /* scrolling_effect
   -------------------------------------------------------------------------*/
@@ -271,7 +305,7 @@ gsap.registerPlugin(ScrollTrigger);
     };
 
     $(function () {
-        animation_text();
+        refreshSplitTextAnimations();
         scrolling_effect();
         stackElement();
         animationFooter();
