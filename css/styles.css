@@ -3225,16 +3225,16 @@ form textarea {
   color: var(--Text-primary);
 }
 .dark-mode .portfolio-item {
-  background-image: radial-gradient(
+  background: radial-gradient(
       120% 90% at 18% -5%,
-      rgba(69, 231, 123, 0.12) 0%,
-      rgba(69, 231, 123, 0) 60%
+      rgba(69, 231, 123, 0.16) 0%,
+      rgba(69, 231, 123, 0.04) 44%,
+      rgba(69, 231, 123, 0) 74%
     ),
-    linear-gradient(180deg, rgba(7, 11, 12, 0.86) 0%, rgba(6, 9, 10, 0.96) 100%),
-    url(../images/item/bg-portfolio-dark.png);
-  background-repeat: no-repeat, no-repeat, no-repeat;
-  background-size: cover, cover, cover;
-  background-position: center, center, center;
+    linear-gradient(165deg, rgba(255, 255, 255, 0.96) 0%, rgba(244, 255, 249, 0.92) 100%);
+  border-color: rgba(28, 36, 51, 0.08);
+  border-top-color: rgba(255, 255, 255, 0.88);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.68), 0px 12px 28px rgba(28, 36, 51, 0.12);
 }
 .dark-mode .service-item .btn-arrow {
   --Bg-linear-2: #f8f7f4;
@@ -4699,18 +4699,19 @@ ANIMATION AREA CSS
 .portfolio-item {
   --portfolio-tilt-x: 0deg;
   --portfolio-tilt-y: 0deg;
-  background-image: radial-gradient(
+  background: radial-gradient(
       120% 90% at 18% -5%,
-      rgba(69, 231, 123, 0.12) 0%,
-      rgba(69, 231, 123, 0) 60%
+      rgba(69, 231, 123, 0.28) 0%,
+      rgba(69, 231, 123, 0.12) 42%,
+      rgba(69, 231, 123, 0.02) 66%,
+      rgba(69, 231, 123, 0) 80%
     ),
-    linear-gradient(180deg, rgba(7, 11, 12, 0.86) 0%, rgba(6, 9, 10, 0.96) 100%),
-    url(../images/item/bg-portfolio-dark.png);
-  background-repeat: no-repeat, no-repeat, no-repeat;
-  background-size: cover, cover, cover;
-  background-position: center, center, center;
-  border-top: 1px solid rgba(255, 255, 255, 0.1019607843);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0px 5px 5px 0px rgba(28, 36, 51, 0.1019607843);
+    linear-gradient(170deg, rgba(252, 255, 253, 0.18) 0%, rgba(228, 250, 239, 0.12) 100%),
+    var(--Bg-linear-2);
+  border: 1px solid transparent;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0px 8px 16px 0px rgba(28, 36, 51, 0.12);
+  backdrop-filter: blur(12px);
   padding: 28px 15px;
   border-radius: 40px;
   position: relative;
