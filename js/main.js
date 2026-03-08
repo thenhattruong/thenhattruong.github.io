@@ -1214,12 +1214,39 @@
             impactX = impactPoint.impactX;
             impactY = impactPoint.impactY;
             let titleImpactDent = null;
+            let titleTypewriterChars = null;
             if (titleElement) {
                 const titleInner =
                     titleElement.querySelector(".intro-center-title__inner") || titleElement;
                 const titleChars = Array.from(
                     titleElement.querySelectorAll(".intro-center-title__char:not(.is-space)")
                 );
+                const titleNameChars = Array.from(
+                    titleElement.querySelectorAll(
+                        ".intro-center-title__line--name .intro-center-title__char:not(.is-space)"
+                    )
+                );
+                const titleRoleChars = Array.from(
+                    titleElement.querySelectorAll(
+                        ".intro-center-title__line--role .intro-center-title__char:not(.is-space)"
+                    )
+                );
+
+                if (titleChars.length) {
+                    window.gsap.set(titleChars, {
+                        autoAlpha: 0,
+                        y: (_, el) =>
+                            el.closest(".intro-center-title__line--role") ? 8 : 12,
+                        filter: "blur(6px)",
+                    });
+                }
+
+                if (titleNameChars.length || titleRoleChars.length) {
+                    titleTypewriterChars = {
+                        name: titleNameChars,
+                        role: titleRoleChars,
+                    };
+                }
 
                 if (titleInner && titleChars.length) {
                     const titleRect = titleInner.getBoundingClientRect();
@@ -1296,6 +1323,44 @@
                     resolve();
                 },
             });
+
+            if (titleTypewriterChars) {
+                if (titleTypewriterChars.name.length) {
+                    introTimeline.to(
+                        titleTypewriterChars.name,
+                        {
+                            autoAlpha: 1,
+                            y: 0,
+                            filter: "blur(0px)",
+                            duration: 0.28,
+                            ease: "power2.out",
+                            stagger: {
+                                each: 0.026,
+                                from: "start",
+                            },
+                        },
+                        0.05
+                    );
+                }
+
+                if (titleTypewriterChars.role.length) {
+                    introTimeline.to(
+                        titleTypewriterChars.role,
+                        {
+                            autoAlpha: 1,
+                            y: 0,
+                            filter: "blur(0px)",
+                            duration: 0.24,
+                            ease: "power2.out",
+                            stagger: {
+                                each: 0.02,
+                                from: "start",
+                            },
+                        },
+                        0.42
+                    );
+                }
+            }
 
             if (titleImpactDent) {
                 const dentHits = [
@@ -1995,50 +2060,50 @@
             let userBarIntroPromise = null;
             let userBarVisiblePromise = Promise.resolve();
             const prepareUserBarNameFill = (nameElement) => {
-            if (!(nameElement instanceof Element)) {
-                return { allChars: [], solidChars: [] };
-            }
+                if (!(nameElement instanceof Element)) {
+                    return { allChars: [], solidChars: [] };
+                }
 
-            let sourceText = nameElement.dataset.fillSourceText;
-            if (!sourceText) {
-                sourceText = (nameElement.textContent || "").trim();
-                nameElement.dataset.fillSourceText = sourceText;
-            }
+                let sourceText = nameElement.dataset.fillSourceText;
+                if (!sourceText) {
+                    sourceText = (nameElement.textContent || "").trim();
+                    nameElement.dataset.fillSourceText = sourceText;
+                }
 
-            const existingChars = nameElement.querySelectorAll(
-                ".userbar-name-fill__char"
-            );
-            if (!existingChars.length) {
-                const wrap = document.createElement("span");
-                wrap.className = "userbar-name-fill";
+                const existingChars = nameElement.querySelectorAll(
+                    ".userbar-name-fill__char"
+                );
+                if (!existingChars.length) {
+                    const wrap = document.createElement("span");
+                    wrap.className = "userbar-name-fill";
 
-                Array.from(sourceText).forEach((char) => {
-                    const charSpan = document.createElement("span");
-                    charSpan.className = "userbar-name-fill__char";
-                    if (char === " ") {
-                        charSpan.classList.add("is-space");
-                        charSpan.textContent = "\u00A0";
-                    } else {
-                        charSpan.textContent = char;
-                    }
-                    wrap.appendChild(charSpan);
-                });
+                    Array.from(sourceText).forEach((char) => {
+                        const charSpan = document.createElement("span");
+                        charSpan.className = "userbar-name-fill__char";
+                        if (char === " ") {
+                            charSpan.classList.add("is-space");
+                            charSpan.textContent = "\u00A0";
+                        } else {
+                            charSpan.textContent = char;
+                        }
+                        wrap.appendChild(charSpan);
+                    });
 
-                nameElement.textContent = "";
-                nameElement.appendChild(wrap);
-            }
+                    nameElement.textContent = "";
+                    nameElement.appendChild(wrap);
+                }
 
-            const allChars = Array.from(
-                nameElement.querySelectorAll(".userbar-name-fill__char")
-            );
-            const solidChars = allChars.filter(
-                (charElement) => !charElement.classList.contains("is-space")
-            );
-            return { allChars, solidChars };
-        };
+                const allChars = Array.from(
+                    nameElement.querySelectorAll(".userbar-name-fill__char")
+                );
+                const solidChars = allChars.filter(
+                    (charElement) => !charElement.classList.contains("is-space")
+                );
+                return { allChars, solidChars };
+            };
 
-        const startUserBarIntro = () => {
-            if (userBarIntroPromise) return userBarIntroPromise;
+            const startUserBarIntro = () => {
+                if (userBarIntroPromise) return userBarIntroPromise;
 
             if (hasGsap && !prefersReducedMotion) {
                 userBarVisiblePromise = new Promise((resolveVisible) => {
@@ -2066,27 +2131,12 @@
 
                     if (userBarNameChars.length) {
                         window.gsap.set(userBarNameChars, {
-                            autoAlpha: 0.14,
-                            y: 12,
-                            scale: 0.82,
+                            autoAlpha: 0,
+                            y: 11,
+                            scale: 0.84,
                             filter: "blur(8px)",
+                            textShadow: "0 0 0 rgba(69, 231, 123, 0)",
                         });
-                        introTimeline.to(
-                            userBarNameChars,
-                            {
-                                autoAlpha: 0.32,
-                                y: 7,
-                                scale: 0.9,
-                                filter: "blur(4px)",
-                                duration: 0.2,
-                                ease: "power2.out",
-                                stagger: {
-                                    each: 0.014,
-                                    from: "start",
-                                },
-                            },
-                            0.03
-                        );
                     }
 
                     if (centerIntroTitle) {
@@ -2190,52 +2240,41 @@
                                 0.2
                             );
 
-                            introTimeline.to(
-                                userBarNameChars,
-                                {
-                                    autoAlpha: 1,
-                                    y: 0,
-                                    scale: 1,
-                                    filter: "blur(0px)",
-                                    duration: 0.28,
-                                    ease: "back.out(1.8)",
-                                    stagger: {
-                                        each: 0.03,
-                                        from: "start",
+                            userBarNameChars.forEach((charElement, index) => {
+                                const charRevealStart = 0.34 + index * 0.036;
+                                introTimeline.to(
+                                    charElement,
+                                    {
+                                        autoAlpha: 1,
+                                        y: 0,
+                                        scale: 1.02,
+                                        filter: "blur(0px)",
+                                        textShadow:
+                                            "0 0 14px rgba(69, 231, 123, 0.72), 0 0 24px rgba(69, 231, 123, 0.34)",
+                                        duration: 0.14,
+                                        ease: "power2.out",
                                     },
-                                },
-                                0.34
-                            );
+                                    charRevealStart
+                                );
+                                introTimeline.to(
+                                    charElement,
+                                    {
+                                        scale: 1,
+                                        textShadow: "0 0 0 rgba(69, 231, 123, 0)",
+                                        duration: 0.14,
+                                        ease: "power1.out",
+                                    },
+                                    charRevealStart + 0.14
+                                );
+                            });
 
+                            const typingEndTime =
+                                0.62 + Math.max(userBarNameChars.length - 1, 0) * 0.036;
                             introTimeline.call(
                                 () => {
-                                    userBarName.classList.add("is-fill-hit");
-                                },
-                                null,
-                                0.48
-                            );
-                            introTimeline.to(
-                                userBarNameChars,
-                                {
-                                    textShadow:
-                                        "0 0 16px rgba(69, 231, 123, 0.72), 0 0 28px rgba(69, 231, 123, 0.34)",
-                                    duration: 0.22,
-                                    ease: "power2.out",
-                                    yoyo: true,
-                                    repeat: 1,
-                                    stagger: {
-                                        each: 0.028,
-                                        from: "start",
-                                    },
-                                },
-                                0.44
-                            );
-                            introTimeline.call(
-                                () => {
-                                    userBarName.classList.remove("is-fill-hit");
                                     window.gsap.set(userBarNameChars, {
                                         clearProps:
-                                            "opacity,visibility,transform,filter,textShadow",
+                                            "opacity,visibility,transform,filter,textShadow,scale",
                                     });
                                     window.gsap.set(userBarName, {
                                         clearProps:
@@ -2243,7 +2282,7 @@
                                     });
                                 },
                                 null,
-                                1.22
+                                typingEndTime + 0.18
                             );
                         } else {
                             introTimeline.to(

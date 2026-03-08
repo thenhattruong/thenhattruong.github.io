@@ -3167,7 +3167,33 @@ form textarea {
   border: 1px solid #e5e7eb;
 }
 .dark-mode .body-overlay {
-  display: none !important;
+  display: block !important;
+  opacity: 1;
+}
+.dark-mode .body-overlay.video-overlay .bg-video {
+  display: none;
+}
+.dark-mode .body-overlay .bg-shape {
+  background: #ffffff;
+}
+.dark-mode .body-overlay .bg-shape::before {
+  background: repeating-linear-gradient(
+      to right,
+      rgba(69, 231, 123, 0.32) 0 1px,
+      transparent 1px 76px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(69, 231, 123, 0.32) 0 1px,
+      transparent 1px 76px
+    );
+  inset: -8% -10% -6%;
+  transform: perspective(1200px) rotateX(68deg) scale(1.28);
+  opacity: 0.76;
+  z-index: 2;
+}
+.dark-mode .body-overlay .bg-shape::after {
+  display: none;
 }
 .dark-mode body,
 .dark-mode #wrapper,
