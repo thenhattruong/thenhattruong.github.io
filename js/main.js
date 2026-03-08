@@ -2315,6 +2315,118 @@
         }
     };
 
+    /* handleEmailPopup
+  -------------------------------------------------------------------------*/
+    const handleEmailPopup = () => {
+        const $popup = $("#email-popup");
+        const $trigger = $(".js-open-email-popup");
+        const $status = $popup.find(".email-popup__status");
+        if (!$popup.length || !$trigger.length) return;
+
+        const $body = $("body");
+        let lastFocusedElement = null;
+
+        const setStatus = (message) => {
+            if ($status.length) {
+                $status.text(message || "");
+            }
+        };
+
+        const fallbackCopyEmail = (emailAddress) => {
+            const input = document.createElement("input");
+            input.type = "text";
+            input.value = emailAddress;
+            input.setAttribute("readonly", "");
+            input.style.position = "absolute";
+            input.style.left = "-9999px";
+            document.body.appendChild(input);
+            input.select();
+            const copied = document.execCommand("copy");
+            document.body.removeChild(input);
+            return copied;
+        };
+
+        const copyEmail = async (emailAddress) => {
+            if (!emailAddress) return false;
+
+            if (navigator.clipboard && window.isSecureContext) {
+                try {
+                    await navigator.clipboard.writeText(emailAddress);
+                    return true;
+                } catch (error) {
+                    return fallbackCopyEmail(emailAddress);
+                }
+            }
+
+            return fallbackCopyEmail(emailAddress);
+        };
+
+        const openPopup = () => {
+            lastFocusedElement = document.activeElement;
+            setStatus("");
+            $popup.addClass("is-open").attr("aria-hidden", "false");
+            $body.addClass("email-popup-open");
+
+            const $focusTarget = $popup
+                .find("[data-open-gmail], [data-copy-email], [data-close-email-popup]")
+                .filter(":visible")
+                .first();
+
+            if ($focusTarget.length) {
+                setTimeout(() => {
+                    $focusTarget.trigger("focus");
+                }, 50);
+            }
+        };
+
+        const closePopup = () => {
+            if (!$popup.hasClass("is-open")) return;
+
+            $popup.removeClass("is-open").attr("aria-hidden", "true");
+            $body.removeClass("email-popup-open");
+
+            if (
+                lastFocusedElement &&
+                typeof lastFocusedElement.focus === "function"
+            ) {
+                lastFocusedElement.focus();
+            }
+        };
+
+        $trigger.on("click", function (e) {
+            e.preventDefault();
+            openPopup();
+        });
+
+        $popup.on("click", "[data-close-email-popup]", function (e) {
+            e.preventDefault();
+            closePopup();
+        });
+
+        $popup.on("click", "[data-open-gmail]", function () {
+            closePopup();
+        });
+
+        $popup.on("click", "[data-copy-email]", async function (e) {
+            e.preventDefault();
+            const emailAddress = $(this).data("email-address");
+            const isCopied = await copyEmail(emailAddress);
+            setStatus(
+                isCopied
+                    ? "Email copied to clipboard."
+                    : "Could not copy email. Please copy it manually."
+            );
+        });
+
+        $(document)
+            .off("keydown.handleEmailPopup")
+            .on("keydown.handleEmailPopup", function (e) {
+                if (e.key === "Escape") {
+                    closePopup();
+                }
+            });
+    };
+
     /* handleContactModal
   -------------------------------------------------------------------------*/
     const handleContactModal = () => {
@@ -2498,6 +2610,7 @@
         runOrderedIntroSequence().catch((error) => {
             console.error("runOrderedIntroSequence failed:", error);
         });
+        handleEmailPopup();
         handleContactModal();
         handleSidebar();
     });

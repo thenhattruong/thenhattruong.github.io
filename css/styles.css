@@ -4990,8 +4990,7 @@ ANIMATION AREA CSS
 #premium-plan .list-check li i {
   display: none;
 }
-#standard-plan .list-check li::before,
-#premium-plan .list-check li::before {
+#standard-plan .list-check li::before {
   content: "";
   position: absolute;
   left: 0;
@@ -5002,6 +5001,28 @@ ANIMATION AREA CSS
   background: #45e77b;
   box-shadow: 0 0 0 2px rgba(69, 231, 123, 0.18), 0 0 12px rgba(69, 231, 123, 0.5);
   transform: translateY(-50%);
+}
+#premium-plan .list-check li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #6c34fa;
+  box-shadow: 0 0 0 2px rgba(108, 52, 250, 0.24), 0 0 12px rgba(108, 52, 250, 0.48), 0 0 20px rgba(108, 52, 250, 0.32);
+  animation: premium-plan-dot-glow 1.8s ease-in-out infinite;
+  transform: translateY(-50%);
+}
+@keyframes premium-plan-dot-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px rgba(108, 52, 250, 0.24), 0 0 12px rgba(108, 52, 250, 0.48), 0 0 20px rgba(108, 52, 250, 0.32);
+  }
+  50% {
+    box-shadow: 0 0 0 3px rgba(108, 52, 250, 0.36), 0 0 18px rgba(108, 52, 250, 0.62), 0 0 28px rgba(108, 52, 250, 0.44);
+  }
 }
 .pricing-item .item-shape {
   position: absolute;
@@ -5634,6 +5655,31 @@ ANIMATION AREA CSS
 .section-contact.style-1 .contact-row {
   align-items: flex-start;
 }
+.section-contact.style-1 .heading-section {
+  --contact-equal-gap: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--contact-equal-gap);
+}
+.section-contact.style-1 .heading-section .tag-heading,
+.section-contact.style-1 .heading-section .title {
+  margin-bottom: 0;
+}
+.section-contact.style-1 .heading-section .title,
+.section-contact.style-1 .heading-section .heading-title {
+  display: flex;
+  flex-direction: column;
+  gap: var(--contact-equal-gap);
+}
+.section-contact.style-1 .heading-section .heading-title > div,
+.section-contact.style-1 .heading-section .heading-title h4,
+.section-contact.style-1 .heading-section .heading-title .list-icon {
+  margin: 0;
+}
+.section-contact.style-1 .heading-section .title h3 {
+  margin: 0;
+  line-height: 1.2;
+}
 .quick-contact-floating {
   --quick-contact-shadow-base: 0 14px 34px rgba(0, 0, 0, 0.3);
   position: fixed;
@@ -5793,6 +5839,108 @@ ANIMATION AREA CSS
 body.contact-modal-open {
   overflow: hidden;
 }
+.email-popup {
+  position: fixed;
+  inset: 0;
+  z-index: 1250;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+.email-popup.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+.email-popup__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+}
+.email-popup__dialog {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 380px);
+  padding: 28px 22px 20px;
+  border-radius: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--Bg-linear-2);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+}
+.email-popup__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--Text-light);
+  font-size: 28px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.25s ease, transform 0.25s ease;
+}
+.email-popup__close:hover,
+.email-popup__close:focus-visible {
+  color: var(--Primary);
+  transform: scale(1.04);
+}
+.email-popup__title {
+  margin: 0 0 8px;
+  font-size: 22px;
+  color: var(--Text-light);
+}
+.email-popup__address {
+  margin: 0 0 18px;
+  color: var(--Text-secondary);
+  word-break: break-word;
+}
+.email-popup__actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+.email-popup__btn {
+  width: 100%;
+  min-height: 42px;
+  border: none;
+  border-radius: 12px;
+  color: var(--Text-light);
+  background: linear-gradient(123.51deg, rgba(215, 237, 237, 0.12) -61.8%, rgba(204, 235, 235, 0.03) 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+}
+.email-popup__btn:hover,
+.email-popup__btn:focus-visible {
+  color: var(--Primary);
+  transform: translateY(-1px);
+  box-shadow: 0 0 18px rgba(69, 231, 123, 0.32);
+}
+.email-popup__btn--primary {
+  color: var(--Primary);
+}
+.email-popup__status {
+  min-height: 20px;
+  margin: 12px 0 0;
+  color: var(--Text-secondary);
+  font-size: 14px;
+}
+body.email-popup-open {
+  overflow: hidden;
+}
 @media (max-width: 767px) {
   .contact-modal {
     padding: 14px;
@@ -5806,6 +5954,13 @@ body.contact-modal-open {
   .contact-modal__close {
     right: 10px;
     top: 10px;
+  }
+  .email-popup__dialog {
+    width: min(100%, 340px);
+    padding: 24px 16px 18px;
+  }
+  .email-popup__title {
+    font-size: 20px;
   }
 }
 

@@ -214,9 +214,8 @@
                                 </div>
                                 <ul class="list-icon d-flex justify-content-center">
                                     <li><a href="https://www.facebook.com/TTN.Use/" class="icon-Facebook"></a></li>
-                                    <li> <a href="" class="icon-Behance"></a></li>
-                                    <li><a href="#" class="icon-Zalo"></a></li>
-                                    <li><a href="#" class="icon-LinkedIn"></a></li>
+                                    <li><a href="https://mail.google.com/mail/?view=cm&fs=1&to=thenhattruong%40gmail.com" target="_blank" rel="noopener noreferrer" class="icon-EnvelopeSimple js-open-email-popup"></a></li>
+                                    <li><a href="https://zalo.me/0973883053" target="_blank" rel="noopener noreferrer" class="icon-Zalo"></a></li>
                                 </ul>
                             </div>
                         </div>
@@ -877,9 +876,8 @@
                                     </div>
                                     <ul class="list-icon d-flex">
                                         <li><a href="https://www.facebook.com/TTN.Use/" class="icon-Facebook"></a></li>
-                                        <li> <a href="" class="icon-Behance"></a></li>
-                                        <li><a href="#" class="icon-Zalo"></a></li>
-                                        <li><a href="#" class="icon-LinkedIn"></a></li>
+                                        <li><a href="https://mail.google.com/mail/?view=cm&fs=1&to=thenhattruong%40gmail.com" target="_blank" rel="noopener noreferrer" class="icon-EnvelopeSimple js-open-email-popup"></a></li>
+                                        <li><a href="https://zalo.me/0973883053" target="_blank" rel="noopener noreferrer" class="icon-Zalo"></a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -937,13 +935,13 @@
                             </a>
                         </li>
                         <li>
-                            <a class="quick-contact-link" href="mailto:thenhattruong@gmail.com"
-                                aria-label="Email" title="Email">
+                            <a class="quick-contact-link js-open-email-popup" href="https://mail.google.com/mail/?view=cm&fs=1&to=thenhattruong%40gmail.com"
+                                target="_blank" rel="noopener noreferrer" aria-label="Email" title="Email">
                                 <i class="icon-EnvelopeSimple"></i>
                             </a>
                         </li>
                         <li>
-                            <a class="quick-contact-link" href="#" aria-label="Zalo" title="Zalo">
+                            <a class="quick-contact-link" href="https://zalo.me/0973883053" target="_blank" rel="noopener noreferrer" aria-label="Zalo" title="Zalo">
                                 <i class="icon-Zalo"></i>
                             </a>
                         </li>
@@ -973,6 +971,24 @@
             <button type="button" class="contact-modal__close" aria-label="Close contact form"
                 data-close-contact-modal>&times;</button>
             <div class="contact-modal__content"></div>
+        </div>
+    </div>
+
+    <div class="email-popup" id="email-popup" aria-hidden="true">
+        <div class="email-popup__backdrop" data-close-email-popup></div>
+        <div class="email-popup__dialog" role="dialog" aria-modal="true" aria-label="Email options">
+            <button type="button" class="email-popup__close" aria-label="Close email popup"
+                data-close-email-popup>&times;</button>
+            <p class="email-popup__title">Contact Via Gmail</p>
+            <p class="email-popup__address">thenhattruong@gmail.com</p>
+            <div class="email-popup__actions">
+                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=thenhattruong%40gmail.com"
+                    target="_blank" rel="noopener noreferrer" class="email-popup__btn email-popup__btn--primary"
+                    data-open-gmail>Open Gmail</a>
+                <button type="button" class="email-popup__btn" data-copy-email
+                    data-email-address="thenhattruong@gmail.com">Copy Email</button>
+            </div>
+            <p class="email-popup__status" aria-live="polite"></p>
         </div>
     </div>
 
