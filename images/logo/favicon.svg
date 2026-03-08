@@ -1,12 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="TN logo">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="TN professional logo">
   <defs>
-    <linearGradient id="tnGradient" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#00A3FF"/>
-      <stop offset="1" stop-color="#00E0B8"/>
+    <linearGradient id="tnProGreen" x1="8" y1="10" x2="56" y2="54" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#34D399"/>
+      <stop offset="1" stop-color="#15803D"/>
     </linearGradient>
   </defs>
-  <rect x="4" y="4" width="56" height="56" rx="14" fill="#0D1324"/>
-  <rect x="4" y="4" width="56" height="56" rx="14" stroke="url(#tnGradient)" stroke-width="2"/>
-  <path d="M19 20H45V26H35V45H29V26H19V20Z" fill="url(#tnGradient)"/>
-  <path d="M19 45V29H24L39 40V29H45V45H40L25 34V45H19Z" fill="#FFFFFF"/>
+  <path d="M8 13H38V22H27V51H18V22H8V13Z" fill="url(#tnProGreen)"/>
+  <path d="M34 51V13H43L54 33V13H56V51H47L36 31V51H34Z" fill="url(#tnProGreen)"/>
 </svg>

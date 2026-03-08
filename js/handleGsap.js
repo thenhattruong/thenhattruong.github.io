@@ -244,6 +244,7 @@ gsap.registerPlugin(ScrollTrigger);
         ScrollTrigger.refresh();
     };
 
+    window.clearSplitTextAnimations = clearSplitTextAnimations;
     window.refreshSplitTextAnimations = refreshSplitTextAnimations;
 
     /* scrolling_effect

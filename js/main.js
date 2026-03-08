@@ -176,6 +176,11 @@
         if (!$toggle.length) return;
 
         const LANG_KEY = "siteLanguage";
+        const lockedTerms = {
+            profileRole: "Multimedia Design",
+            aboutTitle: "Designing Visual Experiences",
+            hireMe: "Hire Me",
+        };
         const translations = {
             en: {
                 "menu.demos": "Demos",
@@ -652,12 +657,13 @@
             setText(".user-bar .box-author .info .name", profileName);
             setTextAll(
                 ".header-sidebar .box .info .text-label, .user-bar .box-author .info .text-label",
-                content.profileRole
+                lockedTerms.profileRole
             );
-            setTextAll(".js-open-contact-modal [data-i18n='cta.hire_me']", content.hireMe);
+            setTextAll(".js-open-contact-modal [data-i18n='cta.hire_me']", lockedTerms.hireMe);
 
             setText("#about .heading-section .tag-heading", content.aboutTag);
-            renderAboutTitleWords(content.aboutTitle);
+            setTextAll("#about [data-i18n='about.role_word_1']", lockedTerms.profileRole);
+            renderAboutTitleWords(lockedTerms.aboutTitle);
             setText("#about > p.text_muted-color", content.aboutDescription);
             setTextList("#about .wrap-counter .counter-item .text-body-1", content.aboutCounters);
 
@@ -727,9 +733,17 @@
             const normalizedLang = lang === "vi" ? "vi" : "en";
             const dictionary = translations[normalizedLang];
 
+            if (typeof window.clearSplitTextAnimations === "function") {
+                window.clearSplitTextAnimations();
+            }
+
             $("[data-i18n]").each(function () {
                 const key = $(this).data("i18n");
-                if (key === "about.title") {
+                if (
+                    key === "about.title" ||
+                    key === "about.role_word_1" ||
+                    key === "cta.hire_me"
+                ) {
                     return;
                 }
                 if (dictionary[key]) {

@@ -3236,6 +3236,10 @@ form textarea {
   border-top-color: rgba(255, 255, 255, 0.88);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.68), 0px 12px 28px rgba(28, 36, 51, 0.12);
 }
+.dark-mode .about-title-follow,
+.dark-mode .about-title-follow .about-title-word {
+  color: var(--Primary);
+}
 .dark-mode .service-item .btn-arrow {
   --Bg-linear-2: #f8f7f4;
   --Text-primary: #121212;
