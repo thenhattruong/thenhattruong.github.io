@@ -23,7 +23,7 @@
     <link rel="stylesheet" type="text/css" href="css/swiper-bundle.min.css">
     <link rel="stylesheet" type="text/css" href="css/animateText.css">
     <link rel="stylesheet" type="text/css" href="css/jquery.fancybox.min.css">
-    <link rel="stylesheet" type="text/css" href="css/styles.css?v=20260309-2">
+    <link rel="stylesheet" type="text/css" href="css/styles.css?v=20260309-12">
 
     <!-- Font -->
     <link rel="stylesheet" href="font/fonts.css">
@@ -32,9 +32,9 @@
     <link rel="stylesheet" type="text/css" href="icons/icomoon/style.css">
 
     <!-- Favicon and Touch Icons -->
-    <link rel="icon" type="image/svg+xml" href="images/logo/favicon-tn.svg?v=20260308-pro">
-    <link rel="shortcut icon" href="images/logo/favicon-tn.svg?v=20260308-pro">
-    <link rel="apple-touch-icon" sizes="180x180" href="images/logo/apple-touch-icon.png?v=20260308">
+    <link rel="icon" type="image/png" href="images/logo/logo-web.png?v=20260309-2">
+    <link rel="shortcut icon" href="images/logo/logo-web.png?v=20260309-2">
+    <link rel="apple-touch-icon" href="images/logo/logo-web.png?v=20260309-2">
 </head>
 
 <body data-language="en">
@@ -54,9 +54,9 @@
             <div class="tf-container">
                 <div class="header-sidebar style-1">
                     <div class="box">
-                        <div class="avatar">
+                        <div class="avatar avatar-no-ring">
                             <a href="#about" class="nav_link avatar-link" aria-label="Go to About section">
-                                <img src="images/user/avatar-2.webp" width="68" height="68" alt="avatar">
+                                <img src="images/user/avatar-2-custom.png" width="68" height="68" alt="TN avatar">
                             </a>
                         </div>
                         <div class="info">
@@ -207,7 +207,7 @@
                                             class="text-label text-uppercase fw-6 text_primary-color font-3 mb_16 letter-spacing-1">
                                             Multimedia Design</div>
                                         <a href="mailto:thenhattruong@gmail.com"
-                                            class="hover-underline-link text_white text-body-2 mb_4">thenhattruong@gmail.com</a>
+                                            class="hover-underline-link text_white text-body-2 mb_4 js-open-email-popup">thenhattruong@gmail.com</a>
                                         <p class="text-caption-2 text_secondary-color font-3">TP. Ho Chi Minh
                                         </p>
                                     </div>
@@ -478,60 +478,62 @@
                     </div>
                     <div class="tabs-content-wrap tf-grid-layout xl-col-2">
                         <div class="portfolio-item">
-                            <a href="images/user/portfolio-item-1-1.webp" data-fancybox="gallery" class="img-style">
-                                <img decoding="async" loading="lazy" src="images/user/portfolio-item-1-1.webp"
-                                    srcset="images/user/portfolio-item-1-1.webp 582w"
-                                    sizes="(max-width: 582px) 100vw, 582px" width="582" height="388" alt="portfolio">
+                            <a href="#project-video-modal" class="img-style js-open-project-video-modal"
+                                data-video-src="video/video-editing-marketing-results.mp4"
+                                data-video-poster="images/user/video-editing-thumbnail.jpg"
+                                data-video-label="Video Editing project">
+                                <img decoding="async" loading="lazy" src="images/user/video-editing-thumbnail.jpg"
+                                    width="582" height="388" alt="Video Editing project thumbnail">
                                 <div class="tag font-3 text-label text-uppercase fw-6 letter-spacing-1">
-                                    Brand Promotion Video
+                                    Promotion Video
                                 </div>
                             </a>
-                            <h5 class=" title font-4 text_white"><a href="#" class="link">VIDEO EDITING</a>
+                            <h5 class=" title font-4 text_white"><a href="#project-video-modal" class="link">VIDEO EDITING</a>
                             </h5>
                             <div class="item-shape">
                                 <img src="images/item/small-comet.webp" loading="lazy" decoding="async" alt="item">
                             </div>
                         </div>
                         <div class="portfolio-item">
-                            <a href="images/user/portfolio-item-3-1.webp" data-fancybox="gallery" class="img-style">
-                                <img decoding="async" loading="lazy" src="images/user/portfolio-item-3-1.webp"
-                                    srcset="images/user/portfolio-item-3-1.webp 582w"
-                                    sizes="(max-width: 582px) 100vw, 582px" width="582" height="388" alt="portfolio">
+                            <a href="#project-video-modal" class="img-style js-open-project-video-modal"
+                                data-video-src="video/motion-graphics.mp4"
+                                data-video-poster="images/user/motion-graphics-cover.jpg"
+                                data-video-label="Motion Graphics video">
+                                <img decoding="async" loading="lazy" src="images/user/motion-graphics-cover.jpg"
+                                    width="582" height="388" alt="Motion Graphics project cover">
                                 <div class="tag font-3 text-label text-uppercase fw-6 letter-spacing-1">
                                     Animated Social Media Ads
                                 </div>
                             </a>
-                            <h5 class=" title font-4 text_white"> <a href="#" class="link">MOTION GRAPHICS</a>
+                            <h5 class=" title font-4 text_white"> <a href="#project-video-modal" class="link">MOTION GRAPHICS</a>
                             </h5>
                             <div class="item-shape">
                                 <img src="images/item/small-comet.webp" loading="lazy" decoding="async" alt="item">
                             </div>
                         </div>
                         <div class="portfolio-item">
-                            <a href="images/user/portfolio-item-2-1.webp" data-fancybox="gallery" class="img-style">
-                                <img decoding="async" loading="lazy" src="images/user/portfolio-item-2-1.webp"
-                                    srcset="images/user/portfolio-item-2-1.webp 582w"
-                                    sizes="(max-width: 582px) 100vw, 582px" width="582" height="388" alt="portfolio">
+                            <a href="images/user/branding-design-card.jpg" data-fancybox="gallery" class="img-style">
+                                <img decoding="async" loading="lazy" src="images/user/branding-design-card.jpg"
+                                    width="582" height="388" alt="Branding design project cover">
                                 <div class="tag font-3 text-label text-uppercase fw-6 letter-spacing-1">
-                                    Marketing Poster Series
-                                </div>
-                            </a>
-                            <h5 class=" title font-4 text_white"> <a href="#" class="link">GRAPHIC DESIGN</a></h5>
-                            <div class="item-shape">
-                                <img src="images/item/small-comet.webp" loading="lazy" decoding="async" alt="item">
-                            </div>
-                        </div>
-                        <div class="portfolio-item">
-                            <a href="images/user/portfolio-item-4-1.webp" data-fancybox="gallery" class="img-style">
-                                <img decoding="async" loading="lazy" src="images/user/portfolio-item-4-1.webp"
-                                    srcset="images/user/portfolio-item-4-1.webp 582w"
-                                    sizes="(max-width: 582px) 100vw, 582px" width="582" height="388" alt="portfolio">
-                                <div class="tag font-3 text-label text-uppercase fw-6 letter-spacing-1">
-                                   Brand Identity & Visual Kit
+                                   Marketing Poster Series
                                 </div>
                             </a>
                             <h5 class=" title font-4 text_white"> <a href="#" class="link">BRANDING DESIGN</a>
                             </h5>
+                            <div class="item-shape">
+                                <img src="images/item/small-comet.webp" loading="lazy" decoding="async" alt="item">
+                            </div>
+                        </div>
+                        <div class="portfolio-item">
+                            <a href="images/user/graphic-design-card.jpg" data-fancybox="gallery" class="img-style">
+                                <img decoding="async" loading="lazy" src="images/user/graphic-design-card.jpg"
+                                    width="582" height="388" alt="Graphic design project cover">
+                                <div class="tag font-3 text-label text-uppercase fw-6 letter-spacing-1">
+                                    Brand Identity & Visual Kit
+                                </div>
+                            </a>
+                            <h5 class=" title font-4 text_white"> <a href="#" class="link">GRAPHIC DESIGN</a></h5>
                             <div class="item-shape">
                                 <img src="images/item/small-comet.webp" loading="lazy" decoding="async" alt="item">
                             </div>
@@ -871,8 +873,8 @@
                                 </div>
                                 <div class="heading-title">
                                     <div class="mb_12">
-                                        <h4 class="text_white fw-4 mb_4"><a href="#"
-                                                class="hover-underline-link link">thenhattruong@gmail.com</a></h4>
+                                        <h4 class="text_white fw-4 mb_4"><a href="mailto:thenhattruong@gmail.com"
+                                                class="hover-underline-link link js-open-email-popup">thenhattruong@gmail.com</a></h4>
                                     </div>
                                     <ul class="list-icon d-flex">
                                         <li><a href="https://www.facebook.com/TTN.Use/" class="icon-Facebook"></a></li>
@@ -989,6 +991,22 @@
                     data-email-address="thenhattruong@gmail.com">Copy Email</button>
             </div>
             <p class="email-popup__status" aria-live="polite"></p>
+        </div>
+    </div>
+
+    <div class="project-video-modal" id="project-video-modal" aria-hidden="true">
+        <a href="#portfolio" class="project-video-modal__backdrop" aria-label="Close project video"
+            data-close-project-video></a>
+        <div class="project-video-modal__dialog" role="dialog" aria-modal="true" aria-label="Project video">
+            <a href="#portfolio" class="project-video-modal__close" aria-label="Close project video"
+                data-close-project-video>&times;</a>
+            <div class="project-video-modal__frame">
+                <video class="project-video-modal__video" controls playsinline preload="metadata"
+                    poster="images/user/video-editing-thumbnail.jpg">
+                    <source src="video/video-editing-marketing-results.mp4" type="video/mp4">
+                    Your browser does not support HTML5 video.
+                </video>
+            </div>
         </div>
     </div>
 
@@ -1148,7 +1166,7 @@
     <script src="js/counter.js"></script>
     <script src="js/textanimation.js"></script>
     <script src="js/jquery.fancybox.js"></script>
-    <script src="js/main.js?v=20260309-2"></script>
+    <script src="js/main.js?v=20260309-23"></script>
     <!-- /Javascript -->
 
 

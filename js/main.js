@@ -338,7 +338,7 @@
                 portfolioTag: "Portfolio",
                 portfolioHeading: "Featured Projects",
                 portfolioTags: [
-                    "Brand Promotion Video",
+                    "Promotion Video",
                     "Animated Social Media Ads",
                     "Marketing Poster Series",
                     "Brand Identity & Visual Kit",
@@ -346,8 +346,8 @@
                 portfolioCategories: [
                     "VIDEO EDITING",
                     "MOTION GRAPHICS",
-                    "GRAPHIC DESIGN",
                     "BRANDING DESIGN",
+                    "GRAPHIC DESIGN",
                 ],
                 testimonialTag: "Testimonials",
                 testimonialHeading: "Trusted By Clients",
@@ -455,14 +455,14 @@
                 portfolioTags: [
                     "Video quảng bá thương hiệu",
                     "Quảng cáo mạng xã hội dạng hoạt họa",
-                    "Bộ poster marketing",
                     "Nhận diện thương hiệu & bộ visual",
+                    "Bộ poster marketing",
                 ],
                 portfolioCategories: [
                     "DỰNG VIDEO",
                     "MOTION GRAPHICS",
-                    "THIẾT KẾ ĐỒ HỌA",
                     "THIẾT KẾ THƯƠNG HIỆU",
+                    "THIẾT KẾ ĐỒ HỌA",
                 ],
                 testimonialTag: "Đánh giá",
                 testimonialHeading: "Được khách hàng tin tưởng",
@@ -1126,6 +1126,7 @@
 
             const avatar = headerSidebar.querySelector(".box .avatar");
             const info = headerSidebar.querySelector(".box .info");
+            const avatarHasNoRing = avatar?.classList.contains("avatar-no-ring");
             const navItems = Array.from(
                 headerSidebar.querySelectorAll(".nav-menu.style-1 > li")
             ).filter((item) => window.getComputedStyle(item).display !== "none");
@@ -1145,7 +1146,6 @@
             const avatarRadius = avatarRect.height / 2;
             const finalX = avatarRect.left + avatarRect.width / 2;
             const finalY = avatarRect.top + avatarRect.height / 2;
-            const startY = -Math.max(window.innerHeight * 0.3, 260);
             let impactX = window.innerWidth / 2;
             let impactY = window.innerHeight / 2;
 
@@ -1167,22 +1167,33 @@
                     };
                 }
 
-                const titleStyles = window.getComputedStyle(titleBox);
-                const borderTopWidth =
-                    parseFloat(titleStyles.borderTopWidth || "0") || 0;
-                const borderCenterY = titleRect.top + borderTopWidth * 0.5;
-                const titleCenterX = titleRect.left + titleRect.width / 2;
+                const impactTarget =
+                    titleElement.querySelector(".intro-center-title__line--name") ||
+                    titleBox;
+                const impactRect = impactTarget.getBoundingClientRect();
+                const targetRect =
+                    impactRect.width && impactRect.height ? impactRect : titleRect;
+                const titleCenterX = targetRect.left + targetRect.width / 2;
+                const impactLineY =
+                    targetRect.top + targetRect.height * (impactTarget === titleBox ? 0.34 : 0.58);
 
                 return {
                     impactX: titleCenterX,
-                    // Bottom of the avatar touches the top border center of the title box.
-                    impactY: borderCenterY - avatarRadius,
+                    // The avatar lands into the title block instead of hovering above it.
+                    impactY: impactLineY - avatarRadius,
                 };
             };
 
             const avatarGhost = avatar.cloneNode(true);
             avatarGhost.classList.remove("avatar-final-flash");
             avatarGhost.classList.add("header-avatar-ghost");
+            avatarGhost.classList.add("avatar-bounce-plain");
+            const avatarBounceTail = document.createElement("span");
+            avatarBounceTail.className = "avatar-bounce-tail";
+            avatarGhost.appendChild(avatarBounceTail);
+            if (avatarHasNoRing) {
+                avatarGhost.classList.add("avatar-entrance-vfx");
+            }
             document.body.appendChild(avatarGhost);
             avatarGhost.classList.add("is-rolling");
 
@@ -1194,6 +1205,20 @@
                 if (hasNotifiedAvatarRollDone) return;
                 hasNotifiedAvatarRollDone = true;
                 if (onAvatarRollDone) onAvatarRollDone();
+            };
+            let avatarNoRingRevealTimeout = null;
+            const playAvatarNoRingReveal = () => {
+                if (!avatarHasNoRing) return;
+                if (avatarNoRingRevealTimeout) {
+                    window.clearTimeout(avatarNoRingRevealTimeout);
+                }
+                avatar.classList.remove("avatar-no-ring-reveal");
+                void avatar.offsetWidth;
+                avatar.classList.add("avatar-no-ring-reveal");
+                avatarNoRingRevealTimeout = window.setTimeout(() => {
+                    avatar.classList.remove("avatar-no-ring-reveal");
+                    avatarNoRingRevealTimeout = null;
+                }, 820);
             };
 
             window.gsap.set(headerSidebar, {
@@ -1211,8 +1236,26 @@
                 });
             }
             const impactPoint = resolveTitleImpact();
-            impactX = impactPoint.impactX;
-            impactY = impactPoint.impactY;
+            const viewportMotionInset = Math.max(
+                14,
+                Math.min(28, avatarRadius * 0.45)
+            );
+            const motionRadius = avatarRadius * 1.22;
+            const viewportMinX = motionRadius + viewportMotionInset;
+            const viewportMaxX =
+                window.innerWidth - motionRadius - viewportMotionInset;
+            const viewportMinY = motionRadius + viewportMotionInset;
+            const viewportMaxY =
+                window.innerHeight - motionRadius - viewportMotionInset;
+            const clampViewportX = (value) =>
+                Math.max(viewportMinX, Math.min(viewportMaxX, value));
+            const clampViewportY = (value) =>
+                Math.max(viewportMinY, Math.min(viewportMaxY, value));
+
+            impactX = clampViewportX(impactPoint.impactX);
+            impactY = clampViewportY(impactPoint.impactY);
+            const motionFinalX = clampViewportX(finalX);
+            const motionFinalY = clampViewportY(finalY);
             let titleImpactDent = null;
             let titleTypewriterChars = null;
             if (titleElement) {
@@ -1231,6 +1274,12 @@
                         ".intro-center-title__line--role .intro-center-title__char:not(.is-space)"
                     )
                 );
+
+                window.gsap.set(titleInner, {
+                    "--intro-title-impact-glow": 0,
+                    transformOrigin: "50% 24%",
+                    force3D: true,
+                });
 
                 if (titleChars.length) {
                     window.gsap.set(titleChars, {
@@ -1280,17 +1329,126 @@
                     };
                 }
             }
-            window.gsap.set(avatarGhost, {
-                autoAlpha: 1,
+            const impactSplash = document.createElement("div");
+            impactSplash.className = "intro-impact-splash";
+            impactSplash.innerHTML = `
+                <span class="intro-impact-splash__core"></span>
+                <span class="intro-impact-splash__ring"></span>
+                <span class="intro-impact-splash__spark intro-impact-splash__spark--line" data-dx="-78" data-dy="-12" data-rotation="194"></span>
+                <span class="intro-impact-splash__spark" data-dx="-52" data-dy="-40" data-rotation="224"></span>
+                <span class="intro-impact-splash__spark" data-dx="-24" data-dy="-60" data-rotation="252"></span>
+                <span class="intro-impact-splash__spark intro-impact-splash__spark--line" data-dx="64" data-dy="-24" data-rotation="334"></span>
+                <span class="intro-impact-splash__spark" data-dx="74" data-dy="-6" data-rotation="8"></span>
+                <span class="intro-impact-splash__spark" data-dx="38" data-dy="18" data-rotation="26"></span>
+                <span class="intro-impact-splash__spark" data-dx="-42" data-dy="16" data-rotation="162"></span>
+            `;
+            document.body.appendChild(impactSplash);
+
+            const impactSplashCore = impactSplash.querySelector(
+                ".intro-impact-splash__core"
+            );
+            const impactSplashRing = impactSplash.querySelector(
+                ".intro-impact-splash__ring"
+            );
+            const impactSplashSparks = Array.from(
+                impactSplash.querySelectorAll(".intro-impact-splash__spark")
+            );
+            const avatarFinalBounce = avatarHasNoRing ? 12 : 8;
+            const avatarStartY = -(motionRadius + viewportMotionInset + 12);
+            const avatarArcLift = Math.max(
+                104,
+                Math.min(182, Math.abs(impactY - motionFinalY) * 0.34 + 56)
+            );
+            const avatarArcMidX = clampViewportX(
+                impactX + (motionFinalX - impactX) * 0.56
+            );
+            const avatarArcPeakY = clampViewportY(
+                Math.min(impactY, motionFinalY) - avatarArcLift
+            );
+            const avatarArcLandingY = clampViewportY(
+                motionFinalY + avatarFinalBounce
+            );
+
+            window.gsap.set(impactSplash, {
+                autoAlpha: 0,
                 left: impactX,
-                top: startY,
+                top: impactY,
                 xPercent: -50,
                 yPercent: -50,
-                rotation: 0,
-                scale: 0.9,
-                filter: "blur(0px)",
-                transformOrigin: "50% 50%",
+                scale: 0.42,
+                force3D: true,
             });
+            if (impactSplashCore) {
+                window.gsap.set(impactSplashCore, {
+                    autoAlpha: 0,
+                    scale: 0.16,
+                    transformOrigin: "50% 50%",
+                    force3D: true,
+                });
+            }
+            if (impactSplashRing) {
+                window.gsap.set(impactSplashRing, {
+                    autoAlpha: 0,
+                    scale: 0.34,
+                    transformOrigin: "50% 50%",
+                    force3D: true,
+                });
+            }
+            impactSplashSparks.forEach((spark) => {
+                const isLineSpark = spark.classList.contains(
+                    "intro-impact-splash__spark--line"
+                );
+                window.gsap.set(spark, {
+                    autoAlpha: 0,
+                    x: 0,
+                    y: 0,
+                    scaleX: isLineSpark ? 0.18 : 0.24,
+                    scaleY: isLineSpark ? 1 : 0.24,
+                    rotation: parseFloat(spark.dataset.rotation || "0"),
+                    transformOrigin: isLineSpark ? "0% 50%" : "50% 50%",
+                    force3D: true,
+                });
+            });
+            window.gsap.set(avatarGhost, {
+                autoAlpha: avatarHasNoRing ? 0 : 1,
+                left: impactX,
+                top: impactY,
+                xPercent: -50,
+                yPercent: -50,
+                x: 0,
+                y: avatarStartY - impactY,
+                rotation: avatarHasNoRing ? -18 : -12,
+                scaleX: avatarHasNoRing ? 0.84 : 0.92,
+                scaleY: avatarHasNoRing ? 0.84 : 0.92,
+                filter: avatarHasNoRing ? "blur(14px)" : "blur(0px)",
+                transformOrigin: "50% 50%",
+                force3D: true,
+                "--avatar-tail-opacity": 0,
+                "--avatar-tail-length": "36px",
+                "--avatar-tail-thickness": "12px",
+                "--avatar-tail-rotation": "0deg",
+                "--avatar-tail-blur": "8px",
+                "--avatar-tail-flare-opacity": 0,
+                "--avatar-tail-flare-scale": 0.78,
+            });
+            if (avatarHasNoRing) {
+                window.gsap.set(avatarGhost, {
+                    "--avatar-no-ring-aura-opacity": 0,
+                    "--avatar-no-ring-aura-scale": 0.38,
+                    "--avatar-no-ring-ring-opacity": 0,
+                    "--avatar-no-ring-ring-scale": 0.68,
+                    "--avatar-no-ring-streak-opacity": 0,
+                    "--avatar-no-ring-streak-shift": "-48px",
+                    "--avatar-no-ring-flare-opacity": 0,
+                    "--avatar-no-ring-flare-scale": 0.72,
+                    "--avatar-no-ring-image-scale": 0.78,
+                    "--avatar-no-ring-image-y": "8px",
+                    "--avatar-no-ring-image-brightness": 1.18,
+                    "--avatar-no-ring-image-saturate": 1.14,
+                    "--avatar-no-ring-image-shadow-alpha": 0,
+                    "--avatar-no-ring-tilt": "-16deg",
+                });
+            }
             window.gsap.set(navItems, {
                 autoAlpha: 0,
                 y: 18,
@@ -1312,17 +1470,30 @@
                     avatar.style.visibility = "";
                     avatarGhost.classList.remove("is-rolling");
                     avatarGhost.remove();
+                    impactSplash.remove();
+                    playAvatarNoRingReveal();
 
                     window.gsap.set(
                         [headerSidebar, avatarGhost, ...navItems, ...revealTargets],
                         {
                             clearProps:
-                                "x,y,opacity,visibility,scale,filter,clipPath,rotation,transformOrigin,left,top,xPercent,yPercent",
+                                "x,y,opacity,visibility,scale,scaleX,scaleY,filter,clipPath,rotation,transformOrigin,left,top,xPercent,yPercent",
                         }
                     );
                     resolve();
                 },
             });
+
+            const titleNameStart = 0.05;
+            const titleNameDuration = 0.28;
+            const titleNameStaggerEach = 0.026;
+            const titleRoleStart = 0.32;
+            const titleRoleDuration = 0.24;
+            const titleRoleStaggerEach = 0.02;
+            const getStaggerRevealEnd = (start, duration, count, staggerEach) =>
+                count > 0
+                    ? start + duration + Math.max(0, count - 1) * staggerEach
+                    : 0;
 
             if (titleTypewriterChars) {
                 if (titleTypewriterChars.name.length) {
@@ -1332,14 +1503,14 @@
                             autoAlpha: 1,
                             y: 0,
                             filter: "blur(0px)",
-                            duration: 0.28,
+                            duration: titleNameDuration,
                             ease: "power2.out",
                             stagger: {
-                                each: 0.026,
+                                each: titleNameStaggerEach,
                                 from: "start",
                             },
                         },
-                        0.05
+                        titleNameStart
                     );
                 }
 
@@ -1350,191 +1521,426 @@
                             autoAlpha: 1,
                             y: 0,
                             filter: "blur(0px)",
-                            duration: 0.24,
+                            duration: titleRoleDuration,
                             ease: "power2.out",
                             stagger: {
-                                each: 0.02,
+                                each: titleRoleStaggerEach,
                                 from: "start",
                             },
                         },
-                        0.42
+                        titleRoleStart
                     );
                 }
             }
 
-            if (titleImpactDent) {
-                const dentHits = [
-                    { time: 0.76, strength: 1, recover: 0.24 },
-                    { time: 1.28, strength: 0.72, recover: 0.2 },
-                    { time: 1.66, strength: 0.54, recover: 0.18 },
-                ];
+            const titleRevealStartTime = titleTypewriterChars
+                ? Math.min(
+                      titleTypewriterChars.name.length ? titleNameStart : Infinity,
+                      titleTypewriterChars.role.length ? titleRoleStart : Infinity
+                  )
+                : 0;
+            const titleRevealEndTime = titleTypewriterChars
+                ? Math.max(
+                      getStaggerRevealEnd(
+                          titleNameStart,
+                          titleNameDuration,
+                          titleTypewriterChars.name.length,
+                          titleNameStaggerEach
+                      ),
+                      getStaggerRevealEnd(
+                          titleRoleStart,
+                          titleRoleDuration,
+                          titleTypewriterChars.role.length,
+                          titleRoleStaggerEach
+                      )
+                  )
+                : 0;
+            const titleRevealHalfTime = titleTypewriterChars
+                ? titleRevealStartTime +
+                  (titleRevealEndTime - titleRevealStartTime) * 0.5
+                : 0;
+            const avatarAppearAdvance = 0.5;
+            const avatarMaterializeLead = 0.12;
+            const avatarMaterializeStart = titleTypewriterChars
+                ? Math.max(0, titleRevealHalfTime - avatarAppearAdvance)
+                : 0.12;
+            const avatarDropStart = avatarMaterializeStart + avatarMaterializeLead;
+            const avatarDropDuration = 0.58;
+            const avatarMaterializeDuration = avatarHasNoRing ? 0.24 : 0.16;
+            const impactTime = avatarDropStart + avatarDropDuration;
+            const titleCompressDuration = 0.1;
+            const titleRecoverDuration = 0.42;
+            const avatarArcStart = impactTime + 0.04;
+            const avatarArcRiseDuration = 0.28;
+            const avatarArcDropDuration = avatarHasNoRing ? 0.34 : 0.32;
+            const avatarArcTravelDuration =
+                avatarArcRiseDuration + avatarArcDropDuration;
+            const avatarFinalSettleDuration = 0.18;
+            const avatarArcEndTime =
+                avatarArcStart +
+                avatarArcTravelDuration +
+                avatarFinalSettleDuration;
+            const avatarArcProgress = { value: 0 };
+            const setAvatarParabolaPosition = (progress) => {
+                const t = Math.max(0, Math.min(1, progress));
+                const inverseT = 1 - t;
+                const nextX =
+                    inverseT * inverseT * impactX +
+                    2 * inverseT * t * avatarArcMidX +
+                    t * t * motionFinalX;
+                const nextY =
+                    inverseT * inverseT * impactY +
+                    2 * inverseT * t * avatarArcPeakY +
+                    t * t * avatarArcLandingY;
+                const velocityX =
+                    2 * inverseT * (avatarArcMidX - impactX) +
+                    2 * t * (motionFinalX - avatarArcMidX);
+                const velocityY =
+                    2 * inverseT * (avatarArcPeakY - impactY) +
+                    2 * t * (avatarArcLandingY - avatarArcPeakY);
+                const tailAngle =
+                    (Math.atan2(velocityY, velocityX) * 180) / Math.PI;
+                const tailSpeed = Math.hypot(velocityX, velocityY);
+                const tailEnergy = Math.max(
+                    0,
+                    Math.min(1, tailSpeed / 280)
+                );
+                const tailEnvelope = Math.sin(t * Math.PI);
+                const tailOpacity = tailEnvelope * (0.16 + tailEnergy * 0.58);
+                const tailLength = 34 + tailEnergy * 34;
+                const tailThickness = 10 + tailEnergy * 6;
+                const tailBlur = 7 + tailEnergy * 4;
+                const tailFlareOpacity = tailEnvelope * (0.12 + tailEnergy * 0.34);
+                const tailFlareScale = 0.76 + tailEnergy * 0.36;
 
-                dentHits.forEach((hit) => {
-                    const compressDuration = 0.1;
-                    const recoverStart = hit.time + compressDuration;
-
-                    introTimeline
-                        .to(
-                            titleImpactDent.titleInner,
-                            {
-                                y: 3.5 * hit.strength,
-                                scaleX: 1 + 0.015 * hit.strength,
-                                scaleY: 1 - 0.055 * hit.strength,
-                                duration: compressDuration,
-                                ease: "power2.out",
-                            },
-                            hit.time
-                        )
-                        .to(
-                            titleImpactDent.titleChars,
-                            {
-                                y: (_, el) =>
-                                    parseFloat(el.dataset.impactDentY || "0") *
-                                    hit.strength,
-                                rotation: (_, el) =>
-                                    parseFloat(
-                                        el.dataset.impactDentTilt || "0"
-                                    ) * hit.strength,
-                                duration: compressDuration,
-                                ease: "power2.out",
-                                stagger: {
-                                    each: 0.003,
-                                    from: "center",
-                                },
-                            },
-                            hit.time
-                        )
-                        .to(
-                            titleImpactDent.titleChars,
-                            {
-                                y: 0,
-                                rotation: 0,
-                                duration: hit.recover,
-                                ease: "power3.out",
-                                stagger: {
-                                    each: 0.003,
-                                    from: "center",
-                                },
-                            },
-                            recoverStart
-                        )
-                        .to(
-                            titleImpactDent.titleInner,
-                            {
-                                y: 0,
-                                scaleX: 1,
-                                scaleY: 1,
-                                duration: hit.recover,
-                                ease: "power3.out",
-                            },
-                            recoverStart
-                        );
+                window.gsap.set(avatarGhost, {
+                    left: clampViewportX(nextX),
+                    top: clampViewportY(nextY),
+                    "--avatar-tail-opacity": tailOpacity,
+                    "--avatar-tail-length": `${tailLength}px`,
+                    "--avatar-tail-thickness": `${tailThickness}px`,
+                    "--avatar-tail-rotation": `${tailAngle}deg`,
+                    "--avatar-tail-blur": `${tailBlur}px`,
+                    "--avatar-tail-flare-opacity": tailFlareOpacity,
+                    "--avatar-tail-flare-scale": tailFlareScale,
                 });
+            };
+
+            if (titleImpactDent) {
+                introTimeline
+                    .to(
+                        titleImpactDent.titleInner,
+                        {
+                            y: 9,
+                            scaleX: 1.04,
+                            scaleY: 0.84,
+                            "--intro-title-impact-glow": 1,
+                            duration: titleCompressDuration,
+                            ease: "power2.out",
+                        },
+                        impactTime
+                    )
+                    .to(
+                        titleImpactDent.titleChars,
+                        {
+                            y: (_, el) =>
+                                parseFloat(el.dataset.impactDentY || "0") * 1.18,
+                            rotation: (_, el) =>
+                                parseFloat(el.dataset.impactDentTilt || "0") * 1.14,
+                            duration: titleCompressDuration,
+                            ease: "power2.out",
+                            stagger: {
+                                each: 0.0025,
+                                from: "center",
+                            },
+                        },
+                        impactTime
+                    )
+                    .to(
+                        titleImpactDent.titleChars,
+                        {
+                            y: 0,
+                            rotation: 0,
+                            duration: titleRecoverDuration,
+                            ease: "elastic.out(1, 0.48)",
+                            stagger: {
+                                each: 0.0025,
+                                from: "center",
+                            },
+                        },
+                        impactTime + titleCompressDuration
+                    )
+                    .to(
+                        titleImpactDent.titleInner,
+                        {
+                            y: 0,
+                            scaleX: 1,
+                            scaleY: 1,
+                            "--intro-title-impact-glow": 0,
+                            duration: titleRecoverDuration + 0.04,
+                            ease: "elastic.out(1, 0.44)",
+                        },
+                        impactTime + titleCompressDuration
+                    );
             }
 
-            introTimeline
-                .to(
-                    avatarGhost,
+            introTimeline.set(
+                impactSplash,
+                {
+                    autoAlpha: 1,
+                },
+                impactTime - 0.01
+            );
+
+            if (impactSplashCore) {
+                introTimeline
+                    .to(
+                        impactSplashCore,
+                        {
+                            autoAlpha: 0.94,
+                            scale: 1.12,
+                            duration: 0.08,
+                            ease: "power2.out",
+                            force3D: true,
+                        },
+                        impactTime - 0.01
+                    )
+                    .to(
+                        impactSplashCore,
+                        {
+                            autoAlpha: 0,
+                            scale: 2.2,
+                            duration: 0.24,
+                            ease: "power2.out",
+                            force3D: true,
+                        },
+                        impactTime + 0.07
+                    );
+            }
+
+            if (impactSplashRing) {
+                introTimeline.set(
+                    impactSplashRing,
                     {
-                        top: impactY,
-                        scaleX: 1.2,
-                        scaleY: 0.76,
-                        duration: 0.8,
-                        ease: "power2.in",
+                        autoAlpha: 0.78,
+                        scale: 0.48,
                     },
-                    0
-                )
-                .to(
-                    avatarGhost,
-                    {
-                        top: impactY - 124,
-                        scaleX: 0.88,
-                        scaleY: 1.14,
-                        duration: 0.34,
-                        ease: "power2.out",
-                    },
-                    0.8
+                    impactTime - 0.01
                 );
 
-            introTimeline
-                .to(
-                    avatarGhost,
+                introTimeline.to(
+                    impactSplashRing,
                     {
-                        top: impactY + 24,
-                        scaleX: 1.16,
-                        scaleY: 0.84,
-                        duration: 0.22,
-                        ease: "power2.inOut",
+                        autoAlpha: 0,
+                        scale: 1.84,
+                        duration: 0.32,
+                        ease: "power2.out",
+                        force3D: true,
                     },
-                    1.14
-                )
-                .to(
+                    impactTime
+                );
+            }
+
+            impactSplashSparks.forEach((spark, index) => {
+                const dx = parseFloat(spark.dataset.dx || "0");
+                const dy = parseFloat(spark.dataset.dy || "0");
+                const isLineSpark = spark.classList.contains(
+                    "intro-impact-splash__spark--line"
+                );
+
+                introTimeline.set(
+                    spark,
+                    {
+                        autoAlpha: isLineSpark ? 0.86 : 0.94,
+                    },
+                    impactTime - 0.01 + index * 0.006
+                );
+
+                introTimeline.to(
+                    spark,
+                    {
+                        autoAlpha: 0,
+                        x: dx,
+                        y: dy,
+                        scaleX: isLineSpark ? 1.16 : 0.05,
+                        scaleY: isLineSpark ? 1 : 0.05,
+                        duration: isLineSpark ? 0.26 : 0.3,
+                        ease: "power2.out",
+                        force3D: true,
+                    },
+                    impactTime + index * 0.008
+                );
+            });
+
+            introTimeline.to(
+                impactSplash,
+                {
+                    autoAlpha: 0,
+                    scale: 0.94,
+                    duration: 0.16,
+                    ease: "power1.out",
+                    force3D: true,
+                },
+                impactTime + 0.22
+            );
+
+            introTimeline.to(
+                avatarGhost,
+                {
+                    autoAlpha: 1,
+                    filter: "blur(0px)",
+                    duration: avatarMaterializeDuration,
+                    ease: "power2.out",
+                    force3D: true,
+                },
+                avatarMaterializeStart
+            );
+
+            introTimeline.to(
+                avatarGhost,
+                {
+                    y: 0,
+                    rotation: avatarHasNoRing ? 3 : 1,
+                    scaleX: 1.18,
+                    scaleY: 0.82,
+                    duration: avatarDropDuration,
+                    ease: "power4.in",
+                    force3D: true,
+                },
+                avatarDropStart
+            );
+
+            introTimeline.to(
+                avatarArcProgress,
+                {
+                    value: 1,
+                    duration: avatarArcTravelDuration,
+                    ease: "none",
+                    onUpdate: () =>
+                        setAvatarParabolaPosition(avatarArcProgress.value),
+                },
+                avatarArcStart
+            );
+
+            introTimeline.to(
+                avatarGhost,
+                {
+                    rotation: avatarHasNoRing ? -6 : -4,
+                    scaleX: 0.96,
+                    scaleY: 1.06,
+                    duration: avatarArcRiseDuration,
+                    ease: "power2.out",
+                    force3D: true,
+                },
+                avatarArcStart
+            );
+
+            introTimeline.to(
+                avatarGhost,
+                {
+                    rotation: 0,
+                    scaleX: 1.08,
+                    scaleY: 0.92,
+                    duration: avatarArcDropDuration,
+                    ease: "power2.in",
+                    force3D: true,
+                },
+                avatarArcStart + avatarArcRiseDuration
+            );
+
+            introTimeline.to(
+                avatarGhost,
+                {
+                    left: motionFinalX,
+                    top: motionFinalY,
+                    scaleX: 1,
+                    scaleY: 1,
+                    duration: avatarFinalSettleDuration,
+                    ease: "back.out(2.1)",
+                    force3D: true,
+                },
+                avatarArcStart + avatarArcTravelDuration
+            );
+
+            if (avatarHasNoRing) {
+                introTimeline.to(
                     avatarGhost,
                     {
-                        top: impactY - 56,
-                        scaleX: 0.94,
-                        scaleY: 1.08,
-                        duration: 0.18,
+                        "--avatar-no-ring-aura-opacity": 0,
+                        "--avatar-no-ring-aura-scale": 0.82,
+                        "--avatar-no-ring-ring-opacity": 0,
+                        "--avatar-no-ring-ring-scale": 0.88,
+                        "--avatar-no-ring-streak-opacity": 0,
+                        "--avatar-no-ring-streak-shift": "0px",
+                        "--avatar-no-ring-flare-opacity": 0,
+                        "--avatar-no-ring-flare-scale": 0.88,
+                        "--avatar-no-ring-image-scale": 0.92,
+                        "--avatar-no-ring-image-y": "2px",
+                        "--avatar-no-ring-image-brightness": 1.1,
+                        "--avatar-no-ring-image-saturate": 1.1,
+                        "--avatar-no-ring-image-shadow-alpha": 0,
+                        "--avatar-no-ring-tilt": "0deg",
+                        duration: avatarMaterializeDuration,
                         ease: "power2.out",
                     },
-                    1.36
-                )
-                .to(
-                    avatarGhost,
-                    {
-                        top: impactY,
-                        scaleX: 1,
-                        scaleY: 1,
-                        duration: 0.14,
-                        ease: "power1.out",
-                    },
-                    1.54
-                )
-                .to(
-                    avatarGhost,
-                    {
-                        left: finalX,
-                        top: finalY - 74,
-                        rotation: -990,
-                        duration: 0.94,
-                        ease: "power2.inOut",
-                    },
-                    1.62
-                )
-                .to(
-                    avatarGhost,
-                    {
-                        top: finalY + 20,
-                        scaleX: 1.12,
-                        scaleY: 0.9,
-                        duration: 0.22,
-                        ease: "power2.in",
-                    },
-                    2.56
-                )
-                .to(
-                    avatarGhost,
-                    {
-                        top: finalY - 14,
-                        scaleX: 0.96,
-                        scaleY: 1.05,
-                        duration: 0.15,
-                        ease: "power1.out",
-                    },
-                    2.78
-                )
-                .to(
-                    avatarGhost,
-                    {
-                        top: finalY,
-                        scaleX: 1,
-                        scaleY: 1,
-                        rotation: -1080,
-                        duration: 0.16,
-                        ease: "power1.out",
-                    },
-                    2.93
+                    avatarMaterializeStart
                 );
+
+                introTimeline.to(
+                    avatarGhost,
+                    {
+                        "--avatar-no-ring-aura-opacity": 0,
+                        "--avatar-no-ring-aura-scale": 0.9,
+                        "--avatar-no-ring-ring-opacity": 0,
+                        "--avatar-no-ring-ring-scale": 0.94,
+                        "--avatar-no-ring-streak-opacity": 0,
+                        "--avatar-no-ring-streak-shift": "0px",
+                        "--avatar-no-ring-flare-opacity": 0,
+                        "--avatar-no-ring-flare-scale": 0.92,
+                        "--avatar-no-ring-image-scale": 1,
+                        "--avatar-no-ring-image-y": "0px",
+                        "--avatar-no-ring-image-brightness": 1.18,
+                        "--avatar-no-ring-image-saturate": 1.16,
+                        "--avatar-no-ring-image-shadow-alpha": 0,
+                        "--avatar-no-ring-tilt": "0deg",
+                        duration: avatarArcRiseDuration,
+                        ease: "power2.out",
+                    },
+                    impactTime
+                );
+
+                introTimeline.to(
+                    avatarGhost,
+                    {
+                        "--avatar-no-ring-aura-opacity": 0,
+                        "--avatar-no-ring-aura-scale": 0.88,
+                        "--avatar-no-ring-ring-opacity": 0,
+                        "--avatar-no-ring-ring-scale": 1.18,
+                        "--avatar-no-ring-streak-opacity": 0,
+                        "--avatar-no-ring-streak-shift": "8px",
+                        "--avatar-no-ring-flare-opacity": 0,
+                        "--avatar-no-ring-flare-scale": 0.96,
+                        "--avatar-no-ring-image-scale": 0.9,
+                        "--avatar-no-ring-image-y": "1px",
+                        "--avatar-no-ring-image-brightness": 1.02,
+                        "--avatar-no-ring-image-saturate": 1.02,
+                        "--avatar-no-ring-image-shadow-alpha": 0,
+                        "--avatar-no-ring-tilt": "0deg",
+                        duration:
+                            avatarArcDropDuration + avatarFinalSettleDuration,
+                        ease: "power1.out",
+                    },
+                    avatarArcStart + avatarArcRiseDuration
+                );
+            }
+
+            let avatarMotionEndTime = avatarArcEndTime;
+
+            const avatarRollDoneTime = avatarMotionEndTime + 0.02;
+            const sidebarRevealStart = avatarRollDoneTime + 0.04;
+            const avatarFlashTime = sidebarRevealStart + 0.02;
+            const revealTargetsStart = sidebarRevealStart + 0.26;
+            const navItemsStart = sidebarRevealStart + 0.3;
 
             introTimeline
                 .call(
@@ -1543,7 +1949,7 @@
                         avatarGhost.classList.remove("is-rolling");
                     },
                     null,
-                    3.11
+                    avatarRollDoneTime
                 )
                 .to(
                     headerSidebar,
@@ -1552,16 +1958,18 @@
                         duration: 1.18,
                         ease: "power2.out",
                     },
-                    3.15
+                    sidebarRevealStart
                 )
                 .call(
                     () => {
-                        avatar.classList.remove("avatar-final-flash");
-                        void avatar.offsetWidth;
-                        avatar.classList.add("avatar-final-flash");
+                        if (!avatarHasNoRing) {
+                            avatar.classList.remove("avatar-final-flash");
+                            void avatar.offsetWidth;
+                            avatar.classList.add("avatar-final-flash");
+                        }
                     },
                     null,
-                    3.17
+                    avatarFlashTime
                 )
                 .to(
                     revealTargets,
@@ -1572,7 +1980,7 @@
                         duration: 0.46,
                         stagger: 0.08,
                     },
-                    3.41
+                    revealTargetsStart
                 )
                 .to(
                     navItems,
@@ -1583,7 +1991,7 @@
                         duration: 0.52,
                         stagger: 0.08,
                     },
-                    3.45
+                    navItemsStart
                 );
         });
     };
@@ -1654,7 +2062,7 @@
 
         cards.forEach((card, index) => {
             const dir = index % 2 === 0 ? -1 : 1;
-            const img = card.querySelector(".img-style img");
+            const media = card.querySelector(".img-style img, .img-style video");
             const tag = card.querySelector(".tag");
             const title = card.querySelector(".title");
             const imgWrap = card.querySelector(".img-style");
@@ -1702,9 +2110,9 @@
                 revealAt
             );
 
-            if (img) {
+            if (media) {
                 timeline.fromTo(
-                    img,
+                    media,
                     {
                         scale: 1.24,
                         rotation: dir * 2.4,
@@ -1795,7 +2203,11 @@
                     clearProps: "transform,opacity,visibility,filter",
                 });
                 window.gsap.set(
-                    cards.map((card) => card.querySelector(".img-style img")).filter(Boolean),
+                    cards
+                        .map((card) =>
+                            card.querySelector(".img-style img, .img-style video")
+                        )
+                        .filter(Boolean),
                     {
                         clearProps: "transform,filter",
                     }
@@ -1872,6 +2284,171 @@
                 $userBar.data("touchGlowBound", "true");
             }
         });
+    };
+
+    const handlePortfolioPopupLinks = () => {
+        const $items = $("#portfolio .portfolio-item");
+        if (!$items.length) return;
+
+        $items.each(function () {
+            const $item = $(this);
+            const $mediaLink = $item
+                .find(".img-style[data-fancybox], .img-style.js-open-project-video-modal")
+                .first();
+            const $titleLink = $item.find(".title .link").first();
+
+            if (!$mediaLink.length || !$titleLink.length) return;
+
+            const mediaHref = $mediaLink.attr("href");
+            if (
+                mediaHref &&
+                (!$titleLink.attr("href") || $titleLink.attr("href") === "#")
+            ) {
+                $titleLink.attr("href", mediaHref);
+            }
+
+            $titleLink
+                .off("click.handlePortfolioPopup")
+                .on("click.handlePortfolioPopup", function (e) {
+                    e.preventDefault();
+                    $mediaLink.trigger("click");
+                });
+        });
+    };
+
+    const handleProjectVideoModal = () => {
+        const $modal = $("#project-video-modal");
+        const $triggers = $(".js-open-project-video-modal");
+        const $video = $modal.find(".project-video-modal__video").first();
+        const $videoSource = $video.find("source").first();
+        const $dialog = $modal.find(".project-video-modal__dialog").first();
+        if (
+            !$modal.length ||
+            !$triggers.length ||
+            !$video.length ||
+            !$videoSource.length ||
+            !$dialog.length
+        ) {
+            return;
+        }
+
+        const $body = $("body");
+        const defaultLabel = $dialog.attr("aria-label") || "Project video";
+        let lastFocusedElement = null;
+
+        const resetVideo = () => {
+            const videoElement = $video.get(0);
+            if (!videoElement) return;
+
+            videoElement.pause();
+            try {
+                videoElement.currentTime = 0;
+            } catch (_error) {
+                // Some browsers block currentTime changes until metadata is ready.
+            }
+        };
+
+        const configureVideo = ($trigger) => {
+            const source = $trigger.attr("data-video-src");
+            const poster = $trigger.attr("data-video-poster") || "";
+            const label = $trigger.attr("data-video-label") || defaultLabel;
+            const videoElement = $video.get(0);
+            const sourceElement = $videoSource.get(0);
+
+            if (!videoElement || !sourceElement || !source) return;
+
+            if ((sourceElement.getAttribute("src") || "") !== source) {
+                sourceElement.setAttribute("src", source);
+                videoElement.load();
+            }
+
+            if (poster) {
+                videoElement.setAttribute("poster", poster);
+            } else {
+                videoElement.removeAttribute("poster");
+            }
+
+            $dialog.attr("aria-label", label);
+        };
+
+        const openModal = ($trigger) => {
+            lastFocusedElement = document.activeElement;
+            configureVideo($trigger);
+            $modal.addClass("is-open").attr("aria-hidden", "false");
+            $body.addClass("project-video-modal-open");
+
+            const videoElement = $video.get(0);
+            if (!videoElement) return;
+
+            setTimeout(() => {
+                try {
+                    videoElement.currentTime = 0;
+                } catch (_error) {
+                    // Ignore metadata timing issues and continue opening the modal.
+                }
+
+                const playResult = videoElement.play();
+                if (playResult && typeof playResult.catch === "function") {
+                    playResult.catch(() => {});
+                }
+            }, 60);
+        };
+
+        const closeModal = () => {
+            if (!$modal.hasClass("is-open")) return;
+
+            $modal.removeClass("is-open").attr("aria-hidden", "true");
+            $body.removeClass("project-video-modal-open");
+            resetVideo();
+
+            if (
+                lastFocusedElement &&
+                typeof lastFocusedElement.focus === "function"
+            ) {
+                lastFocusedElement.focus();
+            }
+        };
+
+        $triggers
+            .off("click.handleProjectVideoModal")
+            .on("click.handleProjectVideoModal", function (e) {
+                e.preventDefault();
+                openModal($(this));
+            });
+
+        $modal
+            .off("click.handleProjectVideoModal", "[data-close-project-video]")
+            .on("click.handleProjectVideoModal", "[data-close-project-video]", function (e) {
+                e.preventDefault();
+                closeModal();
+            });
+
+        $(document)
+            .off("keydown.handleProjectVideoModal")
+            .on("keydown.handleProjectVideoModal", function (e) {
+                if (e.key === "Escape") {
+                    closeModal();
+                }
+            });
+    };
+
+    /* lockUserBarScrollOnHover
+  -------------------------------------------------------------------------*/
+    const lockUserBarScrollOnHover = () => {
+        const userBar = document.querySelector(
+            ".main-content.style-fullwidth .user-bar.style-1"
+        );
+        if (!userBar || userBar.dataset.scrollLockBound === "true") return;
+
+        userBar.addEventListener(
+            "wheel",
+            (event) => {
+                event.preventDefault();
+            },
+            { passive: false }
+        );
+
+        userBar.dataset.scrollLockBound = "true";
     };
 
     /* handleAboutIntroSequence
@@ -2714,9 +3291,12 @@
         switchMode();
         switchLanguage();
         oneNavOnePage();
+        lockUserBarScrollOnHover();
         handleEffectSpotlight();
         handleCounterTouchEffect();
         handleFeaturedProjectReveal();
+        handlePortfolioPopupLinks();
+        handleProjectVideoModal();
         handleQuickContactGlowEffect();
         handlePartnerLogoMask();
         preventDefault();
