@@ -6786,7 +6786,7 @@ body.project-video-modal-open {
 .skills-marquee {
   --marquee-gap: 40px;
   --marquee-duration: 36s;
-  --marquee-logo-height: 30px;
+  --marquee-logo-height: 35px;
   position: relative;
   overflow-x: hidden;
   overflow-y: visible;
@@ -6839,7 +6839,7 @@ body.project-video-modal-open {
   .skills-marquee {
     --marquee-gap: 24px;
     --marquee-duration: 30s;
-    --marquee-logo-height: 24px;
+    --marquee-logo-height: 32px;
     margin: 20px auto 30px;
   }
 }
