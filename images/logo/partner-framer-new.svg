@@ -1,4 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 64 64" fill="none">
-  <rect x="14" y="12" width="36" height="40" rx="10" fill="#111111"/>
+  <rect x="14" y="12" width="36" height="40" rx="10" fill="url(#framerGradient)"/>
   <path d="M24 19H40L31.5 28.5H40L24 45V35.5H32.5L24 27V19Z" fill="white"/>
+  <defs>
+    <linearGradient id="framerGradient" x1="14" y1="12" x2="50" y2="52" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF5FD8"/>
+      <stop offset="1" stop-color="#7C5CFF"/>
+    </linearGradient>
+  </defs>
 </svg>

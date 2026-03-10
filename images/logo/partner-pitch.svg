@@ -1,4 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 64 64" fill="none">
-  <rect x="14" y="14" width="36" height="36" rx="10" fill="#111111"/>
-  <path d="M25 23H35.5C39.64 23 43 26.36 43 30.5C43 34.64 39.64 38 35.5 38H29V45H25V23ZM29 27V34H35.5C37.43 34 39 32.43 39 30.5C39 28.57 37.43 27 35.5 27H29Z" fill="#A3E635"/>
+  <rect x="14" y="14" width="36" height="36" rx="10" fill="url(#pitchGradient)"/>
+  <path d="M25 23H35.5C39.64 23 43 26.36 43 30.5C43 34.64 39.64 38 35.5 38H29V45H25V23ZM29 27V34H35.5C37.43 34 39 32.43 39 30.5C39 28.57 37.43 27 35.5 27H29Z" fill="white"/>
+  <defs>
+    <linearGradient id="pitchGradient" x1="14" y1="14" x2="50" y2="50" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF5A7A"/>
+      <stop offset="1" stop-color="#FF8F4D"/>
+    </linearGradient>
+  </defs>
 </svg>

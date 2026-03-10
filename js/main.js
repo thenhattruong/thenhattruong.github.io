@@ -390,7 +390,7 @@
                 namePlaceholder: "Your name",
                 emailPlaceholder: "Your email",
                 messagePlaceholder: "Your Message...",
-                rights: "© 2025 Truong The Nhat. All rights reserved.",
+                rights: "© 2026 Truong The Nhat. All rights reserved.",
                 settingsColor: "Color",
                 settingsBackground: "Background",
                 settingBackgroundNames: [
@@ -505,7 +505,7 @@
                 namePlaceholder: "Tên của bạn",
                 emailPlaceholder: "Email của bạn",
                 messagePlaceholder: "Tin nhắn của bạn...",
-                rights: "© 2025 Trương Thế Nhật. Đã đăng ký bản quyền.",
+                rights: "© 2026 Trương Thế Nhật. Đã đăng ký bản quyền.",
                 settingsColor: "Màu sắc",
                 settingsBackground: "Nền",
                 settingBackgroundNames: [
