@@ -40,7 +40,7 @@ function lockCounterWidth(odometerEl) {
 function resetCountersToZero() {
     $(".counter-item").removeClass("counted");
 
-    $(".counter-item .odometer").each(function () {
+    $(".counter-item .odometer").each(function() {
         var odometerEl = this;
         if (!odometerEl) return;
         lockCounterWidth(odometerEl);
@@ -74,7 +74,7 @@ function checkCounters() {
         return;
     }
 
-    $(".counter-item").each(function () {
+    $(".counter-item").each(function() {
         var $counter = $(this);
         if (isElementInViewport($counter) && !$counter.hasClass("counted")) {
             $counter.addClass("counted");
@@ -103,12 +103,12 @@ function checkCounters() {
                     typeof odometerEl.odometer.update === "function"
                 ) {
                     odometerEl.odometer.update(0);
-                    window.requestAnimationFrame(function () {
+                    window.requestAnimationFrame(function() {
                         odometerEl.odometer.update(targetValue);
                     });
                 } else {
                     odometerEl.innerHTML = "0";
-                    setTimeout(function () {
+                    setTimeout(function() {
                         odometerEl.innerHTML = String(targetValue);
                     }, 24);
                 }

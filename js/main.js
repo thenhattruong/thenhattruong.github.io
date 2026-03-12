@@ -13,10 +13,79 @@
  
 **/
 
-(function ($) {
+(function($) {
     ("use strict");
 
     const hasIntroSequence = () => Boolean(document.querySelector(".counter-scroll"));
+
+    const applyPerformanceMode = () => {
+        if (!document.body) return;
+
+        const prefersReducedMotion = window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+        ).matches;
+
+        const addRootClass = (className) => {
+            document.body.classList.add(className);
+            if (document.documentElement) {
+                document.documentElement.classList.add(className);
+            }
+        };
+
+        if (prefersReducedMotion) {
+            addRootClass("reduce-motion");
+        }
+
+        const deviceMemory = navigator.deviceMemory || 0;
+        const cpuCores = navigator.hardwareConcurrency || 0;
+        const isLowEndDevice =
+            (deviceMemory && deviceMemory <= 4) ||
+            (cpuCores && cpuCores <= 4);
+
+        if (isLowEndDevice) {
+            addRootClass("low-power");
+            return;
+        }
+
+        if (
+            typeof performance === "undefined" ||
+            typeof performance.now !== "function" ||
+            typeof requestAnimationFrame !== "function"
+        ) {
+            return;
+        }
+
+        let frames = 0;
+        const start = performance.now();
+        const sampleDuration = 800;
+
+        const sample = (now) => {
+            frames += 1;
+            if (now - start < sampleDuration) {
+                requestAnimationFrame(sample);
+                return;
+            }
+            const fps = (frames * 1000) / Math.max(1, now - start);
+            if (fps < 50) {
+                addRootClass("low-power");
+            }
+        };
+
+        requestAnimationFrame(sample);
+    };
+
+    const isLowPowerMode = () => {
+        const body = document.body;
+        const root = document.documentElement;
+        return Boolean(
+            (body &&
+                (body.classList.contains("low-power") ||
+                    body.classList.contains("reduce-motion"))) ||
+            (root &&
+                (root.classList.contains("low-power") ||
+                    root.classList.contains("reduce-motion")))
+        );
+    };
 
     const setIntroLockState = (isLocked) => {
         if (!document.body || !hasIntroSequence()) return;
@@ -42,15 +111,14 @@
         }
 
         const navEntries =
-            typeof performance.getEntriesByType === "function"
-                ? performance.getEntriesByType("navigation")
-                : [];
+            typeof performance.getEntriesByType === "function" ?
+            performance.getEntriesByType("navigation") : [];
         const navType = navEntries.length ? navEntries[0].type : "";
         const legacyNavType =
             performance.navigation &&
-            typeof performance.navigation.type === "number"
-                ? performance.navigation.type
-                : -1;
+            typeof performance.navigation.type === "number" ?
+            performance.navigation.type :
+            -1;
         const isReloadNavigation =
             navType === "reload" || legacyNavType === 1;
 
@@ -84,18 +152,18 @@
             window.setTimeout(resetToHome, 650);
         };
 
-        window.addEventListener("beforeunload", function () {
+        window.addEventListener("beforeunload", function() {
             window.scrollTo(0, 0);
         });
 
-        window.addEventListener("load", function () {
+        window.addEventListener("load", function() {
             if (isReloadNavigation) {
                 forceTopRepeatedly();
             } else {
                 resetToHome();
             }
         });
-        window.addEventListener("pageshow", function (event) {
+        window.addEventListener("pageshow", function(event) {
             if (event.persisted) {
                 forceTopRepeatedly();
             }
@@ -122,7 +190,9 @@
                 isFixed = shouldBeFixed;
             }
         };
-        window.addEventListener("scroll", handleScroll, { passive: true });
+        window.addEventListener("scroll", handleScroll, {
+            passive: true
+        });
         handleScroll();
     };
 
@@ -174,15 +244,16 @@
                             revealOnce();
                         }
                     });
-                },
-                {
+                }, {
                     root: null,
                     threshold: 0.12,
                 }
             );
             observer.observe(marquee);
         } else {
-            window.addEventListener("scroll", onScrollReveal, { passive: true });
+            window.addEventListener("scroll", onScrollReveal, {
+                passive: true
+            });
             window.addEventListener("resize", onScrollReveal);
             onScrollReveal();
         }
@@ -240,15 +311,16 @@
                             revealOnce();
                         }
                     });
-                },
-                {
+                }, {
                     root: null,
                     threshold: 0.2,
                 }
             );
             observer.observe(resumeSection);
         } else {
-            window.addEventListener("scroll", onScrollReveal, { passive: true });
+            window.addEventListener("scroll", onScrollReveal, {
+                passive: true
+            });
             window.addEventListener("resize", onScrollReveal);
             onScrollReveal();
         }
@@ -304,14 +376,16 @@
         };
 
         update();
-        window.addEventListener("scroll", update, { passive: true });
+        window.addEventListener("scroll", update, {
+            passive: true
+        });
         window.addEventListener("load", update);
         window.addEventListener("hashchange", update);
     };
 
     /* Tab Slide 
   ------------------------------------------------------------------------------------- */
-    var tabSlide = function () {
+    var tabSlide = function() {
         if ($(".tab-slide").length > 0) {
             function updateTabSlide() {
                 var $activeTab = $(".tab-slide li.active");
@@ -327,7 +401,7 @@
                     });
                 }
             }
-            $(".tab-slide li").on("click", function () {
+            $(".tab-slide li").on("click", function() {
                 var itemTab = $(this).parent().find("li");
                 $(itemTab).removeClass("active");
                 $(this).addClass("active");
@@ -341,7 +415,7 @@
                 });
             });
 
-            $(window).on("resize", function () {
+            $(window).on("resize", function() {
                 updateTabSlide();
             });
 
@@ -363,7 +437,7 @@
             setActiveItem(savedIndex - 1);
         }
 
-        $(".choose-item").on("click", function () {
+        $(".choose-item").on("click", function() {
             const index = $(this).index();
             setColor(index + 1);
             setActiveItem(index);
@@ -401,22 +475,22 @@
         };
 
         const updateToggles = (isDark) => {
-            $toggles.each(function () {
+            $toggles.each(function() {
                 $(this).toggleClass("active", isDark);
             });
         };
 
         const savedMode = localStorage.getItem("darkMode");
         const defaultMode = $body.data("default-mode") || "light";
-        const isDarkInitially = savedMode
-            ? savedMode === "enabled"
-            : defaultMode === "dark";
+        const isDarkInitially = savedMode ?
+            savedMode === "enabled" :
+            defaultMode === "dark";
 
         $body.toggleClass("dark-mode", isDarkInitially);
         updateToggles(isDarkInitially);
         applyLogo(isDarkInitially);
 
-        $toggles.on("click", function () {
+        $toggles.on("click", function() {
             const isDark = !$body.hasClass("dark-mode");
 
             $body.toggleClass("dark-mode", isDark);
@@ -481,8 +555,7 @@
                 aboutIntroPrefix: "Hello! I'm",
                 aboutRoleWords: ["Multimedia Design", "UI/UX Developer"],
                 aboutTitle: "Designing Visual Experiences",
-                aboutDescription:
-                    "Hello! I'm Truong The Nhat, a Multimedia Designer with 3+ years of experience in video editing, motion graphics, and digital design, creating impactful visual content for brands and digital platforms.",
+                aboutDescription: "Hello! I'm Truong The Nhat, a Multimedia Designer with 3+ years of experience in video editing, motion graphics, and digital design, creating impactful visual content for brands and digital platforms.",
                 aboutCounters: [
                     "Year in Creative Media",
                     "Creative Projects",
@@ -596,8 +669,7 @@
                 aboutIntroPrefix: "Xin chào! Tôi là",
                 aboutRoleWords: ["Thiết kế Đa phương tiện", "Nhà phát triển UI/UX"],
                 aboutTitle: "Thiết kế trải nghiệm thị giác",
-                aboutDescription:
-                    "Xin chào! Tôi là Trương Thế Nhật, nhà thiết kế đa phương tiện với hơn 3 năm kinh nghiệm về dựng video, motion graphics và thiết kế số, tạo ra nội dung hình ảnh ấn tượng cho thương hiệu và nền tảng số.",
+                aboutDescription: "Xin chào! Tôi là Trương Thế Nhật, nhà thiết kế đa phương tiện với hơn 3 năm kinh nghiệm về dựng video, motion graphics và thiết kế số, tạo ra nội dung hình ảnh ấn tượng cho thương hiệu và nền tảng số.",
                 aboutCounters: [
                     "Năm trong lĩnh vực sáng tạo",
                     "Dự án sáng tạo",
@@ -779,6 +851,7 @@
         const initAboutTitleMouseFollow = () => {
             const title = document.querySelector(aboutTitleSelector);
             if (!title || title.dataset.mouseFollowReady === "true") return;
+            if (isLowPowerMode()) return;
 
             let activeWord = null;
             let frameId = 0;
@@ -848,9 +921,9 @@
 
             title.addEventListener("pointerover", (event) => {
                 const targetWord =
-                    event.target instanceof Element
-                        ? event.target.closest(".about-title-word")
-                        : null;
+                    event.target instanceof Element ?
+                    event.target.closest(".about-title-word") :
+                    null;
                 if (!targetWord || !title.contains(targetWord)) return;
                 setActiveWord(targetWord);
             });
@@ -861,9 +934,9 @@
                 isPointerInside = true;
 
                 const targetWord =
-                    event.target instanceof Element
-                        ? event.target.closest(".about-title-word")
-                        : null;
+                    event.target instanceof Element ?
+                    event.target.closest(".about-title-word") :
+                    null;
 
                 if (targetWord && title.contains(targetWord)) {
                     setActiveWord(targetWord);
@@ -874,13 +947,13 @@
 
             title.addEventListener("pointerout", (event) => {
                 const fromWord =
-                    event.target instanceof Element
-                        ? event.target.closest(".about-title-word")
-                        : null;
+                    event.target instanceof Element ?
+                    event.target.closest(".about-title-word") :
+                    null;
                 const toWord =
-                    event.relatedTarget instanceof Element
-                        ? event.relatedTarget.closest(".about-title-word")
-                        : null;
+                    event.relatedTarget instanceof Element ?
+                    event.relatedTarget.closest(".about-title-word") :
+                    null;
 
                 if (fromWord && fromWord !== toWord) {
                     if (activeWord === fromWord) {
@@ -906,9 +979,9 @@
 
             document.title = content.pageTitle;
             const profileName =
-                lang === "vi"
-                    ? "Tr\u01b0\u01a1ng Th\u1ebf Nh\u1eadt"
-                    : "Truong The Nhat";
+                lang === "vi" ?
+                "Tr\u01b0\u01a1ng Th\u1ebf Nh\u1eadt" :
+                "Truong The Nhat";
 
             setText(".header-sidebar .box .info h6.font-4.mb_4", profileName);
             setText(".user-bar .box-author .info .name", profileName);
@@ -994,7 +1067,7 @@
                 window.clearSplitTextAnimations();
             }
 
-            $("[data-i18n]").each(function () {
+            $("[data-i18n]").each(function() {
                 const key = $(this).data("i18n");
                 if (
                     key === "about.title" ||
@@ -1022,15 +1095,15 @@
         const savedLanguage = localStorage.getItem(LANG_KEY);
         const defaultLanguage = $("body").data("language") || "en";
         const initialLanguage =
-            savedLanguage === "vi" || savedLanguage === "en"
-                ? savedLanguage
-                : defaultLanguage === "vi"
-                ? "vi"
-                : "en";
+            savedLanguage === "vi" || savedLanguage === "en" ?
+            savedLanguage :
+            defaultLanguage === "vi" ?
+            "vi" :
+            "en";
 
         applyLanguage(initialLanguage);
 
-        $toggle.on("click", function () {
+        $toggle.on("click", function() {
             const currentLanguage =
                 $("body").attr("data-language") === "vi" ? "vi" : "en";
             const nextLanguage = currentLanguage === "vi" ? "en" : "vi";
@@ -1042,155 +1115,157 @@
 
     /* oneNavOnePage
   -------------------------------------------------------------------------------------*/
-  const oneNavOnePage = () => {
-    if (!$(".section-onepage").length) return;
+    const oneNavOnePage = () => {
+        if (!$(".section-onepage").length) return;
 
-    const $navLinks = $(".nav_link");
-    const $sections = $(".section");
-    let isScrollingByClick = false;
-    let isScrolling = false;
-    let scrollTimeout;
+        const $navLinks = $(".nav_link");
+        const $sections = $(".section");
+        let isScrollingByClick = false;
+        let isScrolling = false;
+        let scrollTimeout;
 
-    $navLinks.on("click", function (e) {
-        e.preventDefault();
+        $navLinks.on("click", function(e) {
+            e.preventDefault();
 
-        const target = $(this).attr("href");
-        const $target = $(target);
-        if (!$target.length) return;
+            const target = $(this).attr("href");
+            const $target = $(target);
+            if (!$target.length) return;
 
-        let offsetTop;
+            let offsetTop;
 
-        const hasUserBar =
-            $(".userbar-fixed").length > 0 && window.innerWidth > 1200;
+            const hasUserBar =
+                $(".userbar-fixed").length > 0 && window.innerWidth > 1200;
 
-        if (hasUserBar) {
-            const userBarTop = $(".userbar-fixed").offset()?.top || 0;
-            const scrollTop = $(window).scrollTop();
-            const userBarDistanceFromViewport = userBarTop - scrollTop;
+            if (hasUserBar) {
+                const userBarTop = $(".userbar-fixed").offset()?.top || 0;
+                const scrollTop = $(window).scrollTop();
+                const userBarDistanceFromViewport = userBarTop - scrollTop;
 
-            const paddingTop = parseInt($target.css("padding-top")) || 0;
-            const targetContentTop = $target.offset().top + paddingTop;
-            offsetTop = targetContentTop - userBarDistanceFromViewport;
-        } else {
-            if (
-                $target.hasClass("first-section") &&
-                window.innerWidth > 1200
-            ) {
-                offsetTop = 0;
+                const paddingTop = parseInt($target.css("padding-top")) || 0;
+                const targetContentTop = $target.offset().top + paddingTop;
+                offsetTop = targetContentTop - userBarDistanceFromViewport;
             } else {
-                const headerHeight = $(".header").outerHeight() || 0;
-                const paddingTop =
-                    parseInt($target.css("padding-top")) || 0;
-                offsetTop =
-                    $target.offset().top - headerHeight + paddingTop / 2;
-            }
-        }
-
-        isScrollingByClick = true;
-
-        const currentId = $target.attr("id");
-        $navLinks
-            .removeClass("active")
-            .filter(`[href="#${currentId}"]`)
-            .addClass("active");
-
-        $("html, body").animate({ scrollTop: offsetTop }, 0, function () {
-            setTimeout(() => {
-                isScrollingByClick = false;
-            }, 50);
-        });
-
-        $(".tf-sidebar-menu,.popup-menu-mobile").removeClass("show");
-        $(".overlay-popup").removeClass("show");
-        $("body").removeAttr("style");
-
-        if ($(this).hasClass("open-popup")) {
-            openYourPopup();
-        }
-    });
-
-    const updateActiveMenu = () => {
-        if (isScrollingByClick || isScrolling) return;
-
-        const scrollTop = $(window).scrollTop();
-        const windowHeight = $(window).height();
-        const viewportTop = scrollTop;
-        const viewportBottom = scrollTop + windowHeight;
-
-        const viewportCenter = scrollTop + windowHeight / 2;
-
-        let bestScore = -1;
-        let currentSection = null;
-        let currentIndex = -1;
-
-        $sections.each(function (index) {
-            const $section = $(this);
-
-            const sectionTop = $section.offset().top;
-            const sectionBottom = sectionTop + $section.outerHeight();
-            const sectionHeight = $section.outerHeight();
-
-            const visibleTop = Math.max(viewportTop, sectionTop);
-            const visibleBottom = Math.min(viewportBottom, sectionBottom);
-            const visibleHeight = Math.max(0, visibleBottom - visibleTop);
-
-            const visiblePercentage = sectionHeight > 0 ? (visibleHeight / sectionHeight) * 100 : 0;
-
-            const containsCenter = sectionTop <= viewportCenter && viewportCenter <= sectionBottom;
-
-            let score = visiblePercentage;
-            if (containsCenter) {
-                score += 1000;
+                if (
+                    $target.hasClass("first-section") &&
+                    window.innerWidth > 1200
+                ) {
+                    offsetTop = 0;
+                } else {
+                    const headerHeight = $(".header").outerHeight() || 0;
+                    const paddingTop =
+                        parseInt($target.css("padding-top")) || 0;
+                    offsetTop =
+                        $target.offset().top - headerHeight + paddingTop / 2;
+                }
             }
 
-            const MIN_VISIBLE_PERCENTAGE = 30;
+            isScrollingByClick = true;
 
-            if (score > bestScore && visiblePercentage >= MIN_VISIBLE_PERCENTAGE) {
-                bestScore = score;
-                currentSection = $section;
-                currentIndex = index;
-            }
-        });
-
-
-        if (currentSection && currentSection.length) {
-            const currentId = currentSection.attr("id");
-
+            const currentId = $target.attr("id");
             $navLinks
                 .removeClass("active")
                 .filter(`[href="#${currentId}"]`)
                 .addClass("active");
-            $sections.removeClass("dimmed");
-            $sections.each(function (index) {
-                if (index < currentIndex) $(this).addClass("dimmed");
+
+            $("html, body").animate({
+                scrollTop: offsetTop
+            }, 0, function() {
+                setTimeout(() => {
+                    isScrollingByClick = false;
+                }, 50);
             });
-        }
+
+            $(".tf-sidebar-menu,.popup-menu-mobile").removeClass("show");
+            $(".overlay-popup").removeClass("show");
+            $("body").removeAttr("style");
+
+            if ($(this).hasClass("open-popup")) {
+                openYourPopup();
+            }
+        });
+
+        const updateActiveMenu = () => {
+            if (isScrollingByClick || isScrolling) return;
+
+            const scrollTop = $(window).scrollTop();
+            const windowHeight = $(window).height();
+            const viewportTop = scrollTop;
+            const viewportBottom = scrollTop + windowHeight;
+
+            const viewportCenter = scrollTop + windowHeight / 2;
+
+            let bestScore = -1;
+            let currentSection = null;
+            let currentIndex = -1;
+
+            $sections.each(function(index) {
+                const $section = $(this);
+
+                const sectionTop = $section.offset().top;
+                const sectionBottom = sectionTop + $section.outerHeight();
+                const sectionHeight = $section.outerHeight();
+
+                const visibleTop = Math.max(viewportTop, sectionTop);
+                const visibleBottom = Math.min(viewportBottom, sectionBottom);
+                const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+
+                const visiblePercentage = sectionHeight > 0 ? (visibleHeight / sectionHeight) * 100 : 0;
+
+                const containsCenter = sectionTop <= viewportCenter && viewportCenter <= sectionBottom;
+
+                let score = visiblePercentage;
+                if (containsCenter) {
+                    score += 1000;
+                }
+
+                const MIN_VISIBLE_PERCENTAGE = 30;
+
+                if (score > bestScore && visiblePercentage >= MIN_VISIBLE_PERCENTAGE) {
+                    bestScore = score;
+                    currentSection = $section;
+                    currentIndex = index;
+                }
+            });
+
+            if (currentSection && currentSection.length) {
+                const currentId = currentSection.attr("id");
+
+                $navLinks
+                    .removeClass("active")
+                    .filter(`[href="#${currentId}"]`)
+                    .addClass("active");
+                $sections.removeClass("dimmed");
+                $sections.each(function(index) {
+                    if (index < currentIndex) $(this).addClass("dimmed");
+                });
+            }
+        };
+
+        let scrollTimer;
+        $(window).on("scroll resize", function() {
+            isScrolling = true;
+
+            clearTimeout(scrollTimeout);
+            clearTimeout(scrollTimer);
+            scrollTimeout = setTimeout(() => {
+                isScrolling = false;
+            }, 50);
+
+            scrollTimer = setTimeout(updateActiveMenu, 100);
+        });
+        updateActiveMenu();
     };
-
-    let scrollTimer;
-    $(window).on("scroll resize", function () {
-        isScrolling = true;
-        
-        clearTimeout(scrollTimeout);
-        clearTimeout(scrollTimer);
-        scrollTimeout = setTimeout(() => {
-            isScrolling = false;
-        }, 50);
-
-        scrollTimer = setTimeout(updateActiveMenu, 100);
-    });
-    updateActiveMenu();
-};
 
     /* handleEffectSpotlight
   -------------------------------------------------------------------------*/
     const handleEffectSpotlight = () => {
         if (!$(".area-effect").length) return;
-        $(".area-effect").each(function () {
+        if (isLowPowerMode()) return;
+        $(".area-effect").each(function() {
             const $container = $(this);
             const $spotlight = $container.find(".spotlight");
             $spotlight.css("opacity", "1");
-            $container.on("mousemove", function (e) {
+            $container.on("mousemove", function(e) {
                 const offset = $container.offset();
                 const relX = e.pageX - offset.left;
                 const relY = e.pageY - offset.top;
@@ -1207,8 +1282,9 @@
     const handleCounterTouchEffect = () => {
         const $touchItems = $(".counter-item, .portfolio-item");
         if (!$touchItems.length) return;
+        if (isLowPowerMode()) return;
 
-        $touchItems.each(function () {
+        $touchItems.each(function() {
             const $item = $(this);
             const isPortfolioItem = $item.hasClass("portfolio-item");
             let touchTimer;
@@ -1251,12 +1327,12 @@
                 $item.removeClass("is-tilt-active");
             };
 
-            $item.on("mousemove", function (e) {
+            $item.on("mousemove", function(e) {
                 setTouchPoint(e.clientX, e.clientY);
                 setPortfolioTilt(e.clientX, e.clientY);
             });
 
-            $item.on("touchstart touchmove", function (e) {
+            $item.on("touchstart touchmove", function(e) {
                 const touches = e.originalEvent.touches;
                 const touch = touches && touches[0];
                 if (!touch) return;
@@ -1267,11 +1343,11 @@
                 clearTimeout(touchTimer);
             });
 
-            $item.on("mouseleave", function () {
+            $item.on("mouseleave", function() {
                 resetPortfolioTilt();
             });
 
-            $item.on("touchend touchcancel", function () {
+            $item.on("touchend touchcancel", function() {
                 clearTimeout(touchTimer);
                 touchTimer = setTimeout(() => {
                     $item.removeClass("is-touch-active");
@@ -1286,9 +1362,9 @@
     const handleHeaderIntroSequence = (options = {}) => {
         return new Promise((resolve) => {
             const onAvatarRollDone =
-                typeof options.onAvatarRollDone === "function"
-                    ? options.onAvatarRollDone
-                    : null;
+                typeof options.onAvatarRollDone === "function" ?
+                options.onAvatarRollDone :
+                null;
             const titleElement =
                 options.titleElement instanceof Element ? options.titleElement : null;
             const headerSidebar = document.querySelector(
@@ -1446,20 +1522,16 @@
                 titleGeometry.right - titleGeometry.left
             );
             const bounceBaseY = clampViewportY(titleGeometry.bounceBaseY);
-            const bounceLandings = [
-                {
-                    x: clampViewportX(titleGeometry.left + titleTravelWidth * 0.82),
-                    y: bounceBaseY,
-                },
-                {
-                    x: clampViewportX(titleGeometry.left + titleTravelWidth * 0.54),
-                    y: clampViewportY(bounceBaseY - avatarRadius * 0.08),
-                },
-                {
-                    x: clampViewportX(titleGeometry.left + titleTravelWidth * 0.08),
-                    y: clampViewportY(bounceBaseY + avatarRadius * 0.04),
-                },
-            ];
+            const bounceLandings = [{
+                x: clampViewportX(titleGeometry.left + titleTravelWidth * 0.82),
+                y: bounceBaseY,
+            }, {
+                x: clampViewportX(titleGeometry.left + titleTravelWidth * 0.54),
+                y: clampViewportY(bounceBaseY - avatarRadius * 0.08),
+            }, {
+                x: clampViewportX(titleGeometry.left + titleTravelWidth * 0.08),
+                y: clampViewportY(bounceBaseY + avatarRadius * 0.04),
+            }, ];
             const avatarStartX =
                 window.innerWidth +
                 motionRadius +
@@ -1474,19 +1546,19 @@
             const finalArcPeak = {
                 x: clampViewportX(
                     bounceLandings[2].x +
-                        (motionFinalX - bounceLandings[2].x) * 0.58
+                    (motionFinalX - bounceLandings[2].x) * 0.58
                 ),
                 y: clampViewportY(
                     Math.min(bounceLandings[2].y, motionFinalY) -
-                        Math.max(
-                            110,
-                            Math.min(
-                                186,
-                                Math.abs(bounceLandings[2].y - motionFinalY) *
-                                    0.42 +
-                                    60
-                            )
+                    Math.max(
+                        110,
+                        Math.min(
+                            186,
+                            Math.abs(bounceLandings[2].y - motionFinalY) *
+                            0.42 +
+                            60
                         )
+                    )
                 ),
             };
             let titleImpactState = null;
@@ -1521,9 +1593,8 @@
                             el.closest(".intro-center-title__line--role") ? 8 : 12,
                         filter: "blur(6px)",
                         color: (_, el) =>
-                            el.closest(".intro-center-title__line--role")
-                                ? "rgba(69, 231, 123, 0.92)"
-                                : "rgba(69, 231, 123, 1)",
+                            el.closest(".intro-center-title__line--role") ?
+                            "rgba(69, 231, 123, 0.92)" : "rgba(69, 231, 123, 1)",
                     });
                 }
 
@@ -1659,7 +1730,9 @@
             });
 
             const introTimeline = window.gsap.timeline({
-                defaults: { ease: "power3.out" },
+                defaults: {
+                    ease: "power3.out"
+                },
                 onComplete: () => {
                     notifyAvatarRollDone();
                     headerSidebar.classList.remove("is-intro-animating");
@@ -1672,10 +1745,8 @@
                     playAvatarNoRingReveal();
 
                     window.gsap.set(
-                        [headerSidebar, avatarGhost, ...navItems, ...revealTargets],
-                        {
-                            clearProps:
-                                "x,y,opacity,visibility,scale,scaleX,scaleY,filter,clipPath,rotation,transformOrigin,left,top,xPercent,yPercent",
+                        [headerSidebar, avatarGhost, ...navItems, ...revealTargets], {
+                            clearProps: "x,y,opacity,visibility,scale,scaleX,scaleY,filter,clipPath,rotation,transformOrigin,left,top,xPercent,yPercent",
                         }
                     );
                     resolve();
@@ -1689,15 +1760,14 @@
             const titleRoleDuration = 0.24;
             const titleRoleStaggerEach = 0.02;
             const getStaggerRevealEnd = (start, duration, count, staggerEach) =>
-                count > 0
-                    ? start + duration + Math.max(0, count - 1) * staggerEach
-                    : 0;
+                count > 0 ?
+                start + duration + Math.max(0, count - 1) * staggerEach :
+                0;
 
             if (titleTypewriterChars) {
                 if (titleTypewriterChars.name.length) {
                     introTimeline.to(
-                        titleTypewriterChars.name,
-                        {
+                        titleTypewriterChars.name, {
                             autoAlpha: 1,
                             y: 0,
                             filter: "blur(0px)",
@@ -1714,8 +1784,7 @@
 
                 if (titleTypewriterChars.role.length) {
                     introTimeline.to(
-                        titleTypewriterChars.role,
-                        {
+                        titleTypewriterChars.role, {
                             autoAlpha: 1,
                             y: 0,
                             filter: "blur(0px)",
@@ -1731,39 +1800,54 @@
                 }
             }
 
-            const titleRevealStartTime = titleTypewriterChars
-                ? Math.min(
-                      titleTypewriterChars.name.length ? titleNameStart : Infinity,
-                      titleTypewriterChars.role.length ? titleRoleStart : Infinity
-                  )
-                : 0;
-            const titleRevealEndTime = titleTypewriterChars
-                ? Math.max(
-                      getStaggerRevealEnd(
-                          titleNameStart,
-                          titleNameDuration,
-                          titleTypewriterChars.name.length,
-                          titleNameStaggerEach
-                      ),
-                      getStaggerRevealEnd(
-                          titleRoleStart,
-                          titleRoleDuration,
-                          titleTypewriterChars.role.length,
-                          titleRoleStaggerEach
-                      )
-                  )
-                : 0;
-            const titleRevealHalfTime = titleTypewriterChars
-                ? titleRevealStartTime +
-                  (titleRevealEndTime - titleRevealStartTime) * 0.5
-                : 0;
-            const titleNameBaseColor = { r: 69, g: 231, b: 123, a: 1 };
-            const titleRoleBaseColor = { r: 69, g: 231, b: 123, a: 0.92 };
-            const titleAccentColor = { r: 255, g: 255, b: 255, a: 0.98 };
+            const titleRevealStartTime = titleTypewriterChars ?
+                Math.min(
+                    titleTypewriterChars.name.length ? titleNameStart : Infinity,
+                    titleTypewriterChars.role.length ? titleRoleStart : Infinity
+                ) :
+                0;
+            const titleRevealEndTime = titleTypewriterChars ?
+                Math.max(
+                    getStaggerRevealEnd(
+                        titleNameStart,
+                        titleNameDuration,
+                        titleTypewriterChars.name.length,
+                        titleNameStaggerEach
+                    ),
+                    getStaggerRevealEnd(
+                        titleRoleStart,
+                        titleRoleDuration,
+                        titleTypewriterChars.role.length,
+                        titleRoleStaggerEach
+                    )
+                ) :
+                0;
+            const titleRevealHalfTime = titleTypewriterChars ?
+                titleRevealStartTime +
+                (titleRevealEndTime - titleRevealStartTime) * 0.5 :
+                0;
+            const titleNameBaseColor = {
+                r: 69,
+                g: 231,
+                b: 123,
+                a: 1
+            };
+            const titleRoleBaseColor = {
+                r: 69,
+                g: 231,
+                b: 123,
+                a: 0.92
+            };
+            const titleAccentColor = {
+                r: 255,
+                g: 255,
+                b: 255,
+                a: 0.98
+            };
             const getTitleCharBaseColor = (char) =>
-                char.closest(".intro-center-title__line--role")
-                    ? titleRoleBaseColor
-                    : titleNameBaseColor;
+                char.closest(".intro-center-title__line--role") ?
+                titleRoleBaseColor :
+                titleNameBaseColor;
             const blendRgba = (fromColor, toColor, mix) => {
                 const normalizedMix = Math.max(0, Math.min(1, mix));
                 const lerp = (fromValue, toValue) =>
@@ -1796,11 +1880,9 @@
                     const lineFactor = isRoleLine ? 0.56 : 1;
 
                     return {
-                        y:
-                            (4 + influence * 20 * lineFactor) *
+                        y: (4 + influence * 20 * lineFactor) *
                             (0.72 + strength * 0.46),
-                        rotation:
-                            (charCenterX < localImpactX ? -1 : 1) *
+                        rotation: (charCenterX < localImpactX ? -1 : 1) *
                             influence *
                             8 *
                             lineFactor *
@@ -1825,23 +1907,23 @@
                         0,
                         Math.min(
                             1,
-                            ((value && typeof value.charCenterX === "number"
-                                ? value.charCenterX
-                                : localImpactX) -
+                            ((value && typeof value.charCenterX === "number" ?
+                                    value.charCenterX :
+                                    localImpactX) -
                                 localImpactX +
                                 sweepFeather) /
-                                sweepFeather
+                            sweepFeather
                         )
                     );
                     const impactMix = Math.max(
                         0,
                         Math.min(
                             1,
-                            ((value && typeof value.influence === "number"
-                                ? value.influence
-                                : 0) -
+                            ((value && typeof value.influence === "number" ?
+                                    value.influence :
+                                    0) -
                                 0.16) /
-                                0.56
+                            0.56
                         )
                     );
                     const nextValue = Math.max(
@@ -1858,8 +1940,7 @@
 
                 introTimeline
                     .to(
-                        titleImpactState.titleInner,
-                        {
+                        titleImpactState.titleInner, {
                             y: 6 + strength * 3,
                             scaleX: 1.02 + strength * 0.02,
                             scaleY: Math.max(0.82, 0.92 - strength * 0.06),
@@ -1870,8 +1951,7 @@
                         startTime
                     )
                     .to(
-                        titleImpactState.titleChars,
-                        {
+                        titleImpactState.titleChars, {
                             y: (index) => dentValues[index]?.y || 0,
                             rotation: (index) => dentValues[index]?.rotation || 0,
                             duration: compressDuration,
@@ -1884,8 +1964,7 @@
                         startTime + compressDuration * 0.18
                     )
                     .to(
-                        titleImpactState.titleChars,
-                        {
+                        titleImpactState.titleChars, {
                             color: (index, el) =>
                                 blendRgba(
                                     getTitleCharBaseColor(el),
@@ -1902,8 +1981,7 @@
                         startTime
                     )
                     .to(
-                        titleImpactState.titleChars,
-                        {
+                        titleImpactState.titleChars, {
                             y: 0,
                             rotation: 0,
                             duration: recoverDuration,
@@ -1916,8 +1994,7 @@
                         startTime + compressDuration
                     )
                     .to(
-                        titleImpactState.titleInner,
-                        {
+                        titleImpactState.titleInner, {
                             y: 0,
                             scaleX: 1,
                             scaleY: 1,
@@ -1933,8 +2010,7 @@
                 const driftMultiplier = 0.88 + strength * 0.16;
 
                 introTimeline.set(
-                    impactSplash,
-                    {
+                    impactSplash, {
                         autoAlpha: 1,
                         left: point.x,
                         top: splashY,
@@ -1946,16 +2022,14 @@
                 if (impactSplashCore) {
                     introTimeline
                         .set(
-                            impactSplashCore,
-                            {
+                            impactSplashCore, {
                                 autoAlpha: 0,
                                 scale: 0.16,
                             },
                             startTime - 0.012
                         )
                         .to(
-                            impactSplashCore,
-                            {
+                            impactSplashCore, {
                                 autoAlpha: 0.94,
                                 scale: 1.06 + strength * 0.1,
                                 duration: 0.08,
@@ -1965,8 +2039,7 @@
                             startTime - 0.01
                         )
                         .to(
-                            impactSplashCore,
-                            {
+                            impactSplashCore, {
                                 autoAlpha: 0,
                                 scale: 2 + strength * 0.24,
                                 duration: 0.22,
@@ -1980,16 +2053,14 @@
                 if (impactSplashRing) {
                     introTimeline
                         .set(
-                            impactSplashRing,
-                            {
+                            impactSplashRing, {
                                 autoAlpha: 0.78,
                                 scale: 0.48,
                             },
                             startTime - 0.01
                         )
                         .to(
-                            impactSplashRing,
-                            {
+                            impactSplashRing, {
                                 autoAlpha: 0,
                                 scale: 1.7 + strength * 0.2,
                                 duration: 0.3,
@@ -2008,8 +2079,7 @@
                     );
 
                     introTimeline.set(
-                        spark,
-                        {
+                        spark, {
                             autoAlpha: isLineSpark ? 0.84 : 0.92,
                             x: 0,
                             y: 0,
@@ -2020,8 +2090,7 @@
                     );
 
                     introTimeline.to(
-                        spark,
-                        {
+                        spark, {
                             autoAlpha: 0,
                             x: dx * driftMultiplier,
                             y: dy * driftMultiplier,
@@ -2036,8 +2105,7 @@
                 });
 
                 introTimeline.to(
-                    impactSplash,
-                    {
+                    impactSplash, {
                         autoAlpha: 0,
                         scale: 0.94 + strength * 0.06,
                         duration: 0.16,
@@ -2060,7 +2128,10 @@
                     top: nextY,
                 });
 
-                return { x: nextX, y: nextY };
+                return {
+                    x: nextX,
+                    y: nextY
+                };
             };
             const captureAvatarPosition = (point = null) => {
                 if (point) {
@@ -2077,12 +2148,12 @@
                 );
             };
             const updateAvatarTail = (point = null) => {
-                const nextX = point
-                    ? point.x
-                    : parseFloat(window.gsap.getProperty(avatarGhost, "left"));
-                const nextY = point
-                    ? point.y
-                    : parseFloat(window.gsap.getProperty(avatarGhost, "top"));
+                const nextX = point ?
+                    point.x :
+                    parseFloat(window.gsap.getProperty(avatarGhost, "left"));
+                const nextY = point ?
+                    point.y :
+                    parseFloat(window.gsap.getProperty(avatarGhost, "top"));
                 const velocityX = nextX - avatarLastMotionX;
                 const velocityY = nextY - avatarLastMotionY;
 
@@ -2115,12 +2186,10 @@
                 const inverseT = 1 - t;
 
                 return {
-                    x:
-                        inverseT * inverseT * startPoint.x +
+                    x: inverseT * inverseT * startPoint.x +
                         2 * inverseT * t * controlPoint.x +
                         t * t * endPoint.x,
-                    y:
-                        inverseT * inverseT * startPoint.y +
+                    y: inverseT * inverseT * startPoint.y +
                         2 * inverseT * t * controlPoint.y +
                         t * t * endPoint.y,
                 };
@@ -2135,11 +2204,12 @@
                 visualProps = {},
                 motionOptions = {}
             ) => {
-                const motionProgress = { value: 0 };
+                const motionProgress = {
+                    value: 0
+                };
 
                 introTimeline.to(
-                    motionProgress,
-                    {
+                    motionProgress, {
                         value: 1,
                         duration,
                         ease: "none",
@@ -2167,8 +2237,7 @@
                 if (!Object.keys(visualProps).length) return;
 
                 introTimeline.to(
-                    avatarGhost,
-                    {
+                    avatarGhost, {
                         duration,
                         ease: transformEase,
                         force3D: true,
@@ -2179,8 +2248,7 @@
             };
             const fadeAvatarTail = (startTime, duration = 0.08) => {
                 introTimeline.to(
-                    avatarGhost,
-                    {
+                    avatarGhost, {
                         "--avatar-tail-opacity": 0,
                         "--avatar-tail-flare-opacity": 0,
                         duration,
@@ -2191,9 +2259,9 @@
             };
             const avatarAppearAdvance = 0.5;
             const avatarMaterializeLead = 0.12;
-            const avatarMaterializeStart = titleTypewriterChars
-                ? Math.max(0, titleRevealHalfTime - avatarAppearAdvance)
-                : 0.12;
+            const avatarMaterializeStart = titleTypewriterChars ?
+                Math.max(0, titleRevealHalfTime - avatarAppearAdvance) :
+                0.12;
             const avatarMaterializeDuration = avatarHasNoRing ? 0.24 : 0.16;
             const avatarEntryStart = avatarMaterializeStart + avatarMaterializeLead;
             const avatarEntryFallDuration = 0.24;
@@ -2205,36 +2273,32 @@
             const avatarFinalDropDuration = avatarHasNoRing ? 0.32 : 0.3;
             const avatarFinalSettleDuration = 0.18;
             const avatarEntryControlPoint = {
-                x:
-                    avatarStartX -
+                x: avatarStartX -
                     (avatarStartX - bounceLandings[0].x) * 0.28,
                 y: clampViewportY(
                     Math.min(avatarStartY, bounceLandings[0].y) -
-                        Math.max(28, avatarRadius * 0.9)
+                    Math.max(28, avatarRadius * 0.9)
                 ),
             };
-            const bouncePeaks = [
-                {
-                    x: clampViewportX(
-                        bounceLandings[0].x +
-                            (bounceLandings[1].x - bounceLandings[0].x) * 0.46
-                    ),
-                    y: clampViewportY(
-                        Math.min(bounceLandings[0].y, bounceLandings[1].y) -
-                            Math.max(58, avatarRadius * 1.9)
-                    ),
-                },
-                {
-                    x: clampViewportX(
-                        bounceLandings[1].x +
-                            (bounceLandings[2].x - bounceLandings[1].x) * 0.48
-                    ),
-                    y: clampViewportY(
-                        Math.min(bounceLandings[1].y, bounceLandings[2].y) -
-                            Math.max(42, avatarRadius * 1.45)
-                    ),
-                },
-            ];
+            const bouncePeaks = [{
+                x: clampViewportX(
+                    bounceLandings[0].x +
+                    (bounceLandings[1].x - bounceLandings[0].x) * 0.46
+                ),
+                y: clampViewportY(
+                    Math.min(bounceLandings[0].y, bounceLandings[1].y) -
+                    Math.max(58, avatarRadius * 1.9)
+                ),
+            }, {
+                x: clampViewportX(
+                    bounceLandings[1].x +
+                    (bounceLandings[2].x - bounceLandings[1].x) * 0.48
+                ),
+                y: clampViewportY(
+                    Math.min(bounceLandings[1].y, bounceLandings[2].y) -
+                    Math.max(42, avatarRadius * 1.45)
+                ),
+            }, ];
             const bounce1ImpactTime = avatarEntryStart + avatarEntryFallDuration;
             const bounce2RiseStart = bounce1ImpactTime + 0.01;
             const bounce2ImpactTime =
@@ -2267,8 +2331,7 @@
             scheduleImpactSplash(bounce3ImpactTime, bounceLandings[2], 1.08);
 
             introTimeline.to(
-                avatarGhost,
-                {
+                avatarGhost, {
                     autoAlpha: 1,
                     filter: "blur(0px)",
                     duration: avatarMaterializeDuration,
@@ -2279,18 +2342,20 @@
             );
 
             scheduleAvatarParabolaMotion(
-                avatarEntryStart,
-                { x: avatarStartX, y: avatarStartY },
+                avatarEntryStart, {
+                    x: avatarStartX,
+                    y: avatarStartY
+                },
                 avatarEntryControlPoint,
                 bounceLandings[0],
                 avatarEntryFallDuration,
-                "power2.in",
-                {
+                "power2.in", {
                     rotation: avatarHasNoRing ? -12 : -10,
                     scaleX: 1.18,
                     scaleY: 0.82,
-                },
-                { clampX: false }
+                }, {
+                    clampX: false
+                }
             );
             fadeAvatarTail(bounce1ImpactTime + 0.01);
             scheduleAvatarParabolaMotion(
@@ -2299,8 +2364,7 @@
                 bouncePeaks[0],
                 bounceLandings[1],
                 bounceTravelDuration1,
-                "power2.out",
-                {
+                "power2.out", {
                     rotation: 10,
                     scaleX: 0.94,
                     scaleY: 1.08,
@@ -2313,8 +2377,7 @@
                 bouncePeaks[1],
                 bounceLandings[2],
                 bounceTravelDuration2,
-                "power2.out",
-                {
+                "power2.out", {
                     rotation: 8,
                     scaleX: 0.96,
                     scaleY: 1.06,
@@ -2327,16 +2390,14 @@
                 finalArcPeak,
                 avatarFinalLandingPoint,
                 avatarFinalArcDuration,
-                "power2.out",
-                {
+                "power2.out", {
                     rotation: -10,
                     scaleX: 0.96,
                     scaleY: 1.06,
                 }
             );
             introTimeline.to(
-                avatarGhost,
-                {
+                avatarGhost, {
                     left: motionFinalX,
                     top: motionFinalY,
                     scaleX: 1,
@@ -2353,8 +2414,7 @@
 
             if (avatarHasNoRing) {
                 introTimeline.to(
-                    avatarGhost,
-                    {
+                    avatarGhost, {
                         "--avatar-no-ring-aura-opacity": 0,
                         "--avatar-no-ring-aura-scale": 0.82,
                         "--avatar-no-ring-ring-opacity": 0,
@@ -2376,8 +2436,7 @@
                 );
 
                 introTimeline.to(
-                    avatarGhost,
-                    {
+                    avatarGhost, {
                         "--avatar-no-ring-aura-opacity": 0,
                         "--avatar-no-ring-aura-scale": 0.9,
                         "--avatar-no-ring-ring-opacity": 0,
@@ -2399,8 +2458,7 @@
                 );
 
                 introTimeline.to(
-                    avatarGhost,
-                    {
+                    avatarGhost, {
                         "--avatar-no-ring-aura-opacity": 0,
                         "--avatar-no-ring-aura-scale": 0.88,
                         "--avatar-no-ring-ring-opacity": 0,
@@ -2415,8 +2473,7 @@
                         "--avatar-no-ring-image-saturate": 1.02,
                         "--avatar-no-ring-image-shadow-alpha": 0,
                         "--avatar-no-ring-tilt": "0deg",
-                        duration:
-                            avatarFinalDropDuration + avatarFinalSettleDuration,
+                        duration: avatarFinalDropDuration + avatarFinalSettleDuration,
                         ease: "power1.out",
                     },
                     avatarFinalArcStart + avatarFinalRiseDuration
@@ -2442,8 +2499,7 @@
                     avatarRollDoneTime
                 )
                 .to(
-                    headerSidebar,
-                    {
+                    headerSidebar, {
                         clipPath: expandedClip,
                         duration: 1.18,
                         ease: "power2.out",
@@ -2462,8 +2518,7 @@
                     avatarFlashTime
                 )
                 .to(
-                    revealTargets,
-                    {
+                    revealTargets, {
                         autoAlpha: 1,
                         y: 0,
                         filter: "blur(0px)",
@@ -2473,8 +2528,7 @@
                     revealTargetsStart
                 )
                 .to(
-                    navItems,
-                    {
+                    navItems, {
                         autoAlpha: 1,
                         y: 0,
                         filter: "blur(0px)",
@@ -2491,9 +2545,8 @@
     const handleFeaturedProjectReveal = () => {
         const section = document.querySelector("#portfolio");
         const cardsWrap = section?.querySelector(".tabs-content-wrap");
-        const cards = cardsWrap
-            ? Array.from(cardsWrap.querySelectorAll(".portfolio-item"))
-            : [];
+        const cards = cardsWrap ?
+            Array.from(cardsWrap.querySelectorAll(".portfolio-item")) : [];
 
         if (!section || !cardsWrap || !cards.length) return;
 
@@ -2536,7 +2589,9 @@
         };
 
         cards.forEach((card) => {
-            window.gsap.set(card, { autoAlpha: 0 });
+            window.gsap.set(card, {
+                autoAlpha: 0
+            });
         });
 
         cards.forEach((card, index) => {
@@ -2545,7 +2600,9 @@
         });
 
         const timeline = window.gsap.timeline({
-            defaults: { ease: "none" },
+            defaults: {
+                ease: "none"
+            },
         });
         const revealOffsets = [0, 0.22, 0.52, 0.84];
         const revealDurations = [0.56, 0.58, 0.62, 0.66];
@@ -2565,19 +2622,21 @@
                     beam.className = "project-reveal-beam";
                     imgWrap.appendChild(beam);
                 }
-                window.gsap.set(beam, { autoAlpha: 0, xPercent: -150 });
+                window.gsap.set(beam, {
+                    autoAlpha: 0,
+                    xPercent: -150
+                });
             }
 
             const revealAt =
                 revealOffsets[index] ??
                 revealOffsets[revealOffsets.length - 1] +
-                    (index - revealOffsets.length + 1) * 0.64;
+                (index - revealOffsets.length + 1) * 0.64;
             const revealDuration =
                 revealDurations[index] ?? revealDurations[revealDurations.length - 1];
 
             timeline.fromTo(
-                card,
-                {
+                card, {
                     x: () => getCenterOffset(card).x,
                     y: () => getCenterOffset(card).y,
                     autoAlpha: 0,
@@ -2585,8 +2644,7 @@
                     rotation: dir * 10,
                     skewX: dir * 5,
                     filter: "blur(14px) saturate(0.55)",
-                },
-                {
+                }, {
                     x: 0,
                     y: 0,
                     autoAlpha: 1,
@@ -2602,13 +2660,11 @@
 
             if (media) {
                 timeline.fromTo(
-                    media,
-                    {
+                    media, {
                         scale: 1.24,
                         rotation: dir * 2.4,
                         filter: "brightness(0.72) saturate(0.7)",
-                    },
-                    {
+                    }, {
                         scale: 1.04,
                         rotation: 0,
                         filter: "brightness(1) saturate(1)",
@@ -2621,9 +2677,10 @@
 
             if (tag) {
                 timeline.fromTo(
-                    tag,
-                    { y: 28, autoAlpha: 0 },
-                    {
+                    tag, {
+                        y: 28,
+                        autoAlpha: 0
+                    }, {
                         y: 0,
                         autoAlpha: 1,
                         duration: revealDuration * 0.6,
@@ -2635,9 +2692,10 @@
 
             if (title) {
                 timeline.fromTo(
-                    title,
-                    { y: 24, autoAlpha: 0 },
-                    {
+                    title, {
+                        y: 24,
+                        autoAlpha: 0
+                    }, {
                         y: 0,
                         autoAlpha: 1,
                         duration: revealDuration * 0.62,
@@ -2650,9 +2708,10 @@
             if (beam) {
                 const beamStart = revealAt + revealDuration * 0.35;
                 timeline.fromTo(
-                    beam,
-                    { xPercent: -150, autoAlpha: 0 },
-                    {
+                    beam, {
+                        xPercent: -150,
+                        autoAlpha: 0
+                    }, {
                         xPercent: 150,
                         autoAlpha: 0.85,
                         duration: revealDuration * 0.45,
@@ -2661,8 +2720,7 @@
                     beamStart
                 );
                 timeline.to(
-                    beam,
-                    {
+                    beam, {
                         autoAlpha: 0,
                         duration: revealDuration * 0.2,
                     },
@@ -2694,11 +2752,10 @@
                 });
                 window.gsap.set(
                     cards
-                        .map((card) =>
-                            card.querySelector(".img-style img, .img-style video")
-                        )
-                        .filter(Boolean),
-                    {
+                    .map((card) =>
+                        card.querySelector(".img-style img, .img-style video")
+                    )
+                    .filter(Boolean), {
                         clearProps: "transform,filter",
                     }
                 );
@@ -2707,8 +2764,7 @@
                         Array.from(
                             card.querySelectorAll(".tag, .title, .project-reveal-beam")
                         )
-                    ),
-                    {
+                    ), {
                         clearProps: "transform,opacity,visibility",
                     }
                 );
@@ -2747,7 +2803,7 @@
 
             $userBar
                 .off("animationend.handleUserBarIntro")
-                .one("animationend.handleUserBarIntro", function (e) {
+                .one("animationend.handleUserBarIntro", function(e) {
                     if (
                         e.originalEvent &&
                         e.originalEvent.animationName !== "user-bar-reveal"
@@ -2761,11 +2817,11 @@
 
             if (!$userBar.data("touchGlowBound")) {
                 let touchTimer;
-                $userBar.on("touchstart touchmove", function () {
+                $userBar.on("touchstart touchmove", function() {
                     $userBar.addClass("is-touch-active");
                     clearTimeout(touchTimer);
                 });
-                $userBar.on("touchend touchcancel", function () {
+                $userBar.on("touchend touchcancel", function() {
                     clearTimeout(touchTimer);
                     touchTimer = setTimeout(() => {
                         $userBar.removeClass("is-touch-active");
@@ -2780,7 +2836,7 @@
         const $items = $("#portfolio .portfolio-item");
         if (!$items.length) return;
 
-        $items.each(function () {
+        $items.each(function() {
             const $item = $(this);
             const $mediaLink = $item
                 .find(".img-style[data-fancybox], .img-style.js-open-project-video-modal")
@@ -2799,7 +2855,7 @@
 
             $titleLink
                 .off("click.handlePortfolioPopup")
-                .on("click.handlePortfolioPopup", function (e) {
+                .on("click.handlePortfolioPopup", function(e) {
                     e.preventDefault();
                     $mediaLink.trigger("click");
                 });
@@ -2901,21 +2957,21 @@
 
         $triggers
             .off("click.handleProjectVideoModal")
-            .on("click.handleProjectVideoModal", function (e) {
+            .on("click.handleProjectVideoModal", function(e) {
                 e.preventDefault();
                 openModal($(this));
             });
 
         $modal
             .off("click.handleProjectVideoModal", "[data-close-project-video]")
-            .on("click.handleProjectVideoModal", "[data-close-project-video]", function (e) {
+            .on("click.handleProjectVideoModal", "[data-close-project-video]", function(e) {
                 e.preventDefault();
                 closeModal();
             });
 
         $(document)
             .off("keydown.handleProjectVideoModal")
-            .on("keydown.handleProjectVideoModal", function (e) {
+            .on("keydown.handleProjectVideoModal", function(e) {
                 if (e.key === "Escape") {
                     closeModal();
                 }
@@ -2934,8 +2990,9 @@
             "wheel",
             (event) => {
                 event.preventDefault();
-            },
-            { passive: false }
+            }, {
+                passive: false
+            }
         );
 
         userBar.dataset.scrollLockBound = "true";
@@ -2958,9 +3015,9 @@
             }
 
             const aboutTitleTarget = aboutSection.querySelector(".about-title-follow");
-            const aboutTitleWrap = aboutTitleTarget
-                ? aboutTitleTarget.closest(".heading-section")
-                : null;
+            const aboutTitleWrap = aboutTitleTarget ?
+                aboutTitleTarget.closest(".heading-section") :
+                null;
             const orderedAboutTargets = aboutTargets.filter(
                 (target) => target !== aboutTitleWrap
             );
@@ -3128,7 +3185,10 @@
             let userBarVisiblePromise = Promise.resolve();
             const prepareUserBarNameFill = (nameElement) => {
                 if (!(nameElement instanceof Element)) {
-                    return { allChars: [], solidChars: [] };
+                    return {
+                        allChars: [],
+                        solidChars: []
+                    };
                 }
 
                 let sourceText = nameElement.dataset.fillSourceText;
@@ -3166,273 +3226,267 @@
                 const solidChars = allChars.filter(
                     (charElement) => !charElement.classList.contains("is-space")
                 );
-                return { allChars, solidChars };
+                return {
+                    allChars,
+                    solidChars
+                };
             };
 
             const startUserBarIntro = () => {
                 if (userBarIntroPromise) return userBarIntroPromise;
 
-            if (hasGsap && !prefersReducedMotion) {
-                userBarVisiblePromise = new Promise((resolveVisible) => {
-                    const introTimeline = window.gsap.timeline();
-                    const userBarName = document.querySelector(
-                        ".main-content.style-fullwidth .user-bar.style-1 .box-author .name, .main-content.style-fullwidth .user-bar.style-1 .box-author .info .name"
-                    );
-                    const preparedUserBarName = prepareUserBarNameFill(userBarName);
-                    const userBarNameChars = preparedUserBarName.solidChars;
-
-                    if (userBar) {
-                        introTimeline.to(
-                            userBar,
-                            {
-                                autoAlpha: 1,
-                                duration: 0.22,
-                                ease: "power2.out",
-                                onComplete: resolveVisible,
-                            },
-                            0
+                if (hasGsap && !prefersReducedMotion) {
+                    userBarVisiblePromise = new Promise((resolveVisible) => {
+                        const introTimeline = window.gsap.timeline();
+                        const userBarName = document.querySelector(
+                            ".main-content.style-fullwidth .user-bar.style-1 .box-author .name, .main-content.style-fullwidth .user-bar.style-1 .box-author .info .name"
                         );
-                    } else {
-                        resolveVisible();
-                    }
+                        const preparedUserBarName = prepareUserBarNameFill(userBarName);
+                        const userBarNameChars = preparedUserBarName.solidChars;
 
-                    if (userBarNameChars.length) {
-                        window.gsap.set(userBarNameChars, {
-                            autoAlpha: 0,
-                            y: 11,
-                            scale: 0.84,
-                            filter: "blur(8px)",
-                            textShadow: "0 0 0 rgba(69, 231, 123, 0)",
-                        });
-                    }
-
-                    if (centerIntroTitle) {
-                        const titleInner =
-                            centerIntroTitle.querySelector(
-                                ".intro-center-title__inner"
-                            ) || centerIntroTitle;
-                        const titleChars = Array.from(
-                            centerIntroTitle.querySelectorAll(
-                                ".intro-center-title__char:not(.is-space)"
-                            )
-                        );
-
-                        if (userBarName && userBarNameChars.length && titleChars.length && titleInner) {
-                            const targetRect = userBarName.getBoundingClientRect();
-                            const targetX = targetRect.left + targetRect.width / 2;
-                            const targetY = targetRect.top + targetRect.height / 2;
-                            const innerRect = titleInner.getBoundingClientRect();
-                            const innerX = innerRect.left + innerRect.width / 2;
-                            const innerY = innerRect.top + innerRect.height / 2;
-                            const innerDx = targetX - innerX;
-                            const innerDy = targetY - innerY;
-                            const targetSlots = userBarNameChars.length;
-                            const titleCount = Math.max(titleChars.length - 1, 1);
-
-                            titleChars.forEach((char, index) => {
-                                const rect = char.getBoundingClientRect();
-                                const charX = rect.left + rect.width / 2;
-                                const charY = rect.top + rect.height / 2;
-                                const slotIndex = Math.round(
-                                    (index / titleCount) * (targetSlots - 1)
-                                );
-                                const targetChar = userBarNameChars[slotIndex];
-                                const targetCharRect =
-                                    targetChar.getBoundingClientRect();
-                                const slotX =
-                                    targetCharRect.left + targetCharRect.width / 2;
-                                const slotY =
-                                    targetCharRect.top + targetCharRect.height / 2;
-
-                                char.dataset.suckDx = (slotX - charX).toFixed(3);
-                                char.dataset.suckDy = (slotY - charY).toFixed(3);
-                                char.dataset.suckScale = (
-                                    0.08 + (slotIndex % 3) * 0.018
-                                ).toFixed(3);
-                                char.dataset.suckRotate = (
-                                    (slotIndex % 2 === 0 ? -1 : 1) * (8 + (index % 4) * 2)
-                                ).toFixed(2);
-                            });
-
+                        if (userBar) {
                             introTimeline.to(
-                                titleChars,
-                                {
-                                    y: (index) => -10 - (index % 4) * 2.5,
-                                    rotation: (index) => (index % 2 === 0 ? -10 : 10),
-                                    scale: 1.05,
-                                    duration: 0.16,
-                                    ease: "power2.out",
-                                    stagger: {
-                                        each: 0.009,
-                                        from: "center",
-                                    },
-                                },
-                                0.04
-                            );
-
-                            introTimeline.to(
-                                titleInner,
-                                {
-                                    x: innerDx * 0.2,
-                                    y: innerDy * 0.2,
-                                    scaleX: 0.95,
-                                    scaleY: 0.91,
-                                    filter: "blur(0.8px)",
+                                userBar, {
+                                    autoAlpha: 1,
                                     duration: 0.22,
                                     ease: "power2.out",
+                                    onComplete: resolveVisible,
                                 },
-                                0.12
-                            );
-
-                            introTimeline.to(
-                                titleChars,
-                                {
-                                    x: (_, el) =>
-                                        parseFloat(el.dataset.suckDx || "0"),
-                                    y: (_, el) =>
-                                        parseFloat(el.dataset.suckDy || "0"),
-                                    scale: (_, el) =>
-                                        parseFloat(el.dataset.suckScale || "0.1"),
-                                    rotation: (_, el) =>
-                                        parseFloat(el.dataset.suckRotate || "0"),
-                                    autoAlpha: 0,
-                                    filter: "blur(10px)",
-                                    duration: 0.64,
-                                    ease: "power4.in",
-                                    stagger: {
-                                        each: 0.014,
-                                        from: "start",
-                                    },
-                                },
-                                0.2
-                            );
-
-                            userBarNameChars.forEach((charElement, index) => {
-                                const charRevealStart = 0.34 + index * 0.036;
-                                introTimeline.to(
-                                    charElement,
-                                    {
-                                        autoAlpha: 1,
-                                        y: 0,
-                                        scale: 1.02,
-                                        filter: "blur(0px)",
-                                        textShadow:
-                                            "0 0 14px rgba(69, 231, 123, 0.72), 0 0 24px rgba(69, 231, 123, 0.34)",
-                                        duration: 0.14,
-                                        ease: "power2.out",
-                                    },
-                                    charRevealStart
-                                );
-                                introTimeline.to(
-                                    charElement,
-                                    {
-                                        scale: 1,
-                                        textShadow: "0 0 0 rgba(69, 231, 123, 0)",
-                                        duration: 0.14,
-                                        ease: "power1.out",
-                                    },
-                                    charRevealStart + 0.14
-                                );
-                            });
-
-                            const typingEndTime =
-                                0.62 + Math.max(userBarNameChars.length - 1, 0) * 0.036;
-                            introTimeline.call(
-                                () => {
-                                    window.gsap.set(userBarNameChars, {
-                                        clearProps:
-                                            "opacity,visibility,transform,filter,textShadow,scale",
-                                    });
-                                    window.gsap.set(userBarName, {
-                                        clearProps:
-                                            "opacity,visibility,transform,filter,letterSpacing,textShadow",
-                                    });
-                                },
-                                null,
-                                typingEndTime + 0.18
+                                0
                             );
                         } else {
-                            introTimeline.to(
-                                centerIntroTitle,
-                                {
-                                    autoAlpha: 0,
-                                    y: -10,
-                                    filter: "blur(8px)",
-                                    duration: 0.4,
-                                    ease: "power2.out",
-                                },
-                                0.24
-                            );
+                            resolveVisible();
                         }
 
-                        introTimeline.to(
-                            centerIntroTitle,
-                            {
+                        if (userBarNameChars.length) {
+                            window.gsap.set(userBarNameChars, {
                                 autoAlpha: 0,
-                                duration: 0.12,
-                                ease: "power1.out",
-                                onComplete: () => {
-                                    centerIntroTitle.remove();
+                                y: 11,
+                                scale: 0.84,
+                                filter: "blur(8px)",
+                                textShadow: "0 0 0 rgba(69, 231, 123, 0)",
+                            });
+                        }
+
+                        if (centerIntroTitle) {
+                            const titleInner =
+                                centerIntroTitle.querySelector(
+                                    ".intro-center-title__inner"
+                                ) || centerIntroTitle;
+                            const titleChars = Array.from(
+                                centerIntroTitle.querySelectorAll(
+                                    ".intro-center-title__char:not(.is-space)"
+                                )
+                            );
+
+                            if (userBarName && userBarNameChars.length && titleChars.length && titleInner) {
+                                const targetRect = userBarName.getBoundingClientRect();
+                                const targetX = targetRect.left + targetRect.width / 2;
+                                const targetY = targetRect.top + targetRect.height / 2;
+                                const innerRect = titleInner.getBoundingClientRect();
+                                const innerX = innerRect.left + innerRect.width / 2;
+                                const innerY = innerRect.top + innerRect.height / 2;
+                                const innerDx = targetX - innerX;
+                                const innerDy = targetY - innerY;
+                                const targetSlots = userBarNameChars.length;
+                                const titleCount = Math.max(titleChars.length - 1, 1);
+
+                                titleChars.forEach((char, index) => {
+                                    const rect = char.getBoundingClientRect();
+                                    const charX = rect.left + rect.width / 2;
+                                    const charY = rect.top + rect.height / 2;
+                                    const slotIndex = Math.round(
+                                        (index / titleCount) * (targetSlots - 1)
+                                    );
+                                    const targetChar = userBarNameChars[slotIndex];
+                                    const targetCharRect =
+                                        targetChar.getBoundingClientRect();
+                                    const slotX =
+                                        targetCharRect.left + targetCharRect.width / 2;
+                                    const slotY =
+                                        targetCharRect.top + targetCharRect.height / 2;
+
+                                    char.dataset.suckDx = (slotX - charX).toFixed(3);
+                                    char.dataset.suckDy = (slotY - charY).toFixed(3);
+                                    char.dataset.suckScale = (
+                                        0.08 + (slotIndex % 3) * 0.018
+                                    ).toFixed(3);
+                                    char.dataset.suckRotate = (
+                                        (slotIndex % 2 === 0 ? -1 : 1) * (8 + (index % 4) * 2)
+                                    ).toFixed(2);
+                                });
+
+                                introTimeline.to(
+                                    titleChars, {
+                                        y: (index) => -10 - (index % 4) * 2.5,
+                                        rotation: (index) => (index % 2 === 0 ? -10 : 10),
+                                        scale: 1.05,
+                                        duration: 0.16,
+                                        ease: "power2.out",
+                                        stagger: {
+                                            each: 0.009,
+                                            from: "center",
+                                        },
+                                    },
+                                    0.04
+                                );
+
+                                introTimeline.to(
+                                    titleInner, {
+                                        x: innerDx * 0.2,
+                                        y: innerDy * 0.2,
+                                        scaleX: 0.95,
+                                        scaleY: 0.91,
+                                        filter: "blur(0.8px)",
+                                        duration: 0.22,
+                                        ease: "power2.out",
+                                    },
+                                    0.12
+                                );
+
+                                introTimeline.to(
+                                    titleChars, {
+                                        x: (_, el) =>
+                                            parseFloat(el.dataset.suckDx || "0"),
+                                        y: (_, el) =>
+                                            parseFloat(el.dataset.suckDy || "0"),
+                                        scale: (_, el) =>
+                                            parseFloat(el.dataset.suckScale || "0.1"),
+                                        rotation: (_, el) =>
+                                            parseFloat(el.dataset.suckRotate || "0"),
+                                        autoAlpha: 0,
+                                        filter: "blur(10px)",
+                                        duration: 0.64,
+                                        ease: "power4.in",
+                                        stagger: {
+                                            each: 0.014,
+                                            from: "start",
+                                        },
+                                    },
+                                    0.2
+                                );
+
+                                userBarNameChars.forEach((charElement, index) => {
+                                    const charRevealStart = 0.34 + index * 0.036;
+                                    introTimeline.to(
+                                        charElement, {
+                                            autoAlpha: 1,
+                                            y: 0,
+                                            scale: 1.02,
+                                            filter: "blur(0px)",
+                                            textShadow: "0 0 14px rgba(69, 231, 123, 0.72), 0 0 24px rgba(69, 231, 123, 0.34)",
+                                            duration: 0.14,
+                                            ease: "power2.out",
+                                        },
+                                        charRevealStart
+                                    );
+                                    introTimeline.to(
+                                        charElement, {
+                                            scale: 1,
+                                            textShadow: "0 0 0 rgba(69, 231, 123, 0)",
+                                            duration: 0.14,
+                                            ease: "power1.out",
+                                        },
+                                        charRevealStart + 0.14
+                                    );
+                                });
+
+                                const typingEndTime =
+                                    0.62 + Math.max(userBarNameChars.length - 1, 0) * 0.036;
+                                introTimeline.call(
+                                    () => {
+                                        window.gsap.set(userBarNameChars, {
+                                            clearProps: "opacity,visibility,transform,filter,textShadow,scale",
+                                        });
+                                        window.gsap.set(userBarName, {
+                                            clearProps: "opacity,visibility,transform,filter,letterSpacing,textShadow",
+                                        });
+                                    },
+                                    null,
+                                    typingEndTime + 0.18
+                                );
+                            } else {
+                                introTimeline.to(
+                                    centerIntroTitle, {
+                                        autoAlpha: 0,
+                                        y: -10,
+                                        filter: "blur(8px)",
+                                        duration: 0.4,
+                                        ease: "power2.out",
+                                    },
+                                    0.24
+                                );
+                            }
+
+                            introTimeline.to(
+                                centerIntroTitle, {
+                                    autoAlpha: 0,
+                                    duration: 0.12,
+                                    ease: "power1.out",
+                                    onComplete: () => {
+                                        centerIntroTitle.remove();
+                                    },
                                 },
-                            },
-                            1.12
-                        );
+                                1.12
+                            );
+                        }
+                    });
+                } else {
+                    if (centerIntroTitle) {
+                        centerIntroTitle.remove();
                     }
-                });
-            } else {
-                if (centerIntroTitle) {
-                    centerIntroTitle.remove();
+                    userBarVisiblePromise = Promise.resolve();
                 }
-                userBarVisiblePromise = Promise.resolve();
+
+                userBarIntroPromise = handleUserBarGlowEffect();
+                return userBarIntroPromise;
+            };
+
+            if (hasGsap && !prefersReducedMotion) {
+                if (centerIntroTitle) {
+                    window.gsap.set(centerIntroTitle, {
+                        autoAlpha: 1,
+                        left: window.innerWidth / 2,
+                        top: window.innerHeight / 2,
+                        y: 0,
+                        filter: "blur(0px)",
+                    });
+                }
+                if (userBar) {
+                    window.gsap.set(userBar, {
+                        autoAlpha: 0
+                    });
+                }
+                if (aboutTargets.length) {
+                    window.gsap.set(aboutTargets, {
+                        autoAlpha: 0,
+                        y: 24,
+                        filter: "blur(8px)",
+                    });
+                }
+            } else if (centerIntroTitle) {
+                centerIntroTitle.remove();
             }
 
-            userBarIntroPromise = handleUserBarGlowEffect();
-            return userBarIntroPromise;
-        };
+            await handleHeaderIntroSequence({
+                onAvatarRollDone: startUserBarIntro,
+                titleElement: centerIntroTitle,
+            });
+            handleHeaderAvatarTrail();
 
-        if (hasGsap && !prefersReducedMotion) {
-            if (centerIntroTitle) {
-                window.gsap.set(centerIntroTitle, {
-                    autoAlpha: 1,
-                    left: window.innerWidth / 2,
-                    top: window.innerHeight / 2,
-                    y: 0,
-                    filter: "blur(0px)",
-                });
+            if (!userBarIntroPromise) {
+                startUserBarIntro();
             }
-            if (userBar) {
-                window.gsap.set(userBar, { autoAlpha: 0 });
-            }
-            if (aboutTargets.length) {
-                window.gsap.set(aboutTargets, {
-                    autoAlpha: 0,
-                    y: 24,
-                    filter: "blur(8px)",
-                });
-            }
-        } else if (centerIntroTitle) {
-            centerIntroTitle.remove();
+
+            await userBarVisiblePromise;
+            await handleAboutIntroSequence();
+            setCounterIntroReady(true);
+            replayAboutCounters();
+            await userBarIntroPromise;
+        } finally {
+            setCounterIntroReady(true);
+            setIntroLockState(false);
         }
-
-        await handleHeaderIntroSequence({
-            onAvatarRollDone: startUserBarIntro,
-            titleElement: centerIntroTitle,
-        });
-        handleHeaderAvatarTrail();
-
-        if (!userBarIntroPromise) {
-            startUserBarIntro();
-        }
-
-        await userBarVisiblePromise;
-        await handleAboutIntroSequence();
-        setCounterIntroReady(true);
-        replayAboutCounters();
-        await userBarIntroPromise;
-    } finally {
-        setCounterIntroReady(true);
-        setIntroLockState(false);
-    }
     };
 
     /* handleHeaderAvatarTrail
@@ -3448,7 +3502,7 @@
             "(prefers-reduced-motion: reduce)"
         ).matches;
         const canHover = window.matchMedia("(hover: hover)").matches;
-        if (prefersReducedMotion || !canHover) return;
+        if (prefersReducedMotion || isLowPowerMode() || !canHover) return;
 
         avatar.dataset.liveTrailReady = "true";
         avatar.classList.add("avatar-live-trail");
@@ -3497,9 +3551,9 @@
             const distanceMix = clamp(distance / 12, 0, 1);
             const speedMix = clamp(speed / 2.4, 0, 1);
 
-            tailBoost = isPointerActive
-                ? Math.max(distanceMix * 0.72, speedMix)
-                : tailBoost * 0.84;
+            tailBoost = isPointerActive ?
+                Math.max(distanceMix * 0.72, speedMix) :
+                tailBoost * 0.84;
 
             if (speed > 0.02) {
                 lastAngle = (Math.atan2(velocityY, velocityX) * 180) / Math.PI;
@@ -3716,6 +3770,75 @@
         $quickContact.on("mouseup mouseleave touchend touchcancel", releaseGlow);
     };
 
+    const handleQuickContactReveal = () => {
+        const quickContact = document.querySelector(".quick-contact-floating");
+        if (!quickContact) return;
+
+        const resumeSection = document.querySelector("#resume");
+        const prefersReducedMotion = window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+        ).matches;
+
+        quickContact.classList.add("quick-contact-reveal");
+
+        if (prefersReducedMotion) {
+            quickContact.classList.add("is-visible");
+            return;
+        }
+
+        if (!resumeSection) {
+            quickContact.classList.add("is-visible");
+            return;
+        }
+
+        let triggerY = 0;
+
+        const setVisible = (isVisible) => {
+            quickContact.classList.toggle("is-visible", isVisible);
+        };
+
+        const computeTrigger = () => {
+            const rect = resumeSection.getBoundingClientRect();
+            const viewportHeight =
+                window.innerHeight || document.documentElement.clientHeight;
+            triggerY = rect.top + window.scrollY - viewportHeight * 0.75;
+        };
+
+        const update = () => {
+            if (document.body && document.body.classList.contains("about-only")) {
+                setVisible(false);
+                return;
+            }
+            setVisible(window.scrollY >= triggerY);
+        };
+
+        computeTrigger();
+        update();
+
+        let frameCount = 0;
+        const settle = () => {
+            computeTrigger();
+            update();
+            frameCount += 1;
+            if (frameCount < 4) {
+                requestAnimationFrame(settle);
+            }
+        };
+        requestAnimationFrame(settle);
+
+        window.addEventListener("scroll", update, {
+            passive: true
+        });
+        window.addEventListener("resize", () => {
+            computeTrigger();
+            update();
+        });
+        window.addEventListener("load", () => {
+            computeTrigger();
+            update();
+        });
+    };
+
     /* handlePartnerLogoMask
   -------------------------------------------------------------------------*/
     const handlePartnerLogoMask = () => {
@@ -3737,10 +3860,10 @@
     /* preventDefault
   -------------------------------------------------------------------------*/
     const preventDefault = () => {
-        $(".link-no-action").on("click", function (e) {
+        $(".link-no-action").on("click", function(e) {
             e.preventDefault();
         });
-        $(".section-resume .education-item .content a").on("click", function (e) {
+        $(".section-resume .education-item .content a").on("click", function(e) {
             e.preventDefault();
         });
     };
@@ -3831,34 +3954,34 @@
             }
         };
 
-        $trigger.on("click", function (e) {
+        $trigger.on("click", function(e) {
             e.preventDefault();
             openPopup();
         });
 
-        $popup.on("click", "[data-close-email-popup]", function (e) {
+        $popup.on("click", "[data-close-email-popup]", function(e) {
             e.preventDefault();
             closePopup();
         });
 
-        $popup.on("click", "[data-open-gmail]", function () {
+        $popup.on("click", "[data-open-gmail]", function() {
             closePopup();
         });
 
-        $popup.on("click", "[data-copy-email]", async function (e) {
+        $popup.on("click", "[data-copy-email]", async function(e) {
             e.preventDefault();
             const emailAddress = $(this).data("email-address");
             const isCopied = await copyEmail(emailAddress);
             setStatus(
-                isCopied
-                    ? "Email copied to clipboard."
-                    : "Could not copy email. Please copy it manually."
+                isCopied ?
+                "Email copied to clipboard." :
+                "Could not copy email. Please copy it manually."
             );
         });
 
         $(document)
             .off("keydown.handleEmailPopup")
-            .on("keydown.handleEmailPopup", function (e) {
+            .on("keydown.handleEmailPopup", function(e) {
                 if (e.key === "Escape") {
                     closePopup();
                 }
@@ -3937,9 +4060,9 @@
                 .find("button")
                 .filter(":visible")
                 .first();
-            const $targetToFocus = $focusTarget.length
-                ? $focusTarget
-                : $fallbackTarget;
+            const $targetToFocus = $focusTarget.length ?
+                $focusTarget :
+                $fallbackTarget;
 
             if ($targetToFocus.length) {
                 setTimeout(() => {
@@ -3962,76 +4085,77 @@
             }
         };
 
-        $openButtons.on("click", function (e) {
+        $openButtons.on("click", function(e) {
             e.preventDefault();
             openModal();
         });
 
-        $modal.on("click", "[data-close-contact-modal]", function (e) {
+        $modal.on("click", "[data-close-contact-modal]", function(e) {
             e.preventDefault();
             closeModal();
         });
 
         $(document)
             .off("keydown.handleContactModal")
-            .on("keydown.handleContactModal", function (e) {
+            .on("keydown.handleContactModal", function(e) {
                 if (e.key === "Escape") {
                     closeModal();
                 }
             });
     };
 
-        /* handleSidebar
+    /* handleSidebar
     -------------------------------------------------------------------------------------*/
-        const handleSidebar = () => {
-            const closeAllPopups = () => {
-                $(
-                    ".popup-show-bar, .popup-menu-mobile, .overlay-popup"
-                ).removeClass("show");
-                $("body").removeClass("no-scroll");
-            };
-
-            $(document)
-                .off("click.handleSidebar")
-                .on("click.handleSidebar", ".show-sidebar", function (e) {
-                    e.preventDefault();
-                    $(".popup-show-bar").toggleClass("show");
-
-                    if (
-                        !$(".popup-show-bar").hasClass("show") &&
-                        !$(".popup-menu-mobile").hasClass("show")
-                    ) {
-                        $("body").removeClass("no-scroll");
-                    }
-                })
-                .on("click.handleSidebar", ".show-menu-mobile", function (e) {
-                    e.preventDefault();
-                    const $target = $($(this).data("target"));
-                    if (!$target.length) return;
-
-                    const isOpen = $target.hasClass("show");
-                    closeAllPopups();
-
-                    if (!isOpen) {
-                        $target.addClass("show");
-                        $(".overlay-popup").addClass("show");
-                        $("body").addClass("no-scroll");
-                    }
-                })
-                .on("click.handleSidebar", ".overlay-popup", function () {
-                    closeAllPopups();
-                })
-                .on(
-                    "click.handleSidebar",
-                    ".popup-menu-mobile .nav_link",
-                    function () {
-                        closeAllPopups();
-                    }
-                );
+    const handleSidebar = () => {
+        const closeAllPopups = () => {
+            $(
+                ".popup-show-bar, .popup-menu-mobile, .overlay-popup"
+            ).removeClass("show");
+            $("body").removeClass("no-scroll");
         };
 
+        $(document)
+            .off("click.handleSidebar")
+            .on("click.handleSidebar", ".show-sidebar", function(e) {
+                e.preventDefault();
+                $(".popup-show-bar").toggleClass("show");
+
+                if (
+                    !$(".popup-show-bar").hasClass("show") &&
+                    !$(".popup-menu-mobile").hasClass("show")
+                ) {
+                    $("body").removeClass("no-scroll");
+                }
+            })
+            .on("click.handleSidebar", ".show-menu-mobile", function(e) {
+                e.preventDefault();
+                const $target = $($(this).data("target"));
+                if (!$target.length) return;
+
+                const isOpen = $target.hasClass("show");
+                closeAllPopups();
+
+                if (!isOpen) {
+                    $target.addClass("show");
+                    $(".overlay-popup").addClass("show");
+                    $("body").addClass("no-scroll");
+                }
+            })
+            .on("click.handleSidebar", ".overlay-popup", function() {
+                closeAllPopups();
+            })
+            .on(
+                "click.handleSidebar",
+                ".popup-menu-mobile .nav_link",
+                function() {
+                    closeAllPopups();
+                }
+            );
+    };
+
     // Dom Ready
-    $(function () {
+    $(function() {
+        applyPerformanceMode();
         forceBackToHomeOnReload();
         headerFixed();
         handleAboutOnlyAtTop();
@@ -4048,6 +4172,7 @@
         handleResumeReveal();
         handlePortfolioPopupLinks();
         handleProjectVideoModal();
+        handleQuickContactReveal();
         handleQuickContactGlowEffect();
         handlePartnerLogoMask();
         handleSkillsMarqueeReveal();
@@ -4061,4 +4186,3 @@
         handleSidebar();
     });
 })(jQuery);
-

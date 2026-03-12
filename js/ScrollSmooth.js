@@ -1,4 +1,4 @@
-!(function () {
+!(function() {
     var s,
         i,
         c,
@@ -45,6 +45,7 @@
             39: 1,
             40: 1,
         };
+
     function y() {
         if (!f && document.body) {
             f = !0;
@@ -54,9 +55,9 @@
                 n = e.scrollHeight;
             if (
                 ((m = 0 <= document.compatMode.indexOf("CSS") ? t : e),
-                (s = e),
-                p.keyboardSupport && Y("keydown", x),
-                top != self)
+                    (s = e),
+                    p.keyboardSupport && Y("keydown", x),
+                    top != self)
             )
                 d = !0;
             else if (
@@ -70,26 +71,26 @@
                     "position:absolute; z-index:-10000; top:0; left:0; right:0; height:" +
                     m.scrollHeight +
                     "px"),
-                    document.body.appendChild(a),
-                    (c = function () {
+                document.body.appendChild(a),
+                    (c = function() {
                         r =
                             r ||
-                            setTimeout(function () {
+                            setTimeout(function() {
                                 u ||
                                     ((a.style.height = "0"),
-                                    (a.style.height = m.scrollHeight + "px"),
-                                    (r = null));
+                                        (a.style.height = m.scrollHeight + "px"),
+                                        (r = null));
                             }, 500);
                     }),
                     setTimeout(c, 10),
                     Y("resize", c);
                 if (
                     ((i = new R(c)).observe(e, {
-                        attributes: !0,
-                        childList: !0,
-                        characterData: !1,
-                    }),
-                    m.offsetHeight <= o)
+                            attributes: !0,
+                            childList: !0,
+                            characterData: !1,
+                        }),
+                        m.offsetHeight <= o)
                 ) {
                     var l = document.createElement("div");
                     (l.style.clear = "both"), e.appendChild(l);
@@ -98,21 +99,22 @@
             p.fixedBackground ||
                 u ||
                 ((e.style.backgroundAttachment = "scroll"),
-                (t.style.backgroundAttachment = "scroll"));
+                    (t.style.backgroundAttachment = "scroll"));
         }
     }
     var b = [],
         g = !1,
         r = Date.now();
+
     function S(d, f, m) {
         if (
-            ((function (e, t) {
-                (e = 0 < e ? 1 : -1),
+            ((function(e, t) {
+                    (e = 0 < e ? 1 : -1),
                     (t = 0 < t ? 1 : -1),
                     (n.x === e && n.y === t) ||
-                        ((n.x = e), (n.y = t), (b = []), (r = 0));
-            })(f, m),
-            1 != p.accelerationMax)
+                    ((n.x = e), (n.y = t), (b = []), (r = 0));
+                })(f, m),
+                1 != p.accelerationMax)
         ) {
             var e = Date.now() - r;
             if (e < p.accelerationDelta) {
@@ -124,18 +126,18 @@
         }
         if (
             (b.push({
-                x: f,
-                y: m,
-                lastX: f < 0 ? 0.99 : -0.99,
-                lastY: m < 0 ? 0.99 : -0.99,
-                start: Date.now(),
-            }),
-            !g)
+                    x: f,
+                    y: m,
+                    lastX: f < 0 ? 0.99 : -0.99,
+                    lastY: m < 0 ? 0.99 : -0.99,
+                    start: Date.now(),
+                }),
+                !g)
         ) {
             var o = q(),
                 h = d === o || d === document.body;
             null == d.$scrollBehavior &&
-                (function (e) {
+                (function(e) {
                     var t = M(e);
                     if (null == B[t]) {
                         var o = getComputedStyle(e, "")["scroll-behavior"];
@@ -144,12 +146,10 @@
                     return B[t];
                 })(d) &&
                 ((d.$scrollBehavior = d.style.scrollBehavior),
-                (d.style.scrollBehavior = "auto"));
-            var w = function (e) {
+                    (d.style.scrollBehavior = "auto"));
+            var w = function(e) {
                 for (
-                    var t = Date.now(), o = 0, n = 0, r = 0;
-                    r < b.length;
-                    r++
+                    var t = Date.now(), o = 0, n = 0, r = 0; r < b.length; r++
                 ) {
                     var a = b[r],
                         l = t - a.start,
@@ -159,25 +159,27 @@
                     var s = (a.x * c - a.lastX) >> 0,
                         u = (a.y * c - a.lastY) >> 0;
                     (o += s),
-                        (n += u),
-                        (a.lastX += s),
-                        (a.lastY += u),
-                        i && (b.splice(r, 1), r--);
+                    (n += u),
+                    (a.lastX += s),
+                    (a.lastY += u),
+                    i && (b.splice(r, 1), r--);
                 }
                 h
-                    ? window.scrollBy(o, n)
-                    : (o && (d.scrollLeft += o), n && (d.scrollTop += n)),
+                    ?
+                    window.scrollBy(o, n) :
+                    (o && (d.scrollLeft += o), n && (d.scrollTop += n)),
                     f || m || (b = []),
-                    b.length
-                        ? j(w, d, 1e3 / p.frameRate + 1)
-                        : ((g = !1),
-                          null != d.$scrollBehavior &&
-                              ((d.style.scrollBehavior = d.$scrollBehavior),
-                              (d.$scrollBehavior = null)));
+                    b.length ?
+                    j(w, d, 1e3 / p.frameRate + 1) :
+                    ((g = !1),
+                        null != d.$scrollBehavior &&
+                        ((d.style.scrollBehavior = d.$scrollBehavior),
+                            (d.$scrollBehavior = null)));
             };
             j(w, d, 0), (g = !0);
         }
     }
+
     function e(e) {
         f || y();
         var t = e.target;
@@ -195,48 +197,49 @@
             (e.wheelDeltaX &&
                 K(e.wheelDeltaX, 120) &&
                 (o = (e.wheelDeltaX / Math.abs(e.wheelDeltaX)) * -120),
-            e.wheelDeltaY &&
+                e.wheelDeltaY &&
                 K(e.wheelDeltaY, 120) &&
                 (n = (e.wheelDeltaY / Math.abs(e.wheelDeltaY)) * -120)),
             o || n || (n = -e.wheelDelta || 0),
             1 === e.deltaMode && ((o *= 40), (n *= 40));
         var r = z(t);
-        return r
-            ? !!(function (e) {
-                  if (!e) return;
-                  l.length || (l = [e, e, e]);
-                  (e = Math.abs(e)),
-                      l.push(e),
-                      l.shift(),
-                      clearTimeout(a),
-                      (a = setTimeout(function () {
-                          try {
-                              localStorage.SS_deltaBuffer = l.join(",");
-                          } catch (e) {}
-                      }, 1e3));
-                  var t = 120 < e && P(e),
-                      o = !P(120) && !P(100) && !t;
-                  return e < 50 || o;
-              })(n) ||
-                  (1.2 < Math.abs(o) && (o *= p.stepSize / 120),
-                  1.2 < Math.abs(n) && (n *= p.stepSize / 120),
-                  S(r, o, n),
-                  e.preventDefault(),
-                  void C())
-            : !d ||
-                  !W ||
-                  (Object.defineProperty(e, "target", {
-                      value: window.frameElement,
-                  }),
-                  parent.wheel(e));
+        return r ?
+            !!(function(e) {
+                if (!e) return;
+                l.length || (l = [e, e, e]);
+                (e = Math.abs(e)),
+                l.push(e),
+                    l.shift(),
+                    clearTimeout(a),
+                    (a = setTimeout(function() {
+                        try {
+                            localStorage.SS_deltaBuffer = l.join(",");
+                        } catch (e) {}
+                    }, 1e3));
+                var t = 120 < e && P(e),
+                    o = !P(120) && !P(100) && !t;
+                return e < 50 || o;
+            })(n) ||
+            (1.2 < Math.abs(o) && (o *= p.stepSize / 120),
+                1.2 < Math.abs(n) && (n *= p.stepSize / 120),
+                S(r, o, n),
+                e.preventDefault(),
+                void C()) :
+            !d ||
+            !W ||
+            (Object.defineProperty(e, "target", {
+                    value: window.frameElement,
+                }),
+                parent.wheel(e));
     }
+
     function x(e) {
         var t = e.target,
             o =
-                e.ctrlKey ||
-                e.altKey ||
-                e.metaKey ||
-                (e.shiftKey && e.keyCode !== w.spacebar);
+            e.ctrlKey ||
+            e.altKey ||
+            e.metaKey ||
+            (e.shiftKey && e.keyCode !== w.spacebar);
         document.body.contains(s) || (s = document.activeElement);
         var n = /^(button|submit|radio|checkbox|file|color|image)$/i;
         if (
@@ -244,7 +247,7 @@
             /^(textarea|select|embed|object)$/i.test(t.nodeName) ||
             (N(t, "input") && !n.test(t.type)) ||
             N(s, "video") ||
-            (function (e) {
+            (function(e) {
                 var t = e.target,
                     o = !1;
                 if (-1 != document.URL.indexOf("www.youtube.com/watch"))
@@ -310,29 +313,33 @@
         }
         S(l, r, a), e.preventDefault(), C();
     }
+
     function t(e) {
         s = e.target;
     }
     var k,
         D,
         M =
-            ((k = 0),
-            function (e) {
+        ((k = 0),
+            function(e) {
                 return e.uniqueID || (e.uniqueID = k++);
             }),
         E = {},
         T = {},
         B = {};
+
     function C() {
         clearTimeout(D),
-            (D = setInterval(function () {
+            (D = setInterval(function() {
                 E = T = B = {};
             }, 1e3));
     }
+
     function H(e, t, o) {
-        for (var n = o ? E : T, r = e.length; r--; ) n[M(e[r])] = t;
+        for (var n = o ? E : T, r = e.length; r--;) n[M(e[r])] = t;
         return t;
     }
+
     function z(e) {
         var t = [],
             o = document.body,
@@ -346,24 +353,30 @@
             } else if (L(e) && X(e)) return H(t, e);
         } while ((e = e.parentElement));
     }
+
     function L(e) {
         return e.clientHeight + 10 < e.scrollHeight;
     }
+
     function O(e) {
         return (
             "hidden" !== getComputedStyle(e, "").getPropertyValue("overflow-y")
         );
     }
+
     function X(e) {
         var t = getComputedStyle(e, "").getPropertyValue("overflow-y");
         return "scroll" === t || "auto" === t;
     }
+
     function Y(e, t, o) {
         window.addEventListener(e, t, o || !1);
     }
+
     function A(e, t, o) {
         window.removeEventListener(e, t, o || !1);
     }
+
     function N(e, t) {
         return e && (e.nodeName || "").toLowerCase() === t.toLowerCase();
     }
@@ -371,59 +384,63 @@
         try {
             l = localStorage.SS_deltaBuffer.split(",");
         } catch (e) {}
+
     function K(e, t) {
         return Math.floor(e / t) == e / t;
     }
+
     function P(e) {
         return K(l[0], e) && K(l[1], e) && K(l[2], e);
     }
     var $,
         j =
-            window.requestAnimationFrame ||
-            window.webkitRequestAnimationFrame ||
-            window.mozRequestAnimationFrame ||
-            function (e, t, o) {
-                window.setTimeout(e, o || 1e3 / 60);
-            },
+        window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        function(e, t, o) {
+            window.setTimeout(e, o || 1e3 / 60);
+        },
         R =
-            window.MutationObserver ||
-            window.WebKitMutationObserver ||
-            window.MozMutationObserver,
+        window.MutationObserver ||
+        window.WebKitMutationObserver ||
+        window.MozMutationObserver,
         q =
-            (($ = document.scrollingElement),
-            function () {
+        (($ = document.scrollingElement),
+            function() {
                 if (!$) {
                     var e = document.createElement("div");
                     (e.style.cssText = "height:10000px;width:1px;"),
-                        document.body.appendChild(e);
+                    document.body.appendChild(e);
                     var t = document.body.scrollTop;
                     document.documentElement.scrollTop,
                         window.scrollBy(0, 3),
                         ($ =
-                            document.body.scrollTop != t
-                                ? document.body
-                                : document.documentElement),
+                            document.body.scrollTop != t ?
+                            document.body :
+                            document.documentElement),
                         window.scrollBy(0, -3),
                         document.body.removeChild(e);
                 }
                 return $;
             });
+
     function V(e) {
         var t;
         return (
-            ((e *= p.pulseScale) < 1
-                ? e - (1 - Math.exp(-e))
-                : ((e -= 1),
-                  (t = Math.exp(-1)) + (1 - Math.exp(-e)) * (1 - t))) *
+            ((e *= p.pulseScale) < 1 ?
+                e - (1 - Math.exp(-e)) :
+                ((e -= 1),
+                    (t = Math.exp(-1)) + (1 - Math.exp(-e)) * (1 - t))) *
             p.pulseNormalize
         );
     }
+
     function F(e) {
-        return 1 <= e
-            ? 1
-            : e <= 0
-            ? 0
-            : (1 == p.pulseNormalize && (p.pulseNormalize /= V(1)), V(e));
+        return 1 <= e ?
+            1 :
+            e <= 0 ?
+            0 :
+            (1 == p.pulseNormalize && (p.pulseNormalize /= V(1)), V(e));
     }
     var I = window.navigator.userAgent,
         _ = /Edge/.test(I),
@@ -439,7 +456,7 @@
             "test",
             null,
             Object.defineProperty({}, "passive", {
-                get: function () {
+                get: function() {
                     ee = !0;
                 },
             })
@@ -449,12 +466,13 @@
             passive: !1,
         },
         oe =
-            "onwheel" in document.createElement("div") ? "wheel" : "mousewheel";
+        "onwheel" in document.createElement("div") ? "wheel" : "mousewheel";
+
     function ne(e) {
         for (var t in e) o.hasOwnProperty(t) && (p[t] = e[t]);
     }
     oe && Z && (Y(oe, e, te), Y("mousedown", t), Y("load", y)),
-        (ne.destroy = function () {
+        (ne.destroy = function() {
             i && i.disconnect(),
                 A(oe, e),
                 A("mousedown", t),
@@ -463,11 +481,11 @@
                 A("load", y);
         }),
         window.SmoothScrollOptions && ne(window.SmoothScrollOptions),
-        "function" == typeof define && define.amd
-            ? define(function () {
-                  return ne;
-              })
-            : "object" == typeof exports
-            ? (module.exports = ne)
-            : (window.SmoothScroll = ne);
+        "function" == typeof define && define.amd ?
+        define(function() {
+            return ne;
+        }) :
+        "object" == typeof exports ?
+        (module.exports = ne) :
+        (window.SmoothScroll = ne);
 })();

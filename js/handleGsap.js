@@ -1,6 +1,6 @@
 gsap.registerPlugin(ScrollTrigger);
 
-(function ($) {
+(function($) {
     let splitTextInstances = [];
     let splitTextTweens = [];
     let aboutTitleRevealTween = null;
@@ -40,14 +40,14 @@ gsap.registerPlugin(ScrollTrigger);
 
     /* animation_text
   -------------------------------------------------------------------------*/
-    var animation_text = function () {
+    var animation_text = function() {
         clearSplitTextAnimations();
 
         if ($(".split-text").length > 0) {
             var st = $(".split-text");
             if (st.length === 0) return;
             gsap.registerPlugin(SplitText, ScrollTrigger);
-            st.each(function (index, el) {
+            st.each(function(index, el) {
                 const $el = $(el);
                 const $target =
                     $el.find("p, a").length > 0 ? $el.find("p, a")[0] : el;
@@ -59,7 +59,9 @@ gsap.registerPlugin(ScrollTrigger);
                 });
                 splitTextInstances.push(pxl_split);
                 let split_type_set = pxl_split.chars;
-                gsap.set($target, { perspective: 400 });
+                gsap.set($target, {
+                    perspective: 400
+                });
 
                 const settings = {
                     scrollTrigger: {
@@ -96,12 +98,13 @@ gsap.registerPlugin(ScrollTrigger);
                 }
 
                 if (hasClass("split-words-scale")) {
-                    pxl_split.split({ type: "words" });
+                    pxl_split.split({
+                        type: "words"
+                    });
                     split_type_set = pxl_split.words;
                     split_type_set.forEach((elw, index) => {
                         gsap.set(
-                            elw,
-                            {
+                            elw, {
                                 opacity: 0,
                                 scale: index % 2 === 0 ? 0 : 2,
                                 force3D: true,
@@ -123,19 +126,19 @@ gsap.registerPlugin(ScrollTrigger);
                     });
                     splitTextTweens.push(tween);
                 } else if (hasClass("effect-blur-fade")) {
-                    pxl_split.split({ type: "words" });
+                    pxl_split.split({
+                        type: "words"
+                    });
                     split_type_set = pxl_split.words;
                     const isTestimonialFeedback =
                         $el.is("p.text-body-2") &&
                         $el.closest("#testimonial .testimonial-item").length > 0;
                     const tween = gsap.fromTo(
-                        split_type_set,
-                        {
+                        split_type_set, {
                             opacity: 0,
                             filter: isTestimonialFeedback ? "blur(6px)" : "blur(10px)",
                             y: isTestimonialFeedback ? 12 : 20,
-                        },
-                        {
+                        }, {
                             opacity: 1,
                             filter: "blur(0px)",
                             y: 0,
@@ -249,10 +252,10 @@ gsap.registerPlugin(ScrollTrigger);
 
     /* scrolling_effect
   -------------------------------------------------------------------------*/
-    var scrolling_effect = function () {
+    var scrolling_effect = function() {
         if ($(".scrolling-effect").length > 0) {
             var st = $(".scrolling-effect");
-            st.each(function (index, el) {
+            st.each(function(index, el) {
                 var $el = $(el);
                 var delay = parseFloat($el.data("delay")) || 0;
                 var settings = {
@@ -296,7 +299,7 @@ gsap.registerPlugin(ScrollTrigger);
 
     /* stackElement
   -------------------------------------------------------------------------*/
-    var stackElement = function () {
+    var stackElement = function() {
         if ($(".stack-element").length > 0) {
             let totalHeight;
             let scrollTriggerInstances = [];
@@ -344,7 +347,7 @@ gsap.registerPlugin(ScrollTrigger);
 
     /* animationFooter
     -------------------------------------------------------------------------------------*/
-    var animationFooter = function () {
+    var animationFooter = function() {
         if ($(".footer-container").length) {
             gsap.set(".footer-container", {
                 yPercent: -100,
@@ -352,7 +355,9 @@ gsap.registerPlugin(ScrollTrigger);
                 opacity: 0,
                 transformOrigin: "center bottom",
             });
-            const uncover = gsap.timeline({ paused: true });
+            const uncover = gsap.timeline({
+                paused: true
+            });
             uncover.to(".footer-container", {
                 yPercent: 0,
                 scale: 1,
@@ -371,29 +376,39 @@ gsap.registerPlugin(ScrollTrigger);
 
     /* scrollTransform
     -------------------------------------------------------------------------------------*/
-    var scrollTransform = function () {
+    var scrollTransform = function() {
         const scrollTransformElements =
             document.querySelectorAll(".scroll-tranform");
         if (scrollTransformElements.length > 0) {
-            scrollTransformElements.forEach(function (element) {
+            scrollTransformElements.forEach(function(element) {
                 const direction = element.dataset.direction || "up";
                 const distance = element.dataset.distance || "10%";
                 let animationProperty;
                 switch (direction.toLowerCase()) {
                     case "left":
-                        animationProperty = { x: `-${distance}` };
+                        animationProperty = {
+                            x: `-${distance}`
+                        };
                         break;
                     case "right":
-                        animationProperty = { x: `${distance}` };
+                        animationProperty = {
+                            x: `${distance}`
+                        };
                         break;
                     case "up":
-                        animationProperty = { y: `-${distance}` };
+                        animationProperty = {
+                            y: `-${distance}`
+                        };
                         break;
                     case "down":
-                        animationProperty = { y: `${distance}` };
+                        animationProperty = {
+                            y: `${distance}`
+                        };
                         break;
                     default:
-                        animationProperty = { y: `-${distance}` };
+                        animationProperty = {
+                            y: `-${distance}`
+                        };
                 }
 
                 gsap.to(element, {
@@ -409,7 +424,7 @@ gsap.registerPlugin(ScrollTrigger);
         }
     };
 
-    $(function () {
+    $(function() {
         refreshSplitTextAnimations();
         scrolling_effect();
         stackElement();

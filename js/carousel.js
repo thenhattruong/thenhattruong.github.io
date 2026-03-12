@@ -100,14 +100,14 @@ if ($partnerEl.length > 0) {
     initSwiperPartner();
 
     let resizeTimeout;
-    window.addEventListener("resize", function () {
+    window.addEventListener("resize", function() {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(initSwiperPartner, 200);
     });
 }
 
 if ($(".sw-layout").length > 0) {
-    $(".sw-layout").each(function () {
+    $(".sw-layout").each(function() {
         var tfSwCategories = $(this);
         var swiperContainer = tfSwCategories.find(".swiper");
         if (swiperContainer.length === 0) return;
@@ -133,9 +133,9 @@ if ($(".sw-layout").length > 0) {
         var paginationType =
             swiperContainer.data("pagination-type") || "bullets";
         var loop =
-            swiperContainer.data("loop") !== undefined
-                ? swiperContainer.data("loop")
-                : false;
+            swiperContainer.data("loop") !== undefined ?
+            swiperContainer.data("loop") :
+            false;
         var nextBtn = tfSwCategories.find(".nav-next-layout")[0] || null;
         var prevBtn = tfSwCategories.find(".nav-prev-layout")[0] || null;
         var progressbar =
@@ -148,21 +148,17 @@ if ($(".sw-layout").length > 0) {
             speed: 1000,
             centeredSlides: center,
             initialSlide: intitSlide,
-            pagination: progressbar
-                ? {
-                      el: progressbar,
-                      clickable: true,
-                      type: paginationType,
-                  }
-                : false,
+            pagination: progressbar ? {
+                el: progressbar,
+                clickable: true,
+                type: paginationType,
+            } : false,
             observer: true,
             observeParents: true,
-            autoplay: autoplay
-                ? {
-                      delay: 3000,
-                      disableOnInteraction: false,
-                  }
-                : false,
+            autoplay: autoplay ? {
+                delay: 3000,
+                disableOnInteraction: false,
+            } : false,
             navigation: {
                 clickable: true,
                 nextEl: nextBtn,
