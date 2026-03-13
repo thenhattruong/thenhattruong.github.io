@@ -117,6 +117,17 @@
   content: "\e902";
 }
 
+.icon-Telegram:before {
+  content: "";
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.125em;
+  background-color: currentColor;
+  -webkit-mask: url("../../images/logo/telegram-mask.png") center/contain no-repeat;
+  mask: url("../../images/logo/telegram-mask.png") center/contain no-repeat;
+}
+
 .icon-LinkedIn:before {
   content: "\e903";
 }

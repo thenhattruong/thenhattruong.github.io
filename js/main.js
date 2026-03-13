@@ -190,6 +190,259 @@
         }
     };
 
+    const initSkillsMarqueeTooltips = () => {
+        const marquee = document.querySelector(".skills-marquee");
+        if (!marquee) return;
+
+        const labelMap = {
+            "tool-1": "Adobe Premiere Pro",
+            "tool-2": "Adobe After Effects",
+            "tool-3": "Adobe Illustrator",
+            "tool-4": "Adobe Photoshop",
+            "tool-5": "Blender",
+            "tool-6": "CapCut",
+            "tool-7": "Visual Studio Code",
+            "tool-8": "GitHub",
+        };
+
+        let tooltip = document.querySelector(".skill-tooltip");
+        if (!tooltip) {
+            tooltip = document.createElement("div");
+            tooltip.className = "skill-tooltip";
+            document.body.appendChild(tooltip);
+        }
+
+        let activeTarget = null;
+        let rafId = null;
+
+        const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+        const positionTooltip = () => {
+            if (!activeTarget) return;
+            const rect = activeTarget.getBoundingClientRect();
+            const tooltipRect = tooltip.getBoundingClientRect();
+            const x = rect.left + rect.width / 2 - tooltipRect.width / 2;
+            const y = rect.top - tooltipRect.height - 10;
+
+            const maxX = window.innerWidth - tooltipRect.width - 8;
+            const maxY = window.innerHeight - tooltipRect.height - 8;
+            const safeX = clamp(x, 8, Math.max(8, maxX));
+            const safeY = clamp(y, 8, Math.max(8, maxY));
+
+            tooltip.style.left = `${safeX}px`;
+            tooltip.style.top = `${safeY}px`;
+            rafId = window.requestAnimationFrame(positionTooltip);
+        };
+
+        const showTooltip = (label, target) => {
+            if (!label) return;
+            tooltip.textContent = label;
+            tooltip.classList.add("is-visible");
+            activeTarget = target;
+            if (rafId) {
+                window.cancelAnimationFrame(rafId);
+            }
+            rafId = window.requestAnimationFrame(positionTooltip);
+        };
+
+        const hideTooltip = () => {
+            tooltip.classList.remove("is-visible");
+            activeTarget = null;
+            if (rafId) {
+                window.cancelAnimationFrame(rafId);
+                rafId = null;
+            }
+        };
+
+        marquee.querySelectorAll("img").forEach((img) => {
+            if (img.closest(".skill-logo")) return;
+
+            const src = img.getAttribute("src") || "";
+            const match = src.match(/tool-\d+/);
+            const key = match ? match[0] : "";
+            const label =
+                img.getAttribute("data-label") ||
+                img.getAttribute("alt") ||
+                (key && labelMap[key]) ||
+                "";
+
+            if (!label) return;
+
+            if (!img.getAttribute("alt")) {
+                img.setAttribute("alt", label);
+            }
+            img.setAttribute("aria-label", label);
+            img.setAttribute("title", label);
+
+            const wrapper = document.createElement("span");
+            wrapper.className = "skill-logo";
+            wrapper.setAttribute("data-label", label);
+            wrapper.setAttribute("role", "img");
+            wrapper.setAttribute("aria-label", label);
+            wrapper.setAttribute("tabindex", "0");
+
+            const parent = img.parentNode;
+            if (!parent) return;
+            parent.insertBefore(wrapper, img);
+            wrapper.appendChild(img);
+
+            wrapper.addEventListener("pointerenter", () => {
+                showTooltip(label, wrapper);
+            });
+            wrapper.addEventListener("pointerleave", hideTooltip);
+            wrapper.addEventListener("focus", () => {
+                showTooltip(label, wrapper);
+            });
+            wrapper.addEventListener("blur", hideTooltip);
+        });
+    };
+
+    const initAboutIntroCharHover = () => {
+        const intro = document.querySelector(".about-intro");
+        if (!intro) return;
+
+        const buildWords = (text) => {
+            const frag = document.createDocumentFragment();
+            text.split(/(\s+)/).forEach((token) => {
+                if (!token) return;
+                if (/\s+/.test(token)) {
+                    frag.appendChild(document.createTextNode(token));
+                    return;
+                }
+                const span = document.createElement("span");
+                span.className = "word";
+                span.textContent = token;
+                frag.appendChild(span);
+            });
+            return frag;
+        };
+
+        const ensureWordWrap = () => {
+            if (intro.querySelector(".word")) return;
+            const hasChar = intro.querySelector(".char");
+            if (hasChar) {
+                const text = intro.textContent || "";
+                intro.innerHTML = "";
+                intro.appendChild(buildWords(text));
+                return;
+            }
+
+            const walker = document.createTreeWalker(
+                intro,
+                NodeFilter.SHOW_TEXT, {
+                    acceptNode: (node) => {
+                        if (!node.nodeValue) return NodeFilter.FILTER_REJECT;
+                        if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+                        if (
+                            node.parentElement &&
+                            node.parentElement.classList.contains("word")
+                        ) {
+                            return NodeFilter.FILTER_REJECT;
+                        }
+                        return NodeFilter.FILTER_ACCEPT;
+                    },
+                }
+            );
+
+            const textNodes = [];
+            while (walker.nextNode()) {
+                textNodes.push(walker.currentNode);
+            }
+
+            textNodes.forEach((node) => {
+                const frag = buildWords(node.nodeValue || "");
+                node.parentNode.replaceChild(frag, node);
+            });
+        };
+
+        ensureWordWrap();
+
+        if (intro.dataset.wordHoverBound === "true") return;
+        intro.dataset.wordHoverBound = "true";
+
+        let lastWord = null;
+        const getWord = (target) => {
+            if (!target) return null;
+            if (target.classList && target.classList.contains("word")) return target;
+            if (target.closest) return target.closest(".word");
+            return null;
+        };
+
+        const bounceWord = (wordEl) => {
+            if (!wordEl || typeof window.gsap === "undefined") return;
+            window.gsap.killTweensOf(wordEl);
+            window.gsap.fromTo(
+                wordEl, {
+                    y: 0,
+                }, {
+                    y: -12,
+                    duration: 0.22,
+                    yoyo: true,
+                    repeat: 1,
+                    ease: "power2.out",
+                    overwrite: "auto",
+                }
+            );
+        };
+
+        const triggerBounce = (target) => {
+            const wordEl = getWord(target);
+            if (!wordEl || wordEl === lastWord) return;
+            lastWord = wordEl;
+            bounceWord(wordEl);
+        };
+
+        const triggerBounceFromPoint = (x, y) => {
+            const el = document.elementFromPoint(x, y);
+            if (!el) return;
+            triggerBounce(el);
+        };
+
+        intro.addEventListener("pointermove", (event) => {
+            if (event.pointerType === "touch") return;
+            triggerBounce(event.target);
+        });
+
+        intro.addEventListener("pointerdown", (event) => {
+            triggerBounce(event.target);
+        });
+
+        intro.addEventListener(
+            "touchstart",
+            (event) => {
+                const touch = event.touches && event.touches[0];
+                if (!touch) return;
+                triggerBounceFromPoint(touch.clientX, touch.clientY);
+            }, {
+                passive: true,
+            }
+        );
+
+        intro.addEventListener(
+            "touchmove",
+            (event) => {
+                const touch = event.touches && event.touches[0];
+                if (!touch) return;
+                triggerBounceFromPoint(touch.clientX, touch.clientY);
+            }, {
+                passive: true,
+            }
+        );
+
+        intro.addEventListener("pointerleave", () => {
+            lastWord = null;
+        });
+
+        intro.addEventListener("touchend", () => {
+            lastWord = null;
+        });
+
+        intro.addEventListener("touchcancel", () => {
+            lastWord = null;
+        });
+    };
+
+    window.initAboutIntroCharHover = initAboutIntroCharHover;
+
     const handleResumeReveal = () => {
         const resumeSection = document.querySelector("#resume");
         if (!resumeSection) return;
@@ -441,7 +694,7 @@
         const lockedTerms = {
             profileRole: "Multimedia Design",
             aboutTitle: "Designing Visual Experiences",
-            hireMe: "Hire Me",
+            hireMe: "Contact Me",
         };
         const translations = {
             en: {
@@ -453,7 +706,7 @@
                 "menu.portfolio": "Portfolio",
                 "menu.pricing": "Pricing",
                 "menu.contact": "Contact",
-                "cta.hire_me": "Hire Me",
+                "cta.hire_me": "Contact Me",
                 "contact.quick": "Quick Contact",
                 "about.intro_prefix": "Hello! I'm",
                 "about.role_word_1": "Multimedia Design",
@@ -565,7 +818,7 @@
                     "Unlimited Revisions",
                 ],
                 perHour: "/per hour",
-                hireMe: "Hire Me",
+                hireMe: "Contact Me",
                 getStarted: "Get Started !",
                 partnerTag: "Partner",
                 partnerHeading: "Trusted By 50+ Brands Worldwide",
@@ -577,7 +830,7 @@
                 namePlaceholder: "Your name",
                 emailPlaceholder: "Your email",
                 messagePlaceholder: "Your Message...",
-                rights: "© 2026 Truong The Nhat Portfolio. All rights reserved.",
+                rights: "\u00A9 2026 Truong The Nhat Portfolio. All rights reserved.",
                 settingsColor: "Color",
                 settingsBackground: "Background",
                 settingBackgroundNames: [
@@ -738,6 +991,7 @@
             const element = document.querySelector(selector);
             if (element && typeof value === "string") {
                 element.setAttribute("placeholder", value);
+                element.setAttribute("data-typing-base", value);
             }
         };
 
@@ -1088,6 +1342,13 @@
                 }
             }
 
+            if (
+                $(this).hasClass("avatar-link") &&
+                window.matchMedia("(max-width: 767px)").matches
+            ) {
+                offsetTop = 0;
+            }
+
             isScrollingByClick = true;
 
             const currentId = $target.attr("id");
@@ -1183,6 +1444,18 @@
             scrollTimer = setTimeout(updateActiveMenu, 100);
         });
         updateActiveMenu();
+    };
+
+    /* handleMobileAvatarTop
+  -------------------------------------------------------------------------------------*/
+    const handleMobileAvatarTop = () => {
+        $(document).on("click", ".user-bar .box-author .img-style", function(e) {
+            if (!window.matchMedia("(max-width: 767px)").matches) return;
+            e.preventDefault();
+            $("html, body").animate({
+                scrollTop: 0
+            }, 0);
+        });
     };
 
     /* handleEffectSpotlight
@@ -3955,6 +4228,659 @@
             });
     };
 
+    /* handleSocialPopup
+  -------------------------------------------------------------------------*/
+    const handleSocialPopup = () => {
+        const $triggers = $(".js-open-social-popup");
+        if (!$triggers.length) return;
+
+        const $body = $("body");
+        let lastFocusedElement = null;
+
+        const setStatus = ($popup, message) => {
+            if (!$popup || !$popup.length) return;
+            const $status = $popup.find(".email-popup__status");
+            if ($status.length) {
+                $status.text(message || "");
+            }
+        };
+
+        const fallbackCopyText = (value) => {
+            const input = document.createElement("input");
+            input.type = "text";
+            input.value = value;
+            input.setAttribute("readonly", "");
+            input.style.position = "absolute";
+            input.style.left = "-9999px";
+            document.body.appendChild(input);
+            input.select();
+            const copied = document.execCommand("copy");
+            document.body.removeChild(input);
+            return copied;
+        };
+
+        const copyText = async (value) => {
+            if (!value) return false;
+
+            if (navigator.clipboard && window.isSecureContext) {
+                try {
+                    await navigator.clipboard.writeText(value);
+                    return true;
+                } catch (error) {
+                    return fallbackCopyText(value);
+                }
+            }
+
+            return fallbackCopyText(value);
+        };
+
+        const openPopup = ($popup) => {
+            if (!$popup || !$popup.length) return;
+
+            lastFocusedElement = document.activeElement;
+            setStatus($popup, "");
+            $popup.addClass("is-open").attr("aria-hidden", "false");
+            $body.addClass("social-popup-open");
+
+            const $focusTarget = $popup
+                .find(
+                    "[data-open-social], [data-copy-social], [data-close-social-popup]"
+                )
+                .filter(":visible")
+                .first();
+
+            if ($focusTarget.length) {
+                setTimeout(() => {
+                    $focusTarget.trigger("focus");
+                }, 50);
+            }
+        };
+
+        const closePopup = ($popup) => {
+            if (!$popup || !$popup.length || !$popup.hasClass("is-open")) return;
+
+            $popup.removeClass("is-open").attr("aria-hidden", "true");
+
+            if (!$(".email-popup.social-popup.is-open").length) {
+                $body.removeClass("social-popup-open");
+            }
+
+            if (
+                lastFocusedElement &&
+                typeof lastFocusedElement.focus === "function"
+            ) {
+                lastFocusedElement.focus();
+            }
+        };
+
+        $triggers.on("click", function(e) {
+            e.preventDefault();
+            const target = $(this).data("popup-target");
+            const $popup = target ? $(target) : $();
+            if (!$popup.length) return;
+            openPopup($popup);
+        });
+
+        $(document)
+            .off("click.handleSocialPopup")
+            .on("click.handleSocialPopup", "[data-close-social-popup]", function(e) {
+                e.preventDefault();
+                closePopup($(this).closest(".email-popup"));
+            })
+            .on("click.handleSocialPopup", "[data-open-social]", function() {
+                closePopup($(this).closest(".email-popup"));
+            })
+            .on("click.handleSocialPopup", "[data-copy-social]", async function(e) {
+                e.preventDefault();
+                const $button = $(this);
+                const $popup = $button.closest(".email-popup");
+                const copyValue = $button.data("copy-value");
+                const successMessage =
+                    $button.data("copy-success") || "Copied to clipboard.";
+                const failMessage =
+                    $button.data("copy-fail") ||
+                    "Could not copy. Please copy it manually.";
+                const isCopied = await copyText(copyValue);
+                setStatus($popup, isCopied ? successMessage : failMessage);
+            });
+
+        $(document)
+            .off("keydown.handleSocialPopup")
+            .on("keydown.handleSocialPopup", function(e) {
+                if (e.key === "Escape") {
+                    const $openPopup = $(".email-popup.social-popup.is-open");
+                    if ($openPopup.length) {
+                        closePopup($openPopup);
+                    }
+                }
+            });
+    };
+
+    /* handleContactTypingEffect
+  -------------------------------------------------------------------------*/
+    const handleContactTypingEffect = () => {
+        const typingSelector =
+            ".form-contact input[placeholder], .form-contact textarea[placeholder]";
+        const fields = Array.from(document.querySelectorAll(typingSelector));
+        if (!fields.length) return;
+
+        const prefersReducedMotion = window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+        ).matches;
+
+        const config = {
+            startDelay: 320,
+            typeSpeed: 58,
+            deleteSpeed: 32,
+            pauseAfterWord: 1100,
+            pauseAfterDelete: 260,
+            cycleDuration: 5000,
+        };
+
+        const states = new Map();
+
+        const triggerClickAnimation = (state) => {
+            if (!state || !state.field) return;
+            const { field } = state;
+            field.classList.remove("is-typing-clicked");
+            void field.offsetWidth;
+            field.classList.add("is-typing-clicked");
+            if (state.clickTimer) {
+                window.clearTimeout(state.clickTimer);
+            }
+            state.clickTimer = window.setTimeout(() => {
+                field.classList.remove("is-typing-clicked");
+            }, 560);
+        };
+
+        const getPhraseSignature = (phrases, isCustom) =>
+            `${isCustom ? "custom" : "base"}:${phrases.join("|")}`;
+
+        const resolvePhrases = (field) => {
+            const custom = field.getAttribute("data-typing-phrases");
+            if (custom) {
+                const list = custom
+                    .split("|")
+                    .map((item) => item.trim())
+                    .filter(Boolean);
+                if (list.length) {
+                    return {
+                        phrases: list,
+                        signature: getPhraseSignature(list, true),
+                    };
+                }
+            }
+
+            const baseText =
+                field.getAttribute("data-typing-base") ||
+                field.getAttribute("placeholder") ||
+                "";
+            const baseValue = baseText.trim();
+            const phrases = baseValue ? [baseValue] : [];
+            return {
+                phrases,
+                signature: getPhraseSignature(phrases, false),
+            };
+        };
+
+        let rafId = null;
+
+        const startLoop = () => {
+            if (rafId !== null) return;
+            rafId = window.requestAnimationFrame(step);
+        };
+
+        const updateStatePhrases = (state) => {
+            const { phrases, signature } = resolvePhrases(state.field);
+            if (!phrases.length) return false;
+
+            if (state.signature !== signature) {
+                state.phrases = phrases;
+                state.signature = signature;
+                state.phraseIndex = 0;
+                state.charIndex = 0;
+                state.isDeleting = false;
+            }
+            return true;
+        };
+
+        const getSpeedFactor = (field) => {
+            const customSpeed = parseFloat(
+                field.getAttribute("data-typing-speed") || ""
+            );
+            if (Number.isFinite(customSpeed) && customSpeed > 0) {
+                return customSpeed;
+            }
+            if (
+                field.id === "message" ||
+                field.id === "modal-message" ||
+                field.id === "name" ||
+                field.id === "modal-name" ||
+                field.id === "email" ||
+                field.id === "modal-email"
+            ) {
+                return 1.5;
+            }
+            return 1;
+        };
+
+        const computeTimings = (phraseLength, speedFactor) => {
+            const safeFactor = Number.isFinite(speedFactor) && speedFactor > 0 ?
+                speedFactor :
+                1;
+            const pauseAfterWord = config.pauseAfterWord;
+            const pauseAfterDelete = config.pauseAfterDelete;
+            let typeDelay = config.typeSpeed / safeFactor;
+            let deleteDelay = config.deleteSpeed / safeFactor;
+
+            if (!phraseLength) {
+                return {
+                    typeDelay,
+                    deleteDelay,
+                    pauseAfterWord,
+                    pauseAfterDelete,
+                };
+            }
+
+            const baseTotal =
+                phraseLength * (typeDelay + deleteDelay) +
+                pauseAfterWord +
+                pauseAfterDelete;
+
+            if (baseTotal <= config.cycleDuration) {
+                const extraIdle = config.cycleDuration - baseTotal;
+                return {
+                    typeDelay,
+                    deleteDelay,
+                    pauseAfterWord,
+                    pauseAfterDelete: pauseAfterDelete + extraIdle,
+                };
+            }
+
+            const available =
+                config.cycleDuration - pauseAfterWord - pauseAfterDelete;
+            if (available <= 0) {
+                return {
+                    typeDelay,
+                    deleteDelay,
+                    pauseAfterWord,
+                    pauseAfterDelete,
+                };
+            }
+
+            const perChar = available / (phraseLength * 2);
+            typeDelay = perChar;
+            deleteDelay = perChar;
+
+            return {
+                typeDelay,
+                deleteDelay,
+                pauseAfterWord,
+                pauseAfterDelete,
+            };
+        };
+
+        const setLineProgress = (state, phraseLength) => {
+            const safeLength = phraseLength > 0 ? phraseLength : 0;
+            const progress = safeLength ?
+                Math.max(0, Math.min(1, state.charIndex / safeLength)) :
+                0;
+            state.field.style.setProperty(
+                "--typing-line-progress",
+                progress.toFixed(3)
+            );
+        };
+
+        const advanceState = (state, now) => {
+            if (!state.field.isConnected) {
+                states.delete(state.field);
+                return;
+            }
+
+            if (now < state.nextChangeAt) return;
+
+            if (!updateStatePhrases(state)) {
+                states.delete(state.field);
+                return;
+            }
+
+            const phrase = state.phrases[state.phraseIndex] || "";
+            const speedFactor = getSpeedFactor(state.field);
+            const timings = computeTimings(phrase.length, speedFactor);
+
+            let guard = 0;
+            while (now >= state.nextChangeAt && guard < 6) {
+                const isDeleting = state.isDeleting;
+                const speed = isDeleting ?
+                    timings.deleteDelay :
+                    timings.typeDelay;
+
+                if (!isDeleting) {
+                    state.charIndex += 1;
+                    const nextText = phrase.substring(0, state.charIndex);
+                    state.field.setAttribute("placeholder", nextText);
+                    setLineProgress(state, phrase.length);
+
+                    if (state.charIndex >= phrase.length) {
+                        state.isDeleting = true;
+                        state.nextChangeAt = now + timings.pauseAfterWord;
+                        break;
+                    }
+
+                    state.nextChangeAt = now + speed;
+                } else {
+                    state.charIndex = 0;
+                    state.field.setAttribute("placeholder", "");
+                    setLineProgress(state, 0);
+                    state.isDeleting = false;
+                    state.phraseIndex =
+                        (state.phraseIndex + 1) % state.phrases.length;
+                    const clearIdle =
+                        Math.max(0, phrase.length * timings.deleteDelay);
+                    state.nextChangeAt =
+                        now + timings.pauseAfterDelete + clearIdle;
+                    break;
+                }
+
+                guard += 1;
+            }
+        };
+
+        const step = (now) => {
+            states.forEach((state) => advanceState(state, now));
+            if (states.size) {
+                rafId = window.requestAnimationFrame(step);
+            } else {
+                rafId = null;
+            }
+        };
+
+        const initField = (field) => {
+            if (!field || states.has(field)) return;
+
+            const base =
+                field.getAttribute("data-typing-base") ||
+                field.getAttribute("placeholder") ||
+                "";
+            if (!base.trim()) return;
+
+            if (!field.getAttribute("data-typing-base")) {
+                field.setAttribute("data-typing-base", base);
+            }
+
+            if (prefersReducedMotion) {
+                field.setAttribute("placeholder", base);
+                return;
+            }
+
+            const state = {
+                field,
+                phrases: [],
+                signature: "",
+                phraseIndex: 0,
+                charIndex: 0,
+                isDeleting: false,
+                clickTimer: null,
+                startDelay: config.startDelay,
+                nextChangeAt: 0,
+            };
+
+            states.set(field, state);
+            updateStatePhrases(state);
+
+            field.setAttribute("placeholder", "");
+            field.style.setProperty("--typing-line-progress", "0");
+            state.nextChangeAt =
+                (window.performance ? performance.now() : Date.now()) +
+                state.startDelay;
+            startLoop();
+
+            const handleFocus = () => {
+                field.classList.add("is-typing-focus");
+                triggerClickAnimation(state);
+            };
+
+            const handlePointerDown = () => {
+                field.classList.add("is-typing-focus");
+                triggerClickAnimation(state);
+            };
+
+            const handleBlur = () => {
+                field.classList.remove("is-typing-focus");
+            };
+
+            field.addEventListener("focus", handleFocus);
+            field.addEventListener("pointerdown", handlePointerDown);
+            field.addEventListener("blur", handleBlur);
+        };
+
+        const initFields = (root) => {
+            const context = root && root.querySelectorAll ? root : document;
+            const items = Array.from(context.querySelectorAll(typingSelector));
+            items.forEach((field) => initField(field));
+        };
+
+        initFields(document);
+        startLoop();
+
+        window.refreshContactTypingEffect = (root) => {
+            initFields(root);
+            startLoop();
+        };
+    };
+
+    /* handleContactServiceMessage
+  -------------------------------------------------------------------------*/
+    const handleContactServiceMessage = () => {
+        const selector = ".list-tag a[data-contact-message]";
+
+        $(document)
+            .off("click.handleContactServiceMessage")
+            .on("click.handleContactServiceMessage", selector, function(e) {
+                e.preventDefault();
+                const $link = $(this);
+                const message = $link.data("contact-message");
+                if (!message) return;
+
+                const $form = $link.closest("form");
+                let $textarea = $form
+                    .find("textarea[name='message']")
+                    .first();
+                if (!$textarea.length) {
+                    $textarea = $form
+                        .find("#message, #modal-message, textarea")
+                        .first();
+                }
+                if (!$textarea.length) return;
+
+                $textarea.val(message);
+                $textarea.trigger("input");
+                $textarea.trigger("change");
+                $textarea.focus();
+            });
+    };
+
+    /* handleContactEmailJS
+  -------------------------------------------------------------------------*/
+    const handleContactEmailJS = () => {
+        const $forms = $(".js-emailjs-form");
+        if (!$forms.length) return;
+
+        const statusMessages = {
+            en: {
+                sending: "Sending your message...",
+                success: "Thanks! Your message has been sent.",
+                error: "Sorry, something went wrong. Please try again.",
+                missing: "EmailJS is not configured yet. Please add your keys.",
+                missingSdk: "EmailJS SDK is not loaded. Please check the script tag.",
+            },
+            vi: {
+                sending: "Đang gửi tin nhắn của bạn...",
+                success: "Cảm ơn bạn! Tin nhắn đã được gửi.",
+                error: "Xin lỗi, gửi thất bại. Vui lòng thử lại.",
+                missing: "Biểu mẫu chưa được cấu hình EmailJS. Vui lòng thêm khóa.",
+                missingSdk: "Chưa tải EmailJS. Vui lòng kiểm tra thẻ script.",
+            },
+        };
+
+        const $toast = $("#form-toast");
+        const $toastMessage = $toast.find(".form-toast__message");
+        const $toastTitle = $toast.find(".form-toast__title");
+        let toastTimer = null;
+
+        const hideToast = () => {
+            if (!$toast.length) return;
+            $toast
+                .removeClass("is-open")
+                .removeAttr("data-status")
+                .attr("aria-hidden", "true");
+            $("body").removeClass("form-toast-open");
+        };
+
+        const showToast = (message, status) => {
+            if (!$toast.length) return;
+            $toastMessage.text(message);
+            if (status) {
+                $toast.attr("data-status", status);
+            } else {
+                $toast.removeAttr("data-status");
+            }
+            $toast.addClass("is-open").attr("aria-hidden", "false");
+            $("body").addClass("form-toast-open");
+            if (toastTimer) {
+                clearTimeout(toastTimer);
+            }
+            toastTimer = setTimeout(hideToast, 4200);
+        };
+
+        const getLanguage = () =>
+            $("body").attr("data-language") === "vi" ? "vi" : "en";
+
+        const getStatusText = (key) => {
+            const lang = getLanguage();
+            if (statusMessages[lang] && statusMessages[lang][key]) {
+                return statusMessages[lang][key];
+            }
+            return statusMessages.en[key] || "";
+        };
+
+        const getStatusTitle = (status) => {
+            const lang = getLanguage();
+            const titles = {
+                en: {
+                    success: "Message sent",
+                    error: "Message failed",
+                    sending: "Sending",
+                },
+                vi: {
+                    success: "Đã gửi thành công",
+                    error: "Gửi thất bại",
+                    sending: "Đang gửi",
+                },
+            };
+            const langTitles = titles[lang] || titles.en;
+            return langTitles[status] || langTitles.error;
+        };
+
+        const notify = (key, status) => {
+            const resolvedStatus =
+                status || (key === "success" || key === "sending" ? key : "error");
+            if ($toastTitle.length) {
+                $toastTitle.text(getStatusTitle(resolvedStatus));
+            }
+            showToast(getStatusText(key), resolvedStatus);
+        };
+
+        const setStatus = ($form, key, status) => {
+            const $status = $form.find(".form-status").first();
+            if (!$status.length) return;
+            $status.text("").removeAttr("data-status");
+        };
+
+        let emailJsReady = false;
+        const ensureEmailJS = (publicKey) => {
+            if (!window.emailjs || !publicKey) return false;
+            if (emailJsReady) return true;
+            try {
+                try {
+                    window.emailjs.init({
+                        publicKey,
+                    });
+                } catch (error) {
+                    window.emailjs.init(publicKey);
+                }
+                emailJsReady = true;
+                return true;
+            } catch (error) {
+                console.error("EmailJS init failed:", error);
+                return false;
+            }
+        };
+
+        $(document)
+            .off("click.handleFormToast")
+            .on("click.handleFormToast", "[data-close-form-toast]", function() {
+                hideToast();
+            })
+            .off("keydown.handleFormToast")
+            .on("keydown.handleFormToast", function(e) {
+                if (e.key === "Escape") {
+                    hideToast();
+                }
+            });
+
+        $(document)
+            .off("submit.handleContactEmailJS")
+            .on("submit.handleContactEmailJS", ".js-emailjs-form", function(e) {
+                e.preventDefault();
+                const $form = $(this);
+                const formElement = $form.get(0);
+                const serviceId = $form.data("emailjs-service");
+                const templateId = $form.data("emailjs-template");
+                const publicKey = $form.data("emailjs-public-key");
+
+                if (!serviceId || !templateId || !publicKey) {
+                    setStatus($form, "missing", "error");
+                    notify("missing", "error");
+                    return;
+                }
+
+                if (!window.emailjs) {
+                    setStatus($form, "missingSdk", "error");
+                    notify("missingSdk", "error");
+                    return;
+                }
+
+                if (!ensureEmailJS(publicKey)) {
+                    setStatus($form, "error", "error");
+                    notify("error", "error");
+                    return;
+                }
+
+                const $button = $form.find("button[type='submit']").first();
+                $button.prop("disabled", true).attr("aria-busy", "true");
+                setStatus($form, "sending", "sending");
+
+                window.emailjs
+                    .sendForm(serviceId, templateId, formElement)
+                    .then(() => {
+                        setStatus($form, "success", "success");
+                        notify("success", "success");
+                        if (formElement) {
+                            formElement.reset();
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("EmailJS send failed:", error);
+                        setStatus($form, "error", "error");
+                        notify("error", "error");
+                    })
+                    .finally(() => {
+                        $button.prop("disabled", false).removeAttr("aria-busy");
+                    });
+            });
+    };
+
     /* handleContactModal
   -------------------------------------------------------------------------*/
     const handleContactModal = () => {
@@ -3987,6 +4913,7 @@
             $clonedForm.find("#name").attr("id", "modal-name");
             $clonedForm.find("#email").attr("id", "modal-email");
             $clonedForm.find("#message").attr("id", "modal-message");
+            $clonedForm.find(".form-status").text("").removeAttr("data-status");
             $clonedForm.find(".item-shape").hide();
 
             if (sourceElement && clonedElement) {
@@ -4011,6 +4938,9 @@
             }
 
             $modalContent.empty().append($clonedForm);
+            if (typeof window.refreshContactTypingEffect === "function") {
+                window.refreshContactTypingEffect($modalContent.get(0));
+            }
         };
 
         const openModal = () => {
@@ -4131,6 +5061,7 @@
         switchMode();
         switchLanguage();
         oneNavOnePage();
+        handleMobileAvatarTop();
         lockUserBarScrollOnHover();
         handleEffectSpotlight();
         handleCounterTouchEffect();
@@ -4143,12 +5074,18 @@
         handlePartnerLogoMask();
         handlePartnerLogoLinks();
         handleSkillsMarqueeReveal();
+        initSkillsMarqueeTooltips();
+        initAboutIntroCharHover();
         preventDefault();
         spliting();
         runOrderedIntroSequence().catch((error) => {
             console.error("runOrderedIntroSequence failed:", error);
         });
         handleEmailPopup();
+        handleSocialPopup();
+        handleContactTypingEffect();
+        handleContactServiceMessage();
+        handleContactEmailJS();
         handleContactModal();
         handleSidebar();
     });

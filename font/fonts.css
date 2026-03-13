@@ -222,5 +222,7 @@
   font-family: 'Nasalization';
   font-style: normal;
   font-weight: 400;
-  src: url(Nasalization\ Rg.otf);
+  font-display: swap;
+  src: url("Nasalization Rg.otf") format("opentype");
 }
+

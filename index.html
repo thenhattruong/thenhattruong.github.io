@@ -37,7 +37,7 @@
   <!-- Font -->
   <link href="font/fonts.css" rel="stylesheet"/>
   <!-- Icon -->
-  <link href="icons/icomoon/style.css" rel="stylesheet" type="text/css"/>
+  <link href="icons/icomoon/style.css?v=20260313-2" rel="stylesheet" type="text/css"/>
   <!-- Favicon and Touch Icons -->
   <link href="images/logo/logo-web.png?v=20260309-2" rel="icon" type="image/png"/>
   <link href="images/logo/logo-web.png?v=20260309-2" rel="shortcut icon"/>
@@ -161,7 +161,7 @@
        </button>
        <a class="tf-btn style-1 animate-hover-btn sm-hide js-open-contact-modal" href="#contact">
         <span data-i18n="cta.hire_me">
-         Hire Me
+         Contact Me
         </span>
        </a>
        <a class="menu-button show-menu-mobile d-xl-none link-no-action" data-target="#menu-2" href="#">
@@ -267,7 +267,7 @@
            <div class="text-label text-uppercase fw-6 text_primary-color font-3 mb_16 letter-spacing-1">
             Multimedia Design
            </div>
-           <a class="hover-underline-link text_white text-body-2 mb_4 js-open-email-popup" href="mailto:thenhattruong@gmail.com">
+           <a class="hover-underline-link text_white text-body-2 mb_4 js-open-contact-modal" href="#contact">
             thenhattruong@gmail.com
            </a>
            <p class="text-caption-2 text_secondary-color font-3">
@@ -277,15 +277,15 @@
          </div>
          <ul class="list-icon d-flex justify-content-center">
           <li>
-           <a class="icon-Facebook" href="https://www.facebook.com/TTN.Use/">
+           <a class="icon-Facebook js-open-social-popup" data-popup-target="#facebook-popup" href="https://www.facebook.com/TTN.Use/">
            </a>
           </li>
           <li>
-           <a class="icon-EnvelopeSimple js-open-email-popup" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=thenhattruong%40gmail.com" rel="noopener noreferrer" target="_blank">
+           <a class="icon-Telegram js-open-email-popup" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=thenhattruong%40gmail.com" rel="noopener noreferrer" target="_blank">
            </a>
           </li>
           <li>
-           <a class="icon-Zalo" href="https://zalo.me/0973883053" rel="noopener noreferrer" target="_blank">
+           <a class="icon-Zalo js-open-social-popup" data-popup-target="#zalo-popup" href="https://zalo.me/0973883053" rel="noopener noreferrer" target="_blank">
            </a>
           </li>
          </ul>
@@ -337,7 +337,7 @@
          <h1 class="title mb_16 about-title-follow" data-i18n="about.title">
           Designing Visual Experiences
          </h1>
-         <p class="text_muted-color font-3 mb_43 split-text split-lines-transform">
+         <p class="text_muted-color font-3 mb_43 split-text split-lines-transform about-intro">
           Hello! I'm Truong The Nhat, a Multimedia Designer with 3+ years of experience in video editing, motion graphics, and digital design, creating impactful visual content for brands and digital platforms.
          </p>
          <div class="wrap-counter tf-grid-layout md-col-3">
@@ -1343,15 +1343,15 @@
           </div>
           <ul class="list-icon d-flex">
            <li>
-            <a class="icon-Facebook" href="https://www.facebook.com/TTN.Use/">
+            <a class="icon-Facebook js-open-social-popup" data-popup-target="#facebook-popup" href="https://www.facebook.com/TTN.Use/">
             </a>
            </li>
            <li>
-            <a class="icon-EnvelopeSimple js-open-email-popup" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=thenhattruong%40gmail.com" rel="noopener noreferrer" target="_blank">
+            <a class="icon-Telegram js-open-email-popup" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=thenhattruong%40gmail.com" rel="noopener noreferrer" target="_blank">
             </a>
            </li>
            <li>
-            <a class="icon-Zalo" href="https://zalo.me/0973883053" rel="noopener noreferrer" target="_blank">
+            <a class="icon-Zalo js-open-social-popup" data-popup-target="#zalo-popup" href="https://zalo.me/0973883053" rel="noopener noreferrer" target="_blank">
             </a>
            </li>
           </ul>
@@ -1359,42 +1359,47 @@
         </div>
        </div>
        <div class="col-12 col-xl-7">
-        <form class="form-contact bs-light-mode">
+        <form class="form-contact bs-light-mode js-emailjs-form" data-emailjs-service="service_kr5f3fk" data-emailjs-template="template_erbsdrv" data-emailjs-public-key="uPtzaITL9ULTQS7tZ">
          <div class="d-grid gap_24 mb_24">
           <fieldset class="">
-           <input aria-required="true" id="name" name="name" placeholder="Your name" required="" tabindex="2" type="text"/>
+           <input aria-required="true" data-typing-speed="1.5" id="name" name="name" placeholder="Your name" required="" tabindex="2" type="text"/>
           </fieldset>
           <fieldset class="">
-           <input aria-required="true" class="" id="email" name="email" placeholder="Your email" required="" tabindex="2" type="email" value=""/>
+           <input aria-required="true" class="" data-typing-speed="1.5" id="email" name="email" placeholder="Your email" required="" tabindex="2" type="email" value=""/>
           </fieldset>
           <fieldset>
-           <textarea aria-required="true" class="" id="message" placeholder="Your Message..." required="" rows="4" tabindex="2"></textarea>
+           <textarea aria-required="true" class="" data-typing-speed="1.5" id="message" name="message" placeholder="Your Message..." required="" rows="4" tabindex="2"></textarea>
           </fieldset>
          </div>
          <ul class="list-tag">
           <li>
-           <a class="text_white text-body-1 font-3" href="#">
-            &lt; $1,000
+           <a class="text_white text-body-1 font-3" data-contact-message="Hi, I need help editing a video." href="#">
+            Edit Video
            </a>
           </li>
           <li>
-           <a class="text_white text-body-1 font-3" href="#">
-            $1,000 - $5,000
+           <a class="text_white text-body-1 font-3" data-contact-message="Hi, I need motion graphics for my project." href="#">
+            Motion Design
            </a>
           </li>
           <li>
-           <a class="text_white text-body-1 font-3" href="#">
-            $5,000 - $10,000
+           <a class="text_white text-body-1 font-3" data-contact-message="Hi, I need a poster design." href="#">
+            Poster Design
            </a>
           </li>
           <li>
-           <a class="text_white text-body-1 font-3" href="#">
-            $10,000 - 20,000
+           <a class="text_white text-body-1 font-3" data-contact-message="Hi, I need graphic design for my project." href="#">
+            Graphic Design
            </a>
           </li>
           <li>
-           <a class="text_white text-body-1 font-3" href="#">
-            &lt; $20,000
+           <a class="text_white text-body-1 font-3" data-contact-message="Hi, I need a 3D design." href="#">
+            3D Design
+           </a>
+          </li>
+          <li>
+           <a class="text_white text-body-1 font-3" data-contact-message="Hi, I need a website or landing page." href="#">
+            Website / Landing Page
            </a>
           </li>
          </ul>
@@ -1405,6 +1410,8 @@
            </span>
           </button>
          </div>
+         <p aria-live="polite" class="form-status" role="status">
+         </p>
          <div class="item-shape">
           <img alt="item" decoding="async" loading="lazy" src="images/item/small-comet.webp"/>
          </div>
@@ -1412,26 +1419,26 @@
        </div>
       </div>
       <p class="font-3 text_secondary-color text-center">
-       &copy; 2026 Truong The Nhat. All rights reserved.
+       &copy; 2026 Truong The Nhat Portfolio. All rights reserved.
       </p>
      </div>
      <!-- End section-contact -->
      <aside aria-label="Quick contact links" class="quick-contact-floating bs-light-mode">
       <ul class="quick-contact-icons">
        <li>
-        <a aria-label="Facebook" class="quick-contact-link" href="https://www.facebook.com/TTN.Use/" rel="noopener noreferrer" target="_blank" title="Facebook">
+        <a aria-label="Facebook" class="quick-contact-link js-open-social-popup" data-popup-target="#facebook-popup" href="https://www.facebook.com/TTN.Use/" rel="noopener noreferrer" target="_blank" title="Facebook">
          <i class="icon-Facebook">
          </i>
         </a>
        </li>
        <li>
         <a aria-label="Email" class="quick-contact-link js-open-email-popup" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=thenhattruong%40gmail.com" rel="noopener noreferrer" target="_blank" title="Email">
-         <i class="icon-EnvelopeSimple">
+         <i class="icon-Telegram">
          </i>
         </a>
        </li>
        <li>
-        <a aria-label="Zalo" class="quick-contact-link" href="https://zalo.me/0973883053" rel="noopener noreferrer" target="_blank" title="Zalo">
+        <a aria-label="Zalo" class="quick-contact-link js-open-social-popup" data-popup-target="#zalo-popup" href="https://zalo.me/0973883053" rel="noopener noreferrer" target="_blank" title="Zalo">
          <i class="icon-Zalo">
          </i>
         </a>
@@ -1473,20 +1480,75 @@
      &times;
     </button>
     <p class="email-popup__title">
-     Contact Via Gmail
-    </p>
-    <p class="email-popup__address">
-     thenhattruong@gmail.com
+     Contact Via Telegram
     </p>
     <div class="email-popup__actions">
      <a class="email-popup__btn email-popup__btn--primary" data-open-gmail="" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=thenhattruong%40gmail.com" rel="noopener noreferrer" target="_blank">
-      Open Gmail
+      Open Telegram
      </a>
      <button class="email-popup__btn" data-copy-email="" data-email-address="thenhattruong@gmail.com" type="button">
-      Copy Email
+      Copy Link
      </button>
     </div>
-    <p aria-live="polite" class="email-popup__status">
+   <p aria-live="polite" class="email-popup__status">
+   </p>
+  </div>
+ </div>
+ <div aria-hidden="true" class="email-popup social-popup" id="facebook-popup">
+  <div class="email-popup__backdrop" data-close-social-popup="">
+  </div>
+  <div aria-label="Facebook options" aria-modal="true" class="email-popup__dialog" role="dialog">
+   <button aria-label="Close Facebook popup" class="email-popup__close" data-close-social-popup="" type="button">
+    &times;
+   </button>
+   <p class="email-popup__title">
+    Contact Via Facebook
+   </p>
+   <div class="email-popup__actions">
+    <a class="email-popup__btn email-popup__btn--primary" data-open-social="" href="https://www.facebook.com/TTN.Use/" rel="noopener noreferrer" target="_blank">
+     Open Facebook
+    </a>
+    <button class="email-popup__btn" data-copy-social="" data-copy-success="Facebook link copied to clipboard." data-copy-value="https://www.facebook.com/TTN.Use/" type="button">
+     Copy Link
+    </button>
+   </div>
+   <p aria-live="polite" class="email-popup__status">
+   </p>
+  </div>
+ </div>
+ <div aria-hidden="true" class="email-popup social-popup" id="zalo-popup">
+  <div class="email-popup__backdrop" data-close-social-popup="">
+  </div>
+  <div aria-label="Zalo options" aria-modal="true" class="email-popup__dialog" role="dialog">
+   <button aria-label="Close Zalo popup" class="email-popup__close" data-close-social-popup="" type="button">
+    &times;
+   </button>
+   <p class="email-popup__title">
+    Contact Via Zalo
+   </p>
+   <div class="email-popup__actions">
+    <a class="email-popup__btn email-popup__btn--primary" data-open-social="" href="https://zalo.me/0973883053" rel="noopener noreferrer" target="_blank">
+     Open Zalo
+    </a>
+    <button class="email-popup__btn" data-copy-social="" data-copy-success="Zalo link copied to clipboard." data-copy-value="https://zalo.me/0973883053" type="button">
+     Copy Link
+    </button>
+   </div>
+   <p aria-live="polite" class="email-popup__status">
+   </p>
+  </div>
+ </div>
+  <div aria-hidden="true" aria-label="Form notification" class="form-toast" id="form-toast" role="dialog">
+   <div class="form-toast__backdrop" data-close-form-toast="">
+   </div>
+   <div class="form-toast__dialog">
+    <button aria-label="Close notification" class="form-toast__close" data-close-form-toast="" type="button">
+     &times;
+    </button>
+    <h3 class="form-toast__title">
+     Notification
+    </h3>
+    <p aria-live="polite" class="form-toast__message">
     </p>
    </div>
   </div>
@@ -1666,6 +1728,8 @@
   <script src="js/textanimation.js">
   </script>
   <script src="js/jquery.fancybox.js">
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
   </script>
   <script src="js/main.js?v=20260312-4">
   </script>

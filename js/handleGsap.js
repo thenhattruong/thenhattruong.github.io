@@ -46,6 +46,7 @@ gsap.registerPlugin(ScrollTrigger);
         if ($(".split-text").length > 0) {
             var st = $(".split-text");
             if (st.length === 0) return;
+            const isMobile = window.matchMedia("(max-width: 767px)").matches;
             gsap.registerPlugin(SplitText, ScrollTrigger);
             st.each(function(index, el) {
                 const $el = $(el);
@@ -80,6 +81,11 @@ gsap.registerPlugin(ScrollTrigger);
                     hasClass("split-lines-transform") ||
                     hasClass("split-lines-rotation-x")
                 ) {
+                    if (isMobile) {
+                        settings.scrollTrigger.start = "top 92%";
+                        settings.duration = 0.6;
+                        settings.stagger = 0.2;
+                    }
                     pxl_split.split({
                         type: "lines",
                         lineThreshold: 0.5,
@@ -87,7 +93,7 @@ gsap.registerPlugin(ScrollTrigger);
                     });
                     split_type_set = pxl_split.lines;
                     settings.opacity = 0;
-                    settings.stagger = 0.5;
+                    if (!isMobile) settings.stagger = 0.5;
                     if (hasClass("split-lines-rotation-x")) {
                         settings.rotationX = -120;
                         settings.transformOrigin = "top center -50";
@@ -245,6 +251,9 @@ gsap.registerPlugin(ScrollTrigger);
     const refreshSplitTextAnimations = () => {
         animation_text();
         ScrollTrigger.refresh();
+        if (typeof window.initAboutIntroCharHover === "function") {
+            window.initAboutIntroCharHover();
+        }
     };
 
     window.clearSplitTextAnimations = clearSplitTextAnimations;
