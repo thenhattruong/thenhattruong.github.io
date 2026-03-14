@@ -190,6 +190,73 @@
         }
     };
 
+    const handlePartnerMarqueeReveal = () => {
+        const marquee = document.querySelector("#partners .partner-marquee");
+        if (!marquee) return;
+
+        marquee.classList.add("partner-marquee-reveal");
+
+        const prefersReducedMotion = window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+        ).matches;
+
+        if (prefersReducedMotion) {
+            marquee.classList.add("is-visible");
+            return;
+        }
+
+        let isVisible = false;
+        let observer = null;
+
+        const revealOnce = () => {
+            if (isVisible) return;
+            marquee.classList.add("is-visible");
+            isVisible = true;
+            cleanup();
+        };
+
+        const onScrollReveal = () => {
+            if (isVisible) return;
+            const rect = marquee.getBoundingClientRect();
+            const viewportHeight =
+                window.innerHeight || document.documentElement.clientHeight;
+            if (rect.top < viewportHeight * 0.85 && rect.bottom > 0) {
+                revealOnce();
+            }
+        };
+
+        const cleanup = () => {
+            window.removeEventListener("scroll", onScrollReveal);
+            window.removeEventListener("resize", onScrollReveal);
+            if (observer) {
+                observer.disconnect();
+                observer = null;
+            }
+        };
+
+        if ("IntersectionObserver" in window) {
+            observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            revealOnce();
+                        }
+                    });
+                }, {
+                    root: null,
+                    threshold: 0.15,
+                }
+            );
+            observer.observe(marquee);
+        } else {
+            window.addEventListener("scroll", onScrollReveal, {
+                passive: true
+            });
+            window.addEventListener("resize", onScrollReveal);
+            onScrollReveal();
+        }
+    };
+
     const initSkillsMarqueeTooltips = () => {
         const marquee = document.querySelector(".skills-marquee");
         if (!marquee) return;
@@ -508,6 +575,147 @@
             window.addEventListener("resize", onScrollReveal);
             onScrollReveal();
         }
+    };
+
+    const handleContactReveal = () => {
+        const contactSection = document.querySelector("#contact");
+        if (!contactSection) return;
+
+        const prefersReducedMotion = window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+        ).matches;
+
+        contactSection.classList.add("contact-fade");
+
+        if (prefersReducedMotion) {
+            contactSection.classList.add("is-visible");
+            return;
+        }
+
+        let revealed = false;
+        let observer = null;
+
+        const revealOnce = () => {
+            if (revealed) return;
+            contactSection.classList.add("is-visible");
+            revealed = true;
+            cleanup();
+        };
+
+        const onScrollReveal = () => {
+            if (revealed) return;
+            const rect = contactSection.getBoundingClientRect();
+            const viewportHeight =
+                window.innerHeight || document.documentElement.clientHeight;
+            if (rect.top < viewportHeight * 0.85 && rect.bottom > 0) {
+                revealOnce();
+            }
+        };
+
+        const cleanup = () => {
+            window.removeEventListener("scroll", onScrollReveal);
+            window.removeEventListener("resize", onScrollReveal);
+            if (observer) {
+                observer.disconnect();
+                observer = null;
+            }
+        };
+
+        if ("IntersectionObserver" in window) {
+            observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            revealOnce();
+                        }
+                    });
+                }, {
+                    root: null,
+                    threshold: 0.2,
+                }
+            );
+            observer.observe(contactSection);
+        } else {
+            window.addEventListener("scroll", onScrollReveal, {
+                passive: true
+            });
+            window.addEventListener("resize", onScrollReveal);
+            onScrollReveal();
+        }
+    };
+
+    const handlePricingReveal = () => {
+        const pricingSection = document.querySelector("#pricing");
+        if (!pricingSection) return;
+
+        const items = Array.from(
+            pricingSection.querySelectorAll(".pricing-item")
+        );
+        if (!items.length) return;
+
+        const prefersReducedMotion = window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+        ).matches;
+
+        items.forEach((item) => item.classList.add("pricing-reveal-ready"));
+
+        if (prefersReducedMotion) {
+            items.forEach((item) => item.classList.add("is-revealed"));
+            return;
+        }
+
+        const revealItem = (item) => {
+            if (item.classList.contains("is-revealed")) return;
+            item.classList.add("is-revealed");
+        };
+
+        const revealVisible = () => {
+            items.forEach((item) => {
+                if (item.classList.contains("is-revealed")) return;
+                if (!item.offsetParent) return;
+                const rect = item.getBoundingClientRect();
+                const viewportHeight =
+                    window.innerHeight || document.documentElement.clientHeight;
+                if (rect.top < viewportHeight * 0.85 && rect.bottom > 0) {
+                    revealItem(item);
+                }
+            });
+        };
+
+        if ("IntersectionObserver" in window) {
+            const observer = new IntersectionObserver(
+                (entries, obs) => {
+                    entries.forEach((entry) => {
+                        if (!entry.isIntersecting) return;
+                        revealItem(entry.target);
+                        obs.unobserve(entry.target);
+                    });
+                }, {
+                    root: null,
+                    threshold: 0.2,
+                }
+            );
+            items.forEach((item) => observer.observe(item));
+        } else {
+            const onScroll = () => {
+                revealVisible();
+            };
+            window.addEventListener("scroll", onScroll, {
+                passive: true
+            });
+            window.addEventListener("resize", onScroll);
+            onScroll();
+        }
+
+        revealVisible();
+
+        $(document).on(
+            "shown.bs.tab",
+            '#pricing [data-bs-toggle="tab"]',
+            function() {
+                requestAnimationFrame(revealVisible);
+            }
+        );
     };
 
     const syncUserBarCenter = () => {
@@ -2763,11 +2971,12 @@
         const prefersReducedMotion = window.matchMedia(
             "(prefers-reduced-motion: reduce)"
         ).matches;
+        const isMobile = window.matchMedia("(max-width: 767px)").matches;
         const hasGsapScrollTrigger =
             typeof window.gsap !== "undefined" &&
             typeof window.ScrollTrigger !== "undefined";
 
-        if (prefersReducedMotion || !hasGsapScrollTrigger) {
+        if (prefersReducedMotion || !hasGsapScrollTrigger || isMobile) {
             showCardsNormally();
             return;
         }
@@ -2972,6 +3181,81 @@
         });
 
         window.ScrollTrigger.refresh();
+    };
+
+    const handleMobilePortfolioReveal = () => {
+        const section = document.querySelector("#portfolio");
+        if (!section) return;
+
+        const items = Array.from(section.querySelectorAll(".portfolio-item"));
+        if (!items.length) return;
+
+        const prefersReducedMotion = window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+        ).matches;
+        const isMobile = window.matchMedia("(max-width: 767px)").matches;
+
+        if (!isMobile) {
+            items.forEach((item) => {
+                item.classList.remove("mobile-reveal-ready", "is-mobile-revealed");
+                item.style.removeProperty("--mobile-reveal-delay");
+            });
+            return;
+        }
+
+        items.forEach((item, index) => {
+            item.classList.add("mobile-reveal-ready");
+            item.style.setProperty(
+                "--mobile-reveal-delay",
+                `${(index * 0.08).toFixed(2)}s`
+            );
+        });
+
+        if (prefersReducedMotion) {
+            items.forEach((item) => item.classList.add("is-mobile-revealed"));
+            return;
+        }
+
+        const revealItem = (item) => {
+            if (item.classList.contains("is-mobile-revealed")) return;
+            item.classList.add("is-mobile-revealed");
+        };
+
+        if ("IntersectionObserver" in window) {
+            const observer = new IntersectionObserver(
+                (entries, obs) => {
+                    entries.forEach((entry) => {
+                        if (!entry.isIntersecting) return;
+                        revealItem(entry.target);
+                        obs.unobserve(entry.target);
+                    });
+                }, {
+                    root: null,
+                    threshold: 0.2,
+                }
+            );
+
+            items.forEach((item) => observer.observe(item));
+        } else {
+            const revealVisible = () => {
+                items.forEach((item) => {
+                    if (item.classList.contains("is-mobile-revealed")) return;
+                    if (!item.offsetParent) return;
+                    const rect = item.getBoundingClientRect();
+                    const viewportHeight =
+                        window.innerHeight || document.documentElement.clientHeight;
+                    if (rect.top < viewportHeight * 0.85 && rect.bottom > 0) {
+                        revealItem(item);
+                    }
+                });
+            };
+
+            window.addEventListener("scroll", revealVisible, {
+                passive: true
+            });
+            window.addEventListener("resize", revealVisible);
+            revealVisible();
+        }
     };
 
     /* handleUserBarGlowEffect
@@ -4550,38 +4834,22 @@
 
             let guard = 0;
             while (now >= state.nextChangeAt && guard < 6) {
-                const isDeleting = state.isDeleting;
-                const speed = isDeleting ?
-                    timings.deleteDelay :
-                    timings.typeDelay;
+                const speed = timings.typeDelay;
 
-                if (!isDeleting) {
-                    state.charIndex += 1;
-                    const nextText = phrase.substring(0, state.charIndex);
-                    state.field.setAttribute("placeholder", nextText);
-                    setLineProgress(state, phrase.length);
+                state.charIndex += 1;
+                if (state.charIndex > phrase.length) {
+                    state.charIndex = phrase.length;
+                }
+                const nextText = phrase.substring(0, state.charIndex);
+                state.field.setAttribute("placeholder", nextText);
+                setLineProgress(state, phrase.length);
 
-                    if (state.charIndex >= phrase.length) {
-                        state.isDeleting = true;
-                        state.nextChangeAt = now + timings.pauseAfterWord;
-                        break;
-                    }
-
-                    state.nextChangeAt = now + speed;
-                } else {
-                    state.charIndex = 0;
-                    state.field.setAttribute("placeholder", "");
-                    setLineProgress(state, 0);
-                    state.isDeleting = false;
-                    state.phraseIndex =
-                        (state.phraseIndex + 1) % state.phrases.length;
-                    const clearIdle =
-                        Math.max(0, phrase.length * timings.deleteDelay);
-                    state.nextChangeAt =
-                        now + timings.pauseAfterDelete + clearIdle;
+                if (state.charIndex >= phrase.length) {
+                    states.delete(state.field);
                     break;
                 }
 
+                state.nextChangeAt = now + speed;
                 guard += 1;
             }
         };
@@ -4660,8 +4928,71 @@
             items.forEach((field) => initField(field));
         };
 
-        initFields(document);
-        startLoop();
+        const contactSection = document.querySelector("#contact");
+
+        const startTyping = (root) => {
+            initFields(root);
+            startLoop();
+        };
+
+        if (prefersReducedMotion) {
+            startTyping(document);
+        } else if (!contactSection) {
+            startTyping(document);
+        } else {
+            let revealed = false;
+            let observer = null;
+
+            const revealOnce = () => {
+                if (revealed) return;
+                revealed = true;
+                window.requestAnimationFrame(() => {
+                    startTyping(contactSection);
+                });
+                cleanup();
+            };
+
+            const onScrollReveal = () => {
+                if (revealed) return;
+                const rect = contactSection.getBoundingClientRect();
+                const viewportHeight =
+                    window.innerHeight || document.documentElement.clientHeight;
+                if (rect.top < viewportHeight * 0.85 && rect.bottom > 0) {
+                    revealOnce();
+                }
+            };
+
+            const cleanup = () => {
+                window.removeEventListener("scroll", onScrollReveal);
+                window.removeEventListener("resize", onScrollReveal);
+                if (observer) {
+                    observer.disconnect();
+                    observer = null;
+                }
+            };
+
+            if ("IntersectionObserver" in window) {
+                observer = new IntersectionObserver(
+                    (entries) => {
+                        entries.forEach((entry) => {
+                            if (entry.isIntersecting) {
+                                revealOnce();
+                            }
+                        });
+                    }, {
+                        root: null,
+                        threshold: 0.25,
+                    }
+                );
+                observer.observe(contactSection);
+            } else {
+                window.addEventListener("scroll", onScrollReveal, {
+                    passive: true
+                });
+                window.addEventListener("resize", onScrollReveal);
+                onScrollReveal();
+            }
+        }
 
         window.refreshContactTypingEffect = (root) => {
             initFields(root);
@@ -4948,24 +5279,6 @@
             lastFocusedElement = document.activeElement;
             $modal.addClass("is-open").attr("aria-hidden", "false");
             $body.addClass("contact-modal-open");
-
-            const $focusTarget = $modal
-                .find("input, textarea")
-                .filter(":visible")
-                .first();
-            const $fallbackTarget = $modal
-                .find("button")
-                .filter(":visible")
-                .first();
-            const $targetToFocus = $focusTarget.length ?
-                $focusTarget :
-                $fallbackTarget;
-
-            if ($targetToFocus.length) {
-                setTimeout(() => {
-                    $targetToFocus.trigger("focus");
-                }, 50);
-            }
         };
 
         const closeModal = () => {
@@ -5066,7 +5379,10 @@
         handleEffectSpotlight();
         handleCounterTouchEffect();
         handleFeaturedProjectReveal();
+        handleMobilePortfolioReveal();
         handleResumeReveal();
+        handleContactReveal();
+        handlePricingReveal();
         handlePortfolioPopupLinks();
         handleProjectVideoModal();
         handleQuickContactReveal();
@@ -5074,6 +5390,7 @@
         handlePartnerLogoMask();
         handlePartnerLogoLinks();
         handleSkillsMarqueeReveal();
+        handlePartnerMarqueeReveal();
         initSkillsMarqueeTooltips();
         initAboutIntroCharHover();
         preventDefault();
