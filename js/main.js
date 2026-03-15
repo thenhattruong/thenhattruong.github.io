@@ -323,6 +323,8 @@
         marquee.querySelectorAll("img").forEach((img) => {
             if (img.closest(".skill-logo")) return;
 
+            const isHiddenGroup = Boolean(img.closest('[aria-hidden="true"]'));
+
             const src = img.getAttribute("src") || "";
             const match = src.match(/tool-\d+/);
             const key = match ? match[0] : "";
@@ -345,7 +347,9 @@
             wrapper.setAttribute("data-label", label);
             wrapper.setAttribute("role", "img");
             wrapper.setAttribute("aria-label", label);
-            wrapper.setAttribute("tabindex", "0");
+            if (!isHiddenGroup) {
+                wrapper.setAttribute("tabindex", "0");
+            }
 
             const parent = img.parentNode;
             if (!parent) return;
@@ -356,10 +360,12 @@
                 showTooltip(label, wrapper);
             });
             wrapper.addEventListener("pointerleave", hideTooltip);
-            wrapper.addEventListener("focus", () => {
-                showTooltip(label, wrapper);
-            });
-            wrapper.addEventListener("blur", hideTooltip);
+            if (!isHiddenGroup) {
+                wrapper.addEventListener("focus", () => {
+                    showTooltip(label, wrapper);
+                });
+                wrapper.addEventListener("blur", hideTooltip);
+            }
         });
     };
 
@@ -3298,7 +3304,11 @@
 
             setTimeout(finishIntro, 1650);
 
-            if (!$userBar.data("touchGlowBound")) {
+            const allowTouchGlow = window.matchMedia(
+                "(hover: hover) and (pointer: fine) and (min-width: 1150px)"
+            ).matches;
+
+            if (allowTouchGlow && !$userBar.data("touchGlowBound")) {
                 let touchTimer;
                 $userBar.on("touchstart touchmove", function() {
                     $userBar.addClass("is-touch-active");
@@ -3311,6 +3321,8 @@
                     }, 220);
                 });
                 $userBar.data("touchGlowBound", "true");
+            } else if (!allowTouchGlow) {
+                $userBar.removeClass("is-touch-active");
             }
         });
     };

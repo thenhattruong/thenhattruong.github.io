@@ -5395,19 +5395,21 @@ ANIMATION AREA CSS
   animation: user-bar-intro-sweep 1.2s cubic-bezier(0.2, 0.9, 0.25, 1) 0.08s forwards;
 }
 
-.main-content.style-fullwidth .user-bar.style-1.is-intro-finished:hover,
-.main-content.style-fullwidth .user-bar.style-1.is-intro-finished.is-touch-active {
-  box-shadow: 0 0 36px rgba(69, 231, 123, 0.42), 0 0 82px rgba(69, 231, 123, 0.2), var(--userbar-shadow-base);
-}
+@media (hover: hover) and (pointer: fine) and (min-width: 1150px) {
+  .main-content.style-fullwidth .user-bar.style-1.is-intro-finished:hover,
+  .main-content.style-fullwidth .user-bar.style-1.is-intro-finished.is-touch-active {
+    box-shadow: 0 0 36px rgba(69, 231, 123, 0.42), 0 0 82px rgba(69, 231, 123, 0.2), var(--userbar-shadow-base);
+  }
 
-.main-content.style-fullwidth .user-bar.style-1.is-intro-finished:hover {
-  transform: translateY(-50%) perspective(1600px) rotateY(12deg) rotateX(1.5deg) scale(1.01);
-}
+  .main-content.style-fullwidth .user-bar.style-1.is-intro-finished:hover {
+    transform: translateY(-50%) perspective(1600px) rotateY(12deg) rotateX(1.5deg) scale(1.01);
+  }
 
-.main-content.style-fullwidth .user-bar.style-1.is-intro-finished:hover::before,
-.main-content.style-fullwidth .user-bar.style-1.is-intro-finished.is-touch-active::before {
-  opacity: 0.62;
-  transform: scale(1);
+  .main-content.style-fullwidth .user-bar.style-1.is-intro-finished:hover::before,
+  .main-content.style-fullwidth .user-bar.style-1.is-intro-finished.is-touch-active::before {
+    opacity: 0.62;
+    transform: scale(1);
+  }
 }
 
 @keyframes user-bar-reveal {
