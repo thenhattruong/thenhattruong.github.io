@@ -1444,7 +1444,7 @@
         </a>
        </li>
        <li>
-        <a aria-label="Mail" class="quick-contact-link js-open-social-popup" data-popup-target="#mail-popup" title="Mail">
+        <a aria-label="Mail" class="quick-contact-link js-open-social-popup" data-popup-target="#email-popup" title="Mail">
          <i class="icon-Mail">
          </i>
         </a>
@@ -1522,27 +1522,27 @@
    </p>
   </div>
  </div>
- <div aria-hidden="true" class="email-popup social-popup" id="mail-popup">
+ <div aria-hidden="true" class="email-popup social-popup" id="email-popup">
   <div class="email-popup__backdrop" data-close-social-popup="">
   </div>
-  <div aria-label="Mail contact form" aria-modal="true" class="email-popup__dialog" role="dialog">
-   <button aria-label="Close Mail popup" class="email-popup__close" data-close-social-popup="" type="button">
+  <div aria-label="Email contact" aria-modal="true" class="email-popup__dialog" role="dialog">
+   <button aria-label="Close Email popup" class="email-popup__close" data-close-social-popup="" type="button">
     &times;
    </button>
    <p class="email-popup__title">
     Contact Via Email
    </p>
    <div class="email-popup__content">
-    <form class="form-contact bs-light-mode js-emailjs-form" id="form-contact-popup" data-emailjs-service="service_kr5f3fk" data-emailjs-template="template_erbsdrv" data-emailjs-public-key="uPtzaITL9ULTQS7tZ">
+    <form class="form-contact bs-light-mode js-emailjs-form" id="popup-form-contact" data-emailjs-service="service_kr5f3fk" data-emailjs-template="template_erbsdrv" data-emailjs-public-key="uPtzaITL9ULTQS7tZ">
      <div class="d-grid gap_24 mb_24">
       <fieldset class="">
-       <input aria-required="true" data-typing-speed="1.5" id="name-popup" name="name" placeholder="Your name" required="" tabindex="2" type="text"/>
+       <input aria-required="true" data-typing-speed="1.5" id="popup-name" name="name" placeholder="Your name" required="" tabindex="2" type="text"/>
       </fieldset>
       <fieldset class="">
-       <input aria-required="true" class="" data-typing-speed="1.5" id="email-popup" name="email" placeholder="Your email" required="" tabindex="2" type="email" value=""/>
+       <input aria-required="true" class="" data-typing-speed="1.5" id="popup-email" name="email" placeholder="Your email" required="" tabindex="2" type="email" value=""/>
       </fieldset>
       <fieldset>
-       <textarea aria-required="true" class="" data-typing-speed="1.5" id="message-popup" name="message" placeholder="Your Message..." required="" rows="4" tabindex="2"></textarea>
+       <textarea aria-required="true" class="" data-typing-speed="1.5" id="popup-message" name="message" placeholder="Your Message..." required="" rows="4" tabindex="2"></textarea>
       </fieldset>
      </div>
      <ul class="list-tag">
