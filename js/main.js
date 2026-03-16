@@ -1058,7 +1058,7 @@
                 ],
                 perHour: "/per hour",
                 hireMe: "Contact Me",
-                getStarted: "Get Started !",
+                getStarted: "Send",
                 partnerTag: "Partner",
                 partnerHeading: "Trusted By 50+ Brands Worldwide",
                 contactTag: "Contact",
