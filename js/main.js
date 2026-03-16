@@ -258,6 +258,10 @@
     };
 
     const initSkillsMarqueeTooltips = () => {
+        // Disable showing app/tool names on hover
+        const enabled = false;
+        if (!enabled) return;
+
         const marquee = document.querySelector(".skills-marquee");
         if (!marquee) return;
 
