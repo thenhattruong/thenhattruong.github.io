@@ -267,7 +267,7 @@
            <div class="text-label text-uppercase fw-6 text_primary-color font-3 mb_16 letter-spacing-1">
             Multimedia Design
            </div>
-           <a class="hover-underline-link text_white text-body-2 mb_4 js-open-contact-modal" href="#contact">
+           <a aria-controls="email-popup" aria-haspopup="dialog" class="hover-underline-link text_white text-body-2 mb_4 js-open-email-popup" href="#email-popup">
             thenhattruong@gmail.com
            </a>
            <p class="text-caption-2 text_secondary-color font-3">
@@ -948,7 +948,7 @@
           </h3>
           <a class="tf-btn style-1 animate-hover-btn" href="#contact">
            <span>
-            Get Started !
+            Contact Me
            </span>
           </a>
          </div>
@@ -995,7 +995,7 @@
           </h3>
           <a class="tf-btn style-1 animate-hover-btn" href="#contact">
            <span>
-            Get Started !
+            Contact Me
            </span>
           </a>
          </div>
@@ -1406,7 +1406,7 @@
          <div class="button-submit">
           <button class="tf-btn style-1 animate-hover-btn" type="submit">
            <span>
-            Get Started !
+            Contact Me
            </span>
           </button>
          </div>
@@ -1423,35 +1423,39 @@
       </p>
      </div>
      <!-- End section-contact -->
-     <aside aria-label="Quick contact links" class="quick-contact-floating bs-light-mode">
-      <ul class="quick-contact-icons">
-       <li>
-        <a aria-label="Facebook" class="quick-contact-link js-open-social-popup" data-popup-target="#facebook-popup" href="https://www.facebook.com/TTN.Use/" rel="noopener noreferrer" target="_blank" title="Facebook">
-         <i class="icon-Facebook">
+      <aside aria-label="Quick contact links" class="quick-contact-floating bs-light-mode">
+        <ul class="quick-contact-icons">
+         <li>
+          <a aria-label="Facebook" class="quick-contact-link js-open-social-popup" data-popup-target="#facebook-popup" href="https://www.facebook.com/TTN.Use/" rel="noopener noreferrer" target="_blank" title="Facebook">
+           <i class="icon-Facebook">
+           </i>
+          </a>
+         </li>
+         <li>
+          <a aria-label="Behance" class="quick-contact-link" title="Behance">
+           <i class="icon-Behance">
+           </i>
+          </a>
+         </li>
+         <li>
+          <a aria-label="Zalo" class="quick-contact-link js-open-social-popup" data-popup-target="#zalo-popup" href="https://zalo.me/0973883053" rel="noopener noreferrer" target="_blank" title="Zalo">
+           <i class="icon-Zalo">
+           </i>
+          </a>
+         </li>
+           <li>
+            <a aria-label="Mail" class="quick-contact-link js-open-contact-modal" href="#contact" title="Mail">
+             <i class="icon-EnvelopeSimple">
+             </i>
+            </a>
+           </li>
+        </ul>
+        <button aria-label="Back to top" class="scroll-top-button js-scroll-top-button" type="button">
+         <i aria-hidden="true" class="icon-ArrowRight">
          </i>
-        </a>
-       </li>
-       <li>
-        <a aria-label="Behance" class="quick-contact-link" title="Behance">
-         <i class="icon-Behance">
-         </i>
-        </a>
-       </li>
-       <li>
-        <a aria-label="Zalo" class="quick-contact-link js-open-social-popup" data-popup-target="#zalo-popup" href="https://zalo.me/0973883053" rel="noopener noreferrer" target="_blank" title="Zalo">
-         <i class="icon-Zalo">
-         </i>
-        </a>
-       </li>
-       <li>
-        <a aria-label="Mail" class="quick-contact-link js-open-social-popup" data-popup-target="#email-popup" title="Mail">
-         <i class="icon-Mail">
-         </i>
-        </a>
-       </li>
-      </ul>
-     </aside>
-    </div>
+        </button>
+       </aside>
+     </div>
     <div class="right-bar style-1 d-flex flex-column align-items-center">
      <ul class="list-icon menu-option d-flex flex-column gap_8">
       <li>
@@ -1478,6 +1482,31 @@
     </div>
    </div>
   </div>
+ <div aria-hidden="true" class="email-popup" id="email-popup">
+  <div class="email-popup__backdrop" data-close-email-popup="">
+  </div>
+  <div aria-label="Email options" aria-modal="true" class="email-popup__dialog" role="dialog">
+   <button aria-label="Close email popup" class="email-popup__close" data-close-email-popup="" type="button">
+    &times;
+   </button>
+   <p class="email-popup__title">
+    Contact Via Email
+   </p>
+   <p class="email-popup__address">
+    thenhattruong@gmail.com
+   </p>
+   <div class="email-popup__actions">
+    <a class="email-popup__btn email-popup__btn--primary" data-open-email="" href="https://mail.google.com/mail/?view=cm&fs=1&to=thenhattruong@gmail.com" rel="noopener noreferrer" target="_blank">
+     Open Gmail
+    </a>
+    <button class="email-popup__btn" data-copy-email="" data-email-address="thenhattruong@gmail.com" type="button">
+     Copy Email
+    </button>
+   </div>
+   <p aria-live="polite" class="email-popup__status">
+   </p>
+  </div>
+ </div>
  <div aria-hidden="true" class="email-popup social-popup" id="facebook-popup">
   <div class="email-popup__backdrop" data-close-social-popup="">
   </div>
@@ -1520,74 +1549,6 @@
    </div>
    <p aria-live="polite" class="email-popup__status">
    </p>
-  </div>
- </div>
- <div aria-hidden="true" class="email-popup social-popup" id="email-popup">
-  <div class="email-popup__backdrop" data-close-social-popup="">
-  </div>
-  <div aria-label="Email contact" aria-modal="true" class="email-popup__dialog" role="dialog">
-   <button aria-label="Close Email popup" class="email-popup__close" data-close-social-popup="" type="button">
-    &times;
-   </button>
-   <p class="email-popup__title">
-    Contact Via Email
-   </p>
-   <div class="email-popup__content">
-    <form class="form-contact bs-light-mode js-emailjs-form" id="popup-form-contact" data-emailjs-service="service_kr5f3fk" data-emailjs-template="template_erbsdrv" data-emailjs-public-key="uPtzaITL9ULTQS7tZ">
-     <div class="d-grid gap_24 mb_24">
-      <fieldset class="">
-       <input aria-required="true" data-typing-speed="1.5" id="popup-name" name="name" placeholder="Your name" required="" tabindex="2" type="text"/>
-      </fieldset>
-      <fieldset class="">
-       <input aria-required="true" class="" data-typing-speed="1.5" id="popup-email" name="email" placeholder="Your email" required="" tabindex="2" type="email" value=""/>
-      </fieldset>
-      <fieldset>
-       <textarea aria-required="true" class="" data-typing-speed="1.5" id="popup-message" name="message" placeholder="Your Message..." required="" rows="4" tabindex="2"></textarea>
-      </fieldset>
-     </div>
-     <ul class="list-tag">
-      <li>
-       <a class="text_white text-body-1 font-3" data-contact-message="Hi, I need help editing a video." href="#">
-        Edit Video
-       </a>
-      </li>
-      <li>
-       <a class="text_white text-body-1 font-3" data-contact-message="Hi, I need motion graphics for my project." href="#">
-        Motion Design
-       </a>
-      </li>
-      <li>
-       <a class="text_white text-body-1 font-3" data-contact-message="Hi, I need a poster design." href="#">
-        Poster Design
-       </a>
-      </li>
-      <li>
-       <a class="text_white text-body-1 font-3" data-contact-message="Hi, I need graphic design for my project." href="#">
-        Graphic Design
-       </a>
-      </li>
-      <li>
-       <a class="text_white text-body-1 font-3" data-contact-message="Hi, I need a 3D design." href="#">
-        3D Design
-       </a>
-      </li>
-      <li>
-       <a class="text_white text-body-1 font-3" data-contact-message="Hi, I need a website or landing page." href="#">
-        Website / Landing Page
-       </a>
-      </li>
-     </ul>
-     <div class="button-submit">
-      <button class="tf-btn style-1 animate-hover-btn" type="submit">
-       <span>
-        Get Started !
-       </span>
-      </button>
-     </div>
-     <p aria-live="polite" class="form-status" role="status">
-     </p>
-    </form>
-   </div>
   </div>
  </div>
   <div aria-hidden="true" aria-label="Form notification" class="form-toast" id="form-toast" role="dialog">

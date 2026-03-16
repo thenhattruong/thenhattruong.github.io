@@ -961,7 +961,7 @@
                 "menu.portfolio": "Dự án",
                 "menu.pricing": "Bảng giá",
                 "menu.contact": "Liên hệ",
-                "cta.hire_me": "Thuê tôi",
+                "cta.hire_me": "Contact Me",
                 "contact.quick": "Liên hệ nhanh",
                 "about.intro_prefix": "Xin chào! Tôi là",
                 "about.role_word_1": "Thiết kế Đa phương tiện",
@@ -1058,7 +1058,7 @@
                 ],
                 perHour: "/per hour",
                 hireMe: "Contact Me",
-                getStarted: "Send",
+                getStarted: "Contact Me",
                 partnerTag: "Partner",
                 partnerHeading: "Trusted By 50+ Brands Worldwide",
                 contactTag: "Contact",
@@ -1171,8 +1171,8 @@
                     "Chỉnh sửa không giới hạn",
                 ],
                 perHour: "/giờ",
-                hireMe: "Thuê tôi",
-                getStarted: "Bắt đầu ngay!",
+                hireMe: "Contact Me",
+                getStarted: "Contact Me",
                 partnerTag: "Đối tác",
                 partnerHeading: "Được 50+ thương hiệu trên toàn cầu tin tưởng",
                 contactTag: "Liên hệ",
@@ -4359,6 +4359,62 @@
         });
     };
 
+    const handleScrollTopButton = () => {
+        const button = document.querySelector(".js-scroll-top-button");
+        const contactSection = document.querySelector("#contact");
+        if (!button || !contactSection) return;
+
+        const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+        const setVisible = (isVisible) => {
+            button.classList.toggle("is-visible", isVisible);
+            button.setAttribute("aria-hidden", isVisible ? "false" : "true");
+        };
+
+        const scrollToTop = (event) => {
+            event.preventDefault();
+            const behavior = motionQuery.matches ? "auto" : "smooth";
+            window.scrollTo({
+                top: 0,
+                behavior
+            });
+        };
+
+        button.addEventListener("click", scrollToTop);
+
+        const computeVisible = () => {
+            const rect = contactSection.getBoundingClientRect();
+            const viewportHeight =
+                window.innerHeight || document.documentElement.clientHeight;
+            return rect.top < viewportHeight && rect.bottom > 0;
+        };
+
+        const updateVisibility = () => {
+            setVisible(computeVisible());
+        };
+
+        updateVisibility();
+
+        if ("IntersectionObserver" in window) {
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        setVisible(entry.isIntersecting);
+                    });
+                }, {
+                    root: null,
+                    threshold: 0.15,
+                }
+            );
+            observer.observe(contactSection);
+        } else {
+            window.addEventListener("scroll", updateVisibility, {
+                passive: true
+            });
+            window.addEventListener("resize", updateVisibility);
+        }
+    };
+
     /* handlePartnerLogoMask
   -------------------------------------------------------------------------*/
     const handlePartnerLogoMask = () => {
@@ -4490,7 +4546,7 @@
             $body.addClass("email-popup-open");
 
             const $focusTarget = $popup
-                .find("[data-open-gmail], [data-copy-email], [data-close-email-popup]")
+                .find("[data-open-email], [data-copy-email], [data-close-email-popup]")
                 .filter(":visible")
                 .first();
 
@@ -4525,7 +4581,7 @@
             closePopup();
         });
 
-        $popup.on("click", "[data-open-gmail]", function() {
+        $popup.on("click", "[data-open-email]", function() {
             closePopup();
         });
 
@@ -5423,6 +5479,7 @@
         handlePortfolioPopupLinks();
         handleProjectVideoModal();
         handleQuickContactReveal();
+        handleScrollTopButton();
         handleQuickContactGlowEffect();
         handlePartnerLogoMask();
         handlePartnerLogoLinks();
