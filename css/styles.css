@@ -8468,6 +8468,11 @@ body:not(.dark-mode) .skills-marquee img.logo-github {
     --marquee-logo-height: 32px;
     margin: 20px auto 30px;
   }
+
+  /* Disable touch interactions on the marquee logos on mobile */
+  .skills-marquee img {
+    pointer-events: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
