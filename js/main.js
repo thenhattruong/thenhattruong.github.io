@@ -258,10 +258,6 @@
     };
 
     const initSkillsMarqueeTooltips = () => {
-        // Disable showing app/tool names on hover
-        const enabled = false;
-        if (!enabled) return;
-
         const marquee = document.querySelector(".skills-marquee");
         if (!marquee) return;
 
@@ -371,6 +367,27 @@
                 wrapper.addEventListener("blur", hideTooltip);
             }
         });
+    };
+
+    const moveTestimonialNavOnMobile = () => {
+        const section = document.querySelector(".section-testimonial");
+        if (!section) return;
+
+        const nav = section.querySelector(".wrap-sw-button");
+        const heading = section.querySelector(".heading-section");
+        const swiper = section.querySelector(".swiper");
+        if (!nav || !heading || !swiper) return;
+
+        const isMobile = window.matchMedia("(max-width: 767px)").matches;
+        if (isMobile) {
+            if (swiper.nextElementSibling !== nav) {
+                swiper.parentNode.insertBefore(nav, swiper.nextElementSibling);
+            }
+        } else {
+            if (!heading.contains(nav)) {
+                heading.appendChild(nav);
+            }
+        }
     };
 
     const initAboutIntroCharHover = () => {
@@ -5408,6 +5425,8 @@
         handleSkillsMarqueeReveal();
         handlePartnerMarqueeReveal();
         initSkillsMarqueeTooltips();
+        moveTestimonialNavOnMobile();
+        window.addEventListener("resize", moveTestimonialNavOnMobile);
         initAboutIntroCharHover();
         preventDefault();
         spliting();
