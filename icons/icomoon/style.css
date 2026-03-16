@@ -146,8 +146,8 @@
 .icon-Zalo:before {
   content: "";
   display: inline-block;
-  width: 1em;
-  height: 1em;
+  width: 1.2em;
+  height: 1.2em;
   vertical-align: -0.125em;
   background-color: currentColor;
   -webkit-mask: url("../../images/logo/icons8-zalo-500.png") center/contain no-repeat;
