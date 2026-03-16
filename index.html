@@ -1444,7 +1444,7 @@
         </a>
        </li>
        <li>
-        <a aria-label="Mail" class="quick-contact-link js-open-social-popup" data-popup-target="#email-popup" title="Mail">
+        <a aria-label="Mail" class="quick-contact-link js-open-social-popup" data-popup-target="#mail-popup" title="Mail">
          <i class="icon-Mail">
          </i>
         </a>
@@ -1522,11 +1522,11 @@
    </p>
   </div>
  </div>
- <div aria-hidden="true" class="email-popup social-popup" id="email-popup">
+ <div aria-hidden="true" class="email-popup social-popup" id="mail-popup">
   <div class="email-popup__backdrop" data-close-social-popup="">
   </div>
-  <div aria-label="Email contact" aria-modal="true" class="email-popup__dialog" role="dialog">
-   <button aria-label="Close Email popup" class="email-popup__close" data-close-social-popup="" type="button">
+  <div aria-label="Mail contact form" aria-modal="true" class="email-popup__dialog" role="dialog">
+   <button aria-label="Close Mail popup" class="email-popup__close" data-close-social-popup="" type="button">
     &times;
    </button>
    <p class="email-popup__title">
@@ -1545,15 +1545,49 @@
        <textarea aria-required="true" class="" data-typing-speed="1.5" id="message-popup" name="message" placeholder="Your Message..." required="" rows="4" tabindex="2"></textarea>
       </fieldset>
      </div>
-     <div class="d-flex justify-content-end">
-      <button class="btn btn-primary" type="submit">
-       Send Message
+     <ul class="list-tag">
+      <li>
+       <a class="text_white text-body-1 font-3" data-contact-message="Hi, I need help editing a video." href="#">
+        Edit Video
+       </a>
+      </li>
+      <li>
+       <a class="text_white text-body-1 font-3" data-contact-message="Hi, I need motion graphics for my project." href="#">
+        Motion Design
+       </a>
+      </li>
+      <li>
+       <a class="text_white text-body-1 font-3" data-contact-message="Hi, I need a poster design." href="#">
+        Poster Design
+       </a>
+      </li>
+      <li>
+       <a class="text_white text-body-1 font-3" data-contact-message="Hi, I need graphic design for my project." href="#">
+        Graphic Design
+       </a>
+      </li>
+      <li>
+       <a class="text_white text-body-1 font-3" data-contact-message="Hi, I need a 3D design." href="#">
+        3D Design
+       </a>
+      </li>
+      <li>
+       <a class="text_white text-body-1 font-3" data-contact-message="Hi, I need a website or landing page." href="#">
+        Website / Landing Page
+       </a>
+      </li>
+     </ul>
+     <div class="button-submit">
+      <button class="tf-btn style-1 animate-hover-btn" type="submit">
+       <span>
+        Get Started !
+       </span>
       </button>
      </div>
+     <p aria-live="polite" class="form-status" role="status">
+     </p>
     </form>
    </div>
-   <p aria-live="polite" class="email-popup__status">
-   </p>
   </div>
  </div>
   <div aria-hidden="true" aria-label="Form notification" class="form-toast" id="form-toast" role="dialog">

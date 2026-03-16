@@ -8096,6 +8096,11 @@ body.contact-modal-open {
   color: var(--Text-light);
 }
 
+.email-popup__content {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
 .email-popup__address {
   margin: 0 0 18px;
   color: var(--Text-secondary);
