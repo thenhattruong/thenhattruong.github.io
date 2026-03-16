@@ -3525,9 +3525,9 @@ body.form-toast-open {
  ------------------------------------------------------------------------------ */
 /*--------- Abstracts variable ---------- */
 .sw-button {
-  height: 36px;
-  width: 36px;
-  font-size: 20px;
+  height: 44px;
+  width: 44px;
+  font-size: 22px;
   border-radius: 50%;
   background: linear-gradient(123.51deg, rgba(215, 237, 237, 0.1) -61.8%, rgba(204, 235, 235, 0.01) 100%);
   color: var(--Text-light);
@@ -3550,9 +3550,9 @@ body.form-toast-open {
 
 @media (min-width: 768px) {
   .sw-button {
-    height: 60px;
-    width: 60px;
-    font-size: 32px;
+    height: 68px;
+    width: 68px;
+    font-size: 36px;
   }
 }
 
