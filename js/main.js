@@ -261,6 +261,10 @@
         const marquee = document.querySelector(".skills-marquee");
         if (!marquee) return;
 
+        // Disable tooltips and touch interactions on mobile devices
+        const isMobile = window.matchMedia("(max-width: 767px)").matches;
+        if (isMobile) return;
+
         const labelMap = {
             "tool-1": "Adobe Premiere Pro",
             "tool-2": "Adobe After Effects",
