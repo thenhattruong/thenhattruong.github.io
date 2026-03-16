@@ -7865,6 +7865,10 @@ ANIMATION AREA CSS
   box-shadow: 0 0 18px rgba(69, 231, 123, 0.32);
 }
 
+.quick-contact-link:hover .icon-Zalo:before {
+  background-color: #fff !important;
+}
+
 @media (min-width: 1150px) {
   .section-contact.style-1 .contact-row {
     flex-wrap: nowrap;
