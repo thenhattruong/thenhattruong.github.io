@@ -7610,6 +7610,12 @@ ANIMATION AREA CSS
   position: unset;
 }
 
+@media (max-width: 767px) {
+  .section-testimonial .wrap-sw-button {
+    margin-top: 18px;
+  }
+}
+
 .section-portfolio .portfolio-item:not(:last-child) {
   margin-bottom: 44px;
 }
@@ -8467,11 +8473,6 @@ body:not(.dark-mode) .skills-marquee img.logo-github {
     --marquee-duration: 30s;
     --marquee-logo-height: 32px;
     margin: 20px auto 30px;
-  }
-
-  /* Disable touch interactions on the marquee logos on mobile */
-  .skills-marquee img {
-    pointer-events: none;
   }
 }
 
