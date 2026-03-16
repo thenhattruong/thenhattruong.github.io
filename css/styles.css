@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --Black: #000000;
   --White: #ffffff;
   --body-text: #666666;
@@ -5404,6 +5404,7 @@ ANIMATION AREA CSS
 }
 
 @media (hover: hover) and (pointer: fine) and (min-width: 1150px) {
+
   .main-content.style-fullwidth .user-bar.style-1.is-intro-finished:hover,
   .main-content.style-fullwidth .user-bar.style-1.is-intro-finished.is-touch-active {
     box-shadow: 0 0 36px rgba(69, 231, 123, 0.42), 0 0 82px rgba(69, 231, 123, 0.2), var(--userbar-shadow-base);
@@ -6857,7 +6858,7 @@ ANIMATION AREA CSS
 }
 
 /* Brand 4: sáng hơn một chút nhưng vẫn giữ hiệu ứng chuyển màu chung */
-.section-partner.style-2 .item-4 > img.partner-logo {
+.section-partner.style-2 .item-4>img.partner-logo {
   filter: grayscale(0.6) saturate(0.9) brightness(1.35);
   opacity: 0.9;
 }
@@ -6919,9 +6920,7 @@ ANIMATION AREA CSS
   filter: blur(0);
 }
 
-.section-partner.style-2
-  .partner-marquee.partner-marquee-reveal.is-visible
-  .partner-marquee__track {
+.section-partner.style-2 .partner-marquee.partner-marquee-reveal.is-visible .partner-marquee__track {
   animation-play-state: running;
 }
 
@@ -6978,7 +6977,7 @@ ANIMATION AREA CSS
     justify-content: center;
   }
 
-  .section-partner.style-2 .partner-item > img.partner-logo {
+  .section-partner.style-2 .partner-item>img.partner-logo {
     width: auto;
     height: 40px;
     padding: 0 !important;
@@ -6989,6 +6988,7 @@ ANIMATION AREA CSS
   0% {
     transform: translate3d(0, 0, 0);
   }
+
   100% {
     transform: translate3d(var(--partner-marquee-shift), 0, 0);
   }
@@ -7410,7 +7410,7 @@ ANIMATION AREA CSS
 
   .heading-section .title,
   .heading-section .heading-title,
-  .heading-section .heading-title > div {
+  .heading-section .heading-title>div {
     text-align: center;
     align-items: center;
   }
@@ -7755,10 +7755,10 @@ ANIMATION AREA CSS
 }
 
 .section-contact.style-1 {
-  padding-bottom: 40px;
+  padding-bottom: 100px;
 }
 
-.section-contact.style-1 > p.font-3 {
+.section-contact.style-1>p.font-3 {
   white-space: nowrap;
   text-wrap: nowrap;
   font-size: clamp(1rem, 3vw, 1.35rem);
@@ -7766,7 +7766,7 @@ ANIMATION AREA CSS
 }
 
 @media (min-width: 992px) {
-  .section-contact.style-1 > p.font-3 {
+  .section-contact.style-1>p.font-3 {
     font-size: 1.5rem;
     line-height: 1.5;
   }
@@ -7967,7 +7967,7 @@ ANIMATION AREA CSS
   .quick-contact-floating {
     right: 10px;
     top: auto;
-    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(40px + env(safe-area-inset-bottom, 0px));
     transform: translateY(0);
   }
 
@@ -7993,7 +7993,7 @@ ANIMATION AREA CSS
 
   .scroll-top-button {
     margin-left: 0;
-    bottom: 0;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   }
 }
 

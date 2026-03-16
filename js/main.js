@@ -4383,10 +4383,11 @@
         button.addEventListener("click", scrollToTop);
 
         const computeVisible = () => {
-            const rect = contactSection.getBoundingClientRect();
+            const scrollTop = window.scrollY || window.pageYOffset;
+            const docHeight = document.documentElement.scrollHeight;
             const viewportHeight =
                 window.innerHeight || document.documentElement.clientHeight;
-            return rect.top < viewportHeight && rect.bottom > 0;
+            return scrollTop + viewportHeight >= docHeight - 80;
         };
 
         const updateVisibility = () => {
@@ -4395,24 +4396,10 @@
 
         updateVisibility();
 
-        if ("IntersectionObserver" in window) {
-            const observer = new IntersectionObserver(
-                (entries) => {
-                    entries.forEach((entry) => {
-                        setVisible(entry.isIntersecting);
-                    });
-                }, {
-                    root: null,
-                    threshold: 0.15,
-                }
-            );
-            observer.observe(contactSection);
-        } else {
-            window.addEventListener("scroll", updateVisibility, {
-                passive: true
-            });
-            window.addEventListener("resize", updateVisibility);
-        }
+        window.addEventListener("scroll", updateVisibility, {
+            passive: true
+        });
+        window.addEventListener("resize", updateVisibility);
     };
 
     /* handlePartnerLogoMask
