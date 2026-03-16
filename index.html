@@ -1444,7 +1444,7 @@
         </a>
        </li>
        <li>
-        <a aria-label="Mail" class="quick-contact-link" href="mailto:thenhattruong@gmail.com" title="Mail">
+        <a aria-label="Mail" class="quick-contact-link js-open-social-popup" data-popup-target="#email-popup" title="Mail">
          <i class="icon-Mail">
          </i>
         </a>
@@ -1517,6 +1517,40 @@
     <button class="email-popup__btn" data-copy-social="" data-copy-success="Zalo link copied to clipboard." data-copy-value="https://zalo.me/0973883053" type="button">
      Copy Link
     </button>
+   </div>
+   <p aria-live="polite" class="email-popup__status">
+   </p>
+  </div>
+ </div>
+ <div aria-hidden="true" class="email-popup social-popup" id="email-popup">
+  <div class="email-popup__backdrop" data-close-social-popup="">
+  </div>
+  <div aria-label="Email contact" aria-modal="true" class="email-popup__dialog" role="dialog">
+   <button aria-label="Close Email popup" class="email-popup__close" data-close-social-popup="" type="button">
+    &times;
+   </button>
+   <p class="email-popup__title">
+    Contact Via Email
+   </p>
+   <div class="email-popup__content">
+    <form class="form-contact bs-light-mode js-emailjs-form" id="form-contact-popup" data-emailjs-service="service_kr5f3fk" data-emailjs-template="template_erbsdrv" data-emailjs-public-key="uPtzaITL9ULTQS7tZ">
+     <div class="d-grid gap_24 mb_24">
+      <fieldset class="">
+       <input aria-required="true" data-typing-speed="1.5" id="name-popup" name="name" placeholder="Your name" required="" tabindex="2" type="text"/>
+      </fieldset>
+      <fieldset class="">
+       <input aria-required="true" class="" data-typing-speed="1.5" id="email-popup" name="email" placeholder="Your email" required="" tabindex="2" type="email" value=""/>
+      </fieldset>
+      <fieldset>
+       <textarea aria-required="true" class="" data-typing-speed="1.5" id="message-popup" name="message" placeholder="Your Message..." required="" rows="4" tabindex="2"></textarea>
+      </fieldset>
+     </div>
+     <div class="d-flex justify-content-end">
+      <button class="btn btn-primary" type="submit">
+       Send Message
+      </button>
+     </div>
+    </form>
    </div>
    <p aria-live="polite" class="email-popup__status">
    </p>
