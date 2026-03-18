@@ -3358,9 +3358,7 @@
 
         $items.each(function() {
             const $item = $(this);
-            const $mediaLink = $item
-                .find(".img-style[data-fancybox], .img-style.js-open-project-video-modal")
-                .first();
+            const $mediaLink = $item.find(".img-style").first();
             const $titleLink = $item.find(".title .link").first();
 
             if (!$mediaLink.length || !$titleLink.length) return;
@@ -3379,27 +3377,57 @@
                     e.preventDefault();
                     $mediaLink.trigger("click");
                 });
+
+            $item
+                .addClass("is-clickable")
+                .off("click.handlePortfolioCard")
+                .on("click.handlePortfolioCard", function(e) {
+                    if ($(e.target).closest("a, button").length) return;
+                    $mediaLink.trigger("click");
+                });
         });
     };
 
     const handleProjectVideoModal = () => {
         const $modal = $("#project-video-modal");
-        const $triggers = $(".js-open-project-video-modal");
+        const $triggers = $("#portfolio .portfolio-item .img-style");
         const $video = $modal.find(".project-video-modal__video").first();
         const $videoSource = $video.find("source").first();
+        const $image = $modal.find(".project-video-modal__image").first();
         const $dialog = $modal.find(".project-video-modal__dialog").first();
+        const $tag = $modal.find(".project-video-modal__tag").first();
+        const $title = $modal.find(".project-video-modal__title").first();
+        const $description = $modal.find(".project-video-modal__description").first();
+        const $tools = $modal.find(".project-video-modal__tools").first();
         if (
             !$modal.length ||
             !$triggers.length ||
             !$video.length ||
             !$videoSource.length ||
+            !$image.length ||
             !$dialog.length
         ) {
             return;
         }
 
         const $body = $("body");
-        const defaultLabel = $dialog.attr("aria-label") || "Project video";
+        const toolIconMap = {
+            "premiere pro": "images/logo/tool-1.svg",
+            "adobe premiere pro": "images/logo/tool-1.svg",
+            "after effects": "images/logo/tool-2.svg",
+            "adobe after effects": "images/logo/tool-2.svg",
+            "illustrator": "images/logo/tool-3.svg",
+            "adobe illustrator": "images/logo/tool-3.svg",
+            "photoshop": "images/logo/tool-4.svg",
+            "adobe photoshop": "images/logo/tool-4.svg",
+            "blender": "images/logo/tool-5.png",
+            "capcut": "images/logo/tool-6.png",
+            "visual studio code": "images/logo/tool-7.png",
+            "vs code": "images/logo/tool-7.png",
+            "vscode": "images/logo/tool-7.png",
+            "github": "images/logo/tool-8.png"
+        };
+        const defaultLabel = $dialog.attr("aria-label") || "Project preview";
         let lastFocusedElement = null;
 
         const resetVideo = () => {
@@ -3414,14 +3442,103 @@
             }
         };
 
+        const resetImage = () => {
+            $image.removeAttr("src");
+            $image.removeAttr("alt");
+        };
+
+        const setModalType = (type) => {
+            $modal.toggleClass("is-video", type === "video");
+            $modal.toggleClass("is-image", type === "image");
+        };
+
+        const setMeta = ($trigger) => {
+            const $item = $trigger.closest(".portfolio-item");
+            const tagText = ($item.find(".tag").first().text() || "").trim();
+            const nameOverride = ($item.attr("data-project-name") || "").trim();
+            const titleText =
+                nameOverride ||
+                ($item.find(".title .link").first().text() || "").trim();
+            const descriptionText = ($item.attr("data-project-description") || "").trim();
+            const toolsText = ($item.attr("data-project-tools") || "").trim();
+
+            if ($tag.length) {
+                $tag.text(tagText);
+            }
+            if ($title.length) {
+                $title.text(titleText);
+            }
+            if ($description.length) {
+                $description.text(descriptionText);
+            }
+            if ($tools.length) {
+                $tools.empty();
+                if (toolsText) {
+                    toolsText
+                        .split(",")
+                        .map((tool) => tool.trim())
+                        .filter(Boolean)
+                        .forEach((tool) => {
+                            const key = tool.toLowerCase();
+                            const iconSrc = toolIconMap[key];
+                            if (iconSrc) {
+                                const $icon = $("<img />", {
+                                    src: iconSrc,
+                                    alt: "",
+                                    decoding: "async",
+                                    loading: "lazy",
+                                    "aria-hidden": "true"
+                                });
+                                $("<span />", {
+                                    class: "project-video-modal__tool",
+                                    "aria-label": tool,
+                                    title: tool
+                                })
+                                    .append($icon)
+                                    .appendTo($tools);
+                                return;
+                            }
+
+                            $("<span />", {
+                                class: "project-video-modal__tool project-video-modal__tool--generic",
+                                role: "img",
+                                "aria-label": tool,
+                                title: tool
+                            })
+                                .append($("<i />", {
+                                    class: "icon-GearSix",
+                                    "aria-hidden": "true"
+                                }))
+                                .appendTo($tools);
+                        });
+                }
+            }
+
+            const labelText =
+                titleText ||
+                $trigger.attr("data-video-label") ||
+                $trigger.attr("aria-label") ||
+                defaultLabel;
+            $dialog.attr("aria-label", labelText);
+
+            return {
+                tagText,
+                titleText,
+                descriptionText,
+                toolsText,
+                labelText
+            };
+        };
+
         const configureVideo = ($trigger) => {
             const source = $trigger.attr("data-video-src");
+            if (!source) return false;
+
             const poster = $trigger.attr("data-video-poster") || "";
-            const label = $trigger.attr("data-video-label") || defaultLabel;
             const videoElement = $video.get(0);
             const sourceElement = $videoSource.get(0);
 
-            if (!videoElement || !sourceElement || !source) return;
+            if (!videoElement || !sourceElement) return false;
 
             if ((sourceElement.getAttribute("src") || "") !== source) {
                 sourceElement.setAttribute("src", source);
@@ -3434,38 +3551,67 @@
                 videoElement.removeAttribute("poster");
             }
 
-            $dialog.attr("aria-label", label);
+            resetImage();
+            setModalType("video");
+            return true;
+        };
+
+        const configureImage = ($trigger, meta) => {
+            const href = $trigger.attr("href");
+            if (!href || href.startsWith("#")) return false;
+
+            const altFallback =
+                ($trigger.find("img").first().attr("alt") || "").trim() ||
+                meta.titleText ||
+                meta.labelText ||
+                "Project preview";
+
+            $image.attr("src", href);
+            $image.attr("alt", altFallback);
+
+            resetVideo();
+            setModalType("image");
+            return true;
         };
 
         const openModal = ($trigger) => {
             lastFocusedElement = document.activeElement;
-            configureVideo($trigger);
+            const meta = setMeta($trigger);
+
+            const isVideo = configureVideo($trigger);
+            if (!isVideo) {
+                configureImage($trigger, meta);
+            }
+
             $modal.addClass("is-open").attr("aria-hidden", "false");
             $body.addClass("project-video-modal-open");
 
-            const videoElement = $video.get(0);
-            if (!videoElement) return;
+            if ($modal.hasClass("is-video")) {
+                const videoElement = $video.get(0);
+                if (!videoElement) return;
 
-            setTimeout(() => {
-                try {
-                    videoElement.currentTime = 0;
-                } catch (_error) {
-                    // Ignore metadata timing issues and continue opening the modal.
-                }
+                setTimeout(() => {
+                    try {
+                        videoElement.currentTime = 0;
+                    } catch (_error) {
+                        // Ignore metadata timing issues and continue opening the modal.
+                    }
 
-                const playResult = videoElement.play();
-                if (playResult && typeof playResult.catch === "function") {
-                    playResult.catch(() => {});
-                }
-            }, 60);
+                    const playResult = videoElement.play();
+                    if (playResult && typeof playResult.catch === "function") {
+                        playResult.catch(() => {});
+                    }
+                }, 60);
+            }
         };
 
         const closeModal = () => {
             if (!$modal.hasClass("is-open")) return;
 
-            $modal.removeClass("is-open").attr("aria-hidden", "true");
+            $modal.removeClass("is-open is-video is-image").attr("aria-hidden", "true");
             $body.removeClass("project-video-modal-open");
             resetVideo();
+            resetImage();
 
             if (
                 lastFocusedElement &&
@@ -3479,6 +3625,8 @@
             .off("click.handleProjectVideoModal")
             .on("click.handleProjectVideoModal", function(e) {
                 e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
                 openModal($(this));
             });
 

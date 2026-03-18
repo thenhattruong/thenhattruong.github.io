@@ -6200,6 +6200,10 @@ ANIMATION AREA CSS
   isolation: isolate;
 }
 
+.portfolio-item.is-clickable {
+  cursor: pointer;
+}
+
 .portfolio-item::before {
   content: "";
   position: absolute;
@@ -8225,7 +8229,7 @@ body.social-popup-open {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  padding: 16px 16px 36px;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -8256,33 +8260,208 @@ body.social-popup-open {
 .project-video-modal__dialog {
   position: relative;
   z-index: 1;
-  width: min(calc((100vh - 56px) * 9 / 16), calc(100vw - 32px));
-  width: min(calc((100dvh - 56px) * 9 / 16), calc(100vw - 32px));
+  max-width: min(88vw, 900px);
+  max-height: calc(100vh - 48px);
+  max-height: calc(100dvh - 48px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-top-color: rgba(255, 255, 255, 0.26);
+  border-radius: 20px;
+  background: var(--Bg-linear-2);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.3);
+  isolation: isolate;
 }
 
-.project-video-modal__frame {
-  width: 100%;
-  aspect-ratio: 9 / 16;
+.project-video-modal__dialog>* {
+  position: relative;
+  z-index: 1;
+}
+
+.project-video-modal__dialog::before,
+.project-video-modal__dialog::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.project-video-modal__dialog::before {
+  inset: -1px;
+  border-radius: inherit;
+  background: radial-gradient(130% 90% at 50% -8%,
+      rgba(69, 231, 123, 0.42) 0%,
+      rgba(69, 231, 123, 0.06) 42%,
+      rgba(69, 231, 123, 0) 72%);
+  opacity: 0.55;
+}
+
+.project-video-modal__dialog::after {
+  inset: -8% -42%;
+  background: linear-gradient(112deg,
+      rgba(255, 255, 255, 0) 34%,
+      rgba(255, 255, 255, 0.16) 45%,
+      rgba(210, 255, 227, 0.72) 50%,
+      rgba(255, 255, 255, 0.15) 55%,
+      rgba(255, 255, 255, 0) 66%);
+  opacity: 0.32;
+  filter: blur(12px);
+  transform: translate3d(-60%, 0, 0) skewX(-18deg) scale(1.08);
+}
+
+.project-video-modal__card {
+  position: relative;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  width: fit-content;
+  max-width: min(88vw, 900px);
+  max-height: calc(100vh - 48px);
+  max-height: calc(100dvh - 48px);
   overflow: hidden;
-  border-radius: 24px;
-  background: #000;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
 }
 
+.project-video-modal__card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.project-video-modal__card::before,
+.project-video-modal__card::after {
+  content: none;
+}
+.project-video-modal__image,
 .project-video-modal__video {
-  display: block;
-  width: 100%;
-  height: 100%;
+  display: none;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
   margin: 0;
   object-fit: contain;
-  background: #000;
+  background: transparent;
+  justify-self: center;
+  align-self: center;
+}
+
+.project-video-modal.is-video .project-video-modal__video {
+  display: block;
+}
+
+.project-video-modal.is-image .project-video-modal__image {
+  display: block;
+}
+
+.project-video-modal__meta {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 20px 18px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-top-color: rgba(255, 255, 255, 0.26);
+  background: linear-gradient(123.51deg,
+      rgba(215, 237, 237, 0.04) -61.8%,
+      rgba(204, 235, 235, 0.005) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  text-align: left;
+  border-radius: 16px;
+}
+
+.project-video-modal__tag {
+  margin: 0;
+  color: var(--Text-secondary);
+}
+
+.project-video-modal__title-row {
+  --project-video-modal-tool-size: 32px;
+  --project-video-modal-tool-lift: 4px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  gap: 8px 12px;
+}
+
+.project-video-modal__title {
+  margin: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.project-video-modal__description {
+  margin: 0;
+  color: var(--Text-secondary);
+}
+
+.project-video-modal__tools {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  margin-left: auto;
+  padding-bottom: var(--project-video-modal-tool-lift);
+  gap: 6px;
+}
+
+.project-video-modal__tool {
+  width: auto;
+  height: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--Text-light);
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--project-video-modal-tool-size);
+  line-height: 1;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.project-video-modal__tool img {
+  width: auto;
+  height: 1em;
+  max-width: none;
+  display: block;
+  object-fit: contain;
+}
+
+.project-video-modal__tool i {
+  font-size: 1em;
+  line-height: 1;
+}
+
+.project-video-modal__tool:hover,
+.project-video-modal__tool:focus-visible {
+  transform: translateY(-1px);
+  opacity: 0.9;
+}
+
+.project-video-modal__tag:empty,
+.project-video-modal__title:empty,
+.project-video-modal__description:empty,
+.project-video-modal__tools:empty {
+  display: none;
 }
 
 .project-video-modal__close {
   position: absolute;
-  right: -14px;
-  top: -14px;
+  right: 12px;
+  top: 12px;
   width: 42px;
   height: 42px;
   border-radius: 50%;
@@ -8308,18 +8487,36 @@ body.project-video-modal-open {
   overflow: hidden;
 }
 
+@media (max-width: 1149px) {
+  .project-video-modal__title-row {
+    --project-video-modal-tool-size: 26px;
+    --project-video-modal-tool-lift: 3px;
+  }
+}
+
 @media (max-width: 767px) {
+  .project-video-modal__title-row {
+    --project-video-modal-tool-size: 18px;
+    --project-video-modal-tool-lift: 2px;
+  }
+
   .project-video-modal {
-    padding: 10px;
+    padding: 10px 10px 24px;
   }
 
   .project-video-modal__dialog {
-    width: min(calc((100vh - 32px) * 9 / 16), calc(100vw - 20px));
-    width: min(calc((100dvh - 32px) * 9 / 16), calc(100vw - 20px));
+    max-width: min(94vw, 520px);
+    max-height: calc(100vh - 32px);
+    max-height: calc(100dvh - 32px);
+    padding: 8px;
+    border-radius: 18px;
   }
 
-  .project-video-modal__frame {
-    border-radius: 18px;
+  .project-video-modal__card {
+    max-width: min(94vw, 520px);
+    max-height: calc(100vh - 32px);
+    max-height: calc(100dvh - 32px);
+    border-radius: 16px;
   }
 
   .project-video-modal__close {
@@ -8328,6 +8525,26 @@ body.project-video-modal-open {
     width: 38px;
     height: 38px;
     font-size: 28px;
+  }
+
+  .project-video-modal__meta {
+    padding: 14px 16px 16px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+
+  .project-video-modal__title-row {
+    flex-wrap: wrap;
+    gap: 6px 10px;
+  }
+
+  .project-video-modal__tools {
+    gap: 5px;
+  }
+
+  .project-video-modal__tool {
+    width: auto;
+    height: auto;
   }
 
   .contact-modal {
