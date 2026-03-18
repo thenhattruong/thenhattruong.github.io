@@ -4387,7 +4387,8 @@
             const docHeight = document.documentElement.scrollHeight;
             const viewportHeight =
                 window.innerHeight || document.documentElement.clientHeight;
-            return scrollTop + viewportHeight >= docHeight - 80;
+            const threshold = 4;
+            return scrollTop > 0 && scrollTop + viewportHeight >= docHeight - threshold;
         };
 
         const updateVisibility = () => {

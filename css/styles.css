@@ -7899,8 +7899,9 @@ ANIMATION AREA CSS
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transform: translate(-50%, 10px);
-  transition: opacity 0.35s ease, transform 0.35s ease, visibility 0s linear 0.35s,
+  transform: translate(-50%, 18px);
+  transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+    visibility 0s linear 0.45s,
     color 0.25s ease, box-shadow 0.25s ease;
 }
 
@@ -7909,7 +7910,8 @@ ANIMATION AREA CSS
   visibility: visible;
   pointer-events: auto;
   transform: translate(-50%, 0);
-  transition: opacity 0.35s ease, transform 0.35s ease, visibility 0s,
+  transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+    visibility 0s,
     color 0.25s ease, box-shadow 0.25s ease;
 }
 
