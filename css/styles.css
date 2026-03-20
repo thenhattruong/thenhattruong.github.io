@@ -7875,6 +7875,18 @@ ANIMATION AREA CSS
   line-height: 1;
 }
 
+.quick-contact-icon-image {
+  display: block;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+.dark-mode .quick-contact-icon-image {
+  filter: brightness(0) saturate(100%);
+}
+
 .quick-contact-link:hover,
 .quick-contact-link:focus-visible,
 .quick-contact-link:active {
@@ -7995,6 +8007,11 @@ ANIMATION AREA CSS
 
   .quick-contact-link i {
     font-size: 22px;
+  }
+
+  .quick-contact-icon-image {
+    width: 22px;
+    height: 22px;
   }
 
   .scroll-top-button {

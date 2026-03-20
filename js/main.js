@@ -272,7 +272,7 @@
             "tool-4": "Adobe Photoshop",
             "tool-5": "Blender",
             "tool-6": "CapCut",
-            "tool-7": "Visual Studio Code",
+            "tool-7": "Figma",
             "tool-8": "GitHub",
         };
 
@@ -3422,9 +3422,7 @@
             "adobe photoshop": "images/logo/tool-4.svg",
             "blender": "images/logo/tool-5.png",
             "capcut": "images/logo/tool-6.png",
-            "visual studio code": "images/logo/tool-7.png",
-            "vs code": "images/logo/tool-7.png",
-            "vscode": "images/logo/tool-7.png",
+            "figma": "images/logo/Figma-logo.svg",
             "github": "images/logo/tool-8.png"
         };
         const defaultLabel = $dialog.attr("aria-label") || "Project preview";
