@@ -7830,6 +7830,7 @@ ANIMATION AREA CSS
   visibility: hidden;
   pointer-events: none;
   transform: translateY(-50%) translateX(28px);
+  will-change: transform, opacity;
   transition: opacity 0.45s ease, transform 0.45s ease, visibility 0s linear 0.45s;
 }
 
@@ -7881,10 +7882,18 @@ ANIMATION AREA CSS
   height: 24px;
   object-fit: contain;
   filter: brightness(0) invert(1);
+  transition: filter 0.25s ease, transform 0.25s ease;
 }
 
 .dark-mode .quick-contact-icon-image {
   filter: brightness(0) saturate(100%);
+}
+
+.quick-contact-link--mail:hover .quick-contact-icon-image,
+.quick-contact-link--mail:focus-visible .quick-contact-icon-image,
+.quick-contact-link--mail:active .quick-contact-icon-image {
+  filter: brightness(0) saturate(100%) invert(76%) sepia(48%) saturate(997%) hue-rotate(84deg) brightness(101%) contrast(90%) drop-shadow(0 0 10px rgba(69, 231, 123, 0.5));
+  transform: scale(1.06);
 }
 
 .quick-contact-link:hover,
@@ -7916,6 +7925,7 @@ ANIMATION AREA CSS
   visibility: hidden;
   pointer-events: none;
   transform: translate(-50%, 18px);
+  will-change: transform, opacity;
   transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
     visibility 0s linear 0.45s,
     color 0.25s ease, box-shadow 0.25s ease;
@@ -8694,6 +8704,7 @@ body.project-video-modal-open {
   backdrop-filter: blur(10px);
   z-index: 9999;
   isolation: isolate;
+  will-change: transform, opacity;
 }
 
 .skill-tooltip.is-visible {

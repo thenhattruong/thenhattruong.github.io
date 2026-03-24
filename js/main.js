@@ -17,6 +17,38 @@
     ("use strict");
 
     const hasIntroSequence = () => Boolean(document.querySelector(".counter-scroll"));
+    const rafThrottle = (callback) => {
+        let rafId = 0;
+        let lastArgs = [];
+        let lastContext = null;
+
+        const throttled = function(...args) {
+            lastArgs = args;
+            lastContext = this;
+
+            if (rafId) return;
+
+            rafId = window.requestAnimationFrame(() => {
+                rafId = 0;
+                const argsToUse = lastArgs;
+                const contextToUse = lastContext;
+                lastArgs = [];
+                lastContext = null;
+                callback.apply(contextToUse, argsToUse);
+            });
+        };
+
+        throttled.cancel = () => {
+            if (rafId) {
+                window.cancelAnimationFrame(rafId);
+            }
+            rafId = 0;
+            lastArgs = [];
+            lastContext = null;
+        };
+
+        return throttled;
+    };
 
     const setIntroLockState = (isLocked) => {
         if (!document.body || !hasIntroSequence()) return;
@@ -121,7 +153,8 @@
                 isFixed = shouldBeFixed;
             }
         };
-        window.addEventListener("scroll", handleScroll, {
+        const scheduleHandleScroll = rafThrottle(handleScroll);
+        window.addEventListener("scroll", scheduleHandleScroll, {
             passive: true
         });
         handleScroll();
@@ -284,7 +317,8 @@
         }
 
         let activeTarget = null;
-        let rafId = null;
+        let tooltipFollowFrame = 0;
+        let tooltipListenersBound = false;
 
         const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
         const positionTooltip = () => {
@@ -301,7 +335,40 @@
 
             tooltip.style.left = `${safeX}px`;
             tooltip.style.top = `${safeY}px`;
-            rafId = window.requestAnimationFrame(positionTooltip);
+        };
+        const scheduleTooltipPosition = rafThrottle(positionTooltip);
+        const startTooltipFollow = () => {
+            if (tooltipFollowFrame) return;
+
+            const step = () => {
+                tooltipFollowFrame = 0;
+                if (!activeTarget) return;
+                positionTooltip();
+                tooltipFollowFrame = window.requestAnimationFrame(step);
+            };
+
+            tooltipFollowFrame = window.requestAnimationFrame(step);
+        };
+        const stopTooltipFollow = () => {
+            if (tooltipFollowFrame) {
+                window.cancelAnimationFrame(tooltipFollowFrame);
+            }
+            tooltipFollowFrame = 0;
+        };
+        const bindTooltipListeners = () => {
+            if (tooltipListenersBound) return;
+            tooltipListenersBound = true;
+            window.addEventListener("scroll", scheduleTooltipPosition, {
+                passive: true
+            });
+            window.addEventListener("resize", scheduleTooltipPosition);
+        };
+        const unbindTooltipListeners = () => {
+            if (!tooltipListenersBound) return;
+            tooltipListenersBound = false;
+            window.removeEventListener("scroll", scheduleTooltipPosition);
+            window.removeEventListener("resize", scheduleTooltipPosition);
+            scheduleTooltipPosition.cancel();
         };
 
         const showTooltip = (label, target) => {
@@ -309,19 +376,16 @@
             tooltip.textContent = label;
             tooltip.classList.add("is-visible");
             activeTarget = target;
-            if (rafId) {
-                window.cancelAnimationFrame(rafId);
-            }
-            rafId = window.requestAnimationFrame(positionTooltip);
+            bindTooltipListeners();
+            scheduleTooltipPosition();
+            startTooltipFollow();
         };
 
         const hideTooltip = () => {
             tooltip.classList.remove("is-visible");
             activeTarget = null;
-            if (rafId) {
-                window.cancelAnimationFrame(rafId);
-                rafId = null;
-            }
+            stopTooltipFollow();
+            unbindTooltipListeners();
         };
 
         marquee.querySelectorAll("img").forEach((img) => {
@@ -363,6 +427,7 @@
             wrapper.addEventListener("pointerenter", () => {
                 showTooltip(label, wrapper);
             });
+            wrapper.addEventListener("pointermove", scheduleTooltipPosition);
             wrapper.addEventListener("pointerleave", hideTooltip);
             if (!isHiddenGroup) {
                 wrapper.addEventListener("focus", () => {
@@ -767,6 +832,7 @@
             mainContent.style.setProperty("--about-center-line", `${centerLine}px`);
             userBar.style.top = `${centerLine}px`;
         };
+        const scheduleUpdateCenterLine = rafThrottle(updateCenterLine);
 
         let frameCount = 0;
         const settle = () => {
@@ -777,12 +843,12 @@
             }
         };
         requestAnimationFrame(settle);
-        window.addEventListener("resize", updateCenterLine);
-        window.addEventListener("load", updateCenterLine);
+        window.addEventListener("resize", scheduleUpdateCenterLine);
+        window.addEventListener("load", scheduleUpdateCenterLine);
 
         if ("ResizeObserver" in window) {
             const observer = new ResizeObserver(() => {
-                updateCenterLine();
+                scheduleUpdateCenterLine();
             });
             observer.observe(aboutSection);
         }
@@ -797,9 +863,10 @@
             const isAboutHash = hash === "" || hash === "#about";
             document.body.classList.toggle("about-only", atTop && isAboutHash);
         };
+        const scheduleUpdate = rafThrottle(update);
 
         update();
-        window.addEventListener("scroll", update, {
+        window.addEventListener("scroll", scheduleUpdate, {
             passive: true
         });
         window.addEventListener("load", update);
@@ -4458,8 +4525,11 @@
         }
 
         let triggerY = 0;
+        let currentVisibility = null;
 
         const setVisible = (isVisible) => {
+            if (currentVisibility === isVisible) return;
+            currentVisibility = isVisible;
             quickContact.classList.toggle("is-visible", isVisible);
         };
 
@@ -4477,6 +4547,12 @@
             }
             setVisible(window.scrollY >= triggerY);
         };
+        const scheduleUpdate = rafThrottle(update);
+        const refreshTrigger = () => {
+            computeTrigger();
+            update();
+        };
+        const scheduleRefreshTrigger = rafThrottle(refreshTrigger);
 
         computeTrigger();
         update();
@@ -4492,17 +4568,11 @@
         };
         requestAnimationFrame(settle);
 
-        window.addEventListener("scroll", update, {
+        window.addEventListener("scroll", scheduleUpdate, {
             passive: true
         });
-        window.addEventListener("resize", () => {
-            computeTrigger();
-            update();
-        });
-        window.addEventListener("load", () => {
-            computeTrigger();
-            update();
-        });
+        window.addEventListener("resize", scheduleRefreshTrigger);
+        window.addEventListener("load", scheduleRefreshTrigger);
     };
 
     const handleScrollTopButton = () => {
@@ -4511,8 +4581,11 @@
         if (!button || !contactSection) return;
 
         const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+        let currentVisibility = null;
 
         const setVisible = (isVisible) => {
+            if (currentVisibility === isVisible) return;
+            currentVisibility = isVisible;
             button.classList.toggle("is-visible", isVisible);
             button.setAttribute("aria-hidden", isVisible ? "false" : "true");
         };
@@ -4540,13 +4613,14 @@
         const updateVisibility = () => {
             setVisible(computeVisible());
         };
+        const scheduleUpdateVisibility = rafThrottle(updateVisibility);
 
         updateVisibility();
 
-        window.addEventListener("scroll", updateVisibility, {
+        window.addEventListener("scroll", scheduleUpdateVisibility, {
             passive: true
         });
-        window.addEventListener("resize", updateVisibility);
+        window.addEventListener("resize", scheduleUpdateVisibility);
     };
 
     /* handlePartnerLogoMask
@@ -5621,7 +5695,7 @@
         handlePartnerMarqueeReveal();
         initSkillsMarqueeTooltips();
         moveTestimonialNavOnMobile();
-        window.addEventListener("resize", moveTestimonialNavOnMobile);
+        window.addEventListener("resize", rafThrottle(moveTestimonialNavOnMobile));
         initAboutIntroCharHover();
         preventDefault();
         spliting();
