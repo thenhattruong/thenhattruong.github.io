@@ -17,6 +17,38 @@
     ("use strict");
 
     const hasIntroSequence = () => Boolean(document.querySelector(".counter-scroll"));
+    const rafThrottle = (callback) => {
+        let rafId = 0;
+        let lastArgs = [];
+        let lastContext = null;
+
+        const throttled = function(...args) {
+            lastArgs = args;
+            lastContext = this;
+
+            if (rafId) return;
+
+            rafId = window.requestAnimationFrame(() => {
+                rafId = 0;
+                const argsToUse = lastArgs;
+                const contextToUse = lastContext;
+                lastArgs = [];
+                lastContext = null;
+                callback.apply(contextToUse, argsToUse);
+            });
+        };
+
+        throttled.cancel = () => {
+            if (rafId) {
+                window.cancelAnimationFrame(rafId);
+            }
+            rafId = 0;
+            lastArgs = [];
+            lastContext = null;
+        };
+
+        return throttled;
+    };
 
     const setIntroLockState = (isLocked) => {
         if (!document.body || !hasIntroSequence()) return;
@@ -121,7 +153,8 @@
                 isFixed = shouldBeFixed;
             }
         };
-        window.addEventListener("scroll", handleScroll, {
+        const scheduleHandleScroll = rafThrottle(handleScroll);
+        window.addEventListener("scroll", scheduleHandleScroll, {
             passive: true
         });
         handleScroll();
@@ -272,7 +305,7 @@
             "tool-4": "Adobe Photoshop",
             "tool-5": "Blender",
             "tool-6": "CapCut",
-            "tool-7": "Visual Studio Code",
+            "tool-7": "Figma",
             "tool-8": "GitHub",
         };
 
@@ -284,7 +317,8 @@
         }
 
         let activeTarget = null;
-        let rafId = null;
+        let tooltipFollowFrame = 0;
+        let tooltipListenersBound = false;
 
         const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
         const positionTooltip = () => {
@@ -301,7 +335,40 @@
 
             tooltip.style.left = `${safeX}px`;
             tooltip.style.top = `${safeY}px`;
-            rafId = window.requestAnimationFrame(positionTooltip);
+        };
+        const scheduleTooltipPosition = rafThrottle(positionTooltip);
+        const startTooltipFollow = () => {
+            if (tooltipFollowFrame) return;
+
+            const step = () => {
+                tooltipFollowFrame = 0;
+                if (!activeTarget) return;
+                positionTooltip();
+                tooltipFollowFrame = window.requestAnimationFrame(step);
+            };
+
+            tooltipFollowFrame = window.requestAnimationFrame(step);
+        };
+        const stopTooltipFollow = () => {
+            if (tooltipFollowFrame) {
+                window.cancelAnimationFrame(tooltipFollowFrame);
+            }
+            tooltipFollowFrame = 0;
+        };
+        const bindTooltipListeners = () => {
+            if (tooltipListenersBound) return;
+            tooltipListenersBound = true;
+            window.addEventListener("scroll", scheduleTooltipPosition, {
+                passive: true
+            });
+            window.addEventListener("resize", scheduleTooltipPosition);
+        };
+        const unbindTooltipListeners = () => {
+            if (!tooltipListenersBound) return;
+            tooltipListenersBound = false;
+            window.removeEventListener("scroll", scheduleTooltipPosition);
+            window.removeEventListener("resize", scheduleTooltipPosition);
+            scheduleTooltipPosition.cancel();
         };
 
         const showTooltip = (label, target) => {
@@ -309,19 +376,16 @@
             tooltip.textContent = label;
             tooltip.classList.add("is-visible");
             activeTarget = target;
-            if (rafId) {
-                window.cancelAnimationFrame(rafId);
-            }
-            rafId = window.requestAnimationFrame(positionTooltip);
+            bindTooltipListeners();
+            scheduleTooltipPosition();
+            startTooltipFollow();
         };
 
         const hideTooltip = () => {
             tooltip.classList.remove("is-visible");
             activeTarget = null;
-            if (rafId) {
-                window.cancelAnimationFrame(rafId);
-                rafId = null;
-            }
+            stopTooltipFollow();
+            unbindTooltipListeners();
         };
 
         marquee.querySelectorAll("img").forEach((img) => {
@@ -363,6 +427,7 @@
             wrapper.addEventListener("pointerenter", () => {
                 showTooltip(label, wrapper);
             });
+            wrapper.addEventListener("pointermove", scheduleTooltipPosition);
             wrapper.addEventListener("pointerleave", hideTooltip);
             if (!isHiddenGroup) {
                 wrapper.addEventListener("focus", () => {
@@ -767,6 +832,7 @@
             mainContent.style.setProperty("--about-center-line", `${centerLine}px`);
             userBar.style.top = `${centerLine}px`;
         };
+        const scheduleUpdateCenterLine = rafThrottle(updateCenterLine);
 
         let frameCount = 0;
         const settle = () => {
@@ -777,12 +843,12 @@
             }
         };
         requestAnimationFrame(settle);
-        window.addEventListener("resize", updateCenterLine);
-        window.addEventListener("load", updateCenterLine);
+        window.addEventListener("resize", scheduleUpdateCenterLine);
+        window.addEventListener("load", scheduleUpdateCenterLine);
 
         if ("ResizeObserver" in window) {
             const observer = new ResizeObserver(() => {
-                updateCenterLine();
+                scheduleUpdateCenterLine();
             });
             observer.observe(aboutSection);
         }
@@ -797,9 +863,10 @@
             const isAboutHash = hash === "" || hash === "#about";
             document.body.classList.toggle("about-only", atTop && isAboutHash);
         };
+        const scheduleUpdate = rafThrottle(update);
 
         update();
-        window.addEventListener("scroll", update, {
+        window.addEventListener("scroll", scheduleUpdate, {
             passive: true
         });
         window.addEventListener("load", update);
@@ -3358,9 +3425,7 @@
 
         $items.each(function() {
             const $item = $(this);
-            const $mediaLink = $item
-                .find(".img-style[data-fancybox], .img-style.js-open-project-video-modal")
-                .first();
+            const $mediaLink = $item.find(".img-style").first();
             const $titleLink = $item.find(".title .link").first();
 
             if (!$mediaLink.length || !$titleLink.length) return;
@@ -3379,27 +3444,55 @@
                     e.preventDefault();
                     $mediaLink.trigger("click");
                 });
+
+            $item
+                .addClass("is-clickable")
+                .off("click.handlePortfolioCard")
+                .on("click.handlePortfolioCard", function(e) {
+                    if ($(e.target).closest("a, button").length) return;
+                    $mediaLink.trigger("click");
+                });
         });
     };
 
     const handleProjectVideoModal = () => {
         const $modal = $("#project-video-modal");
-        const $triggers = $(".js-open-project-video-modal");
+        const $triggers = $("#portfolio .portfolio-item .img-style");
         const $video = $modal.find(".project-video-modal__video").first();
         const $videoSource = $video.find("source").first();
+        const $image = $modal.find(".project-video-modal__image").first();
         const $dialog = $modal.find(".project-video-modal__dialog").first();
+        const $tag = $modal.find(".project-video-modal__tag").first();
+        const $title = $modal.find(".project-video-modal__title").first();
+        const $description = $modal.find(".project-video-modal__description").first();
+        const $tools = $modal.find(".project-video-modal__tools").first();
         if (
             !$modal.length ||
             !$triggers.length ||
             !$video.length ||
             !$videoSource.length ||
+            !$image.length ||
             !$dialog.length
         ) {
             return;
         }
 
         const $body = $("body");
-        const defaultLabel = $dialog.attr("aria-label") || "Project video";
+        const toolIconMap = {
+            "premiere pro": "images/logo/tool-1.svg",
+            "adobe premiere pro": "images/logo/tool-1.svg",
+            "after effects": "images/logo/tool-2.svg",
+            "adobe after effects": "images/logo/tool-2.svg",
+            "illustrator": "images/logo/tool-3.svg",
+            "adobe illustrator": "images/logo/tool-3.svg",
+            "photoshop": "images/logo/tool-4.svg",
+            "adobe photoshop": "images/logo/tool-4.svg",
+            "blender": "images/logo/tool-5.png",
+            "capcut": "images/logo/tool-6.png",
+            "figma": "images/logo/Figma-logo.svg",
+            "github": "images/logo/tool-8.png"
+        };
+        const defaultLabel = $dialog.attr("aria-label") || "Project preview";
         let lastFocusedElement = null;
 
         const resetVideo = () => {
@@ -3414,14 +3507,103 @@
             }
         };
 
+        const resetImage = () => {
+            $image.removeAttr("src");
+            $image.removeAttr("alt");
+        };
+
+        const setModalType = (type) => {
+            $modal.toggleClass("is-video", type === "video");
+            $modal.toggleClass("is-image", type === "image");
+        };
+
+        const setMeta = ($trigger) => {
+            const $item = $trigger.closest(".portfolio-item");
+            const tagText = ($item.find(".tag").first().text() || "").trim();
+            const nameOverride = ($item.attr("data-project-name") || "").trim();
+            const titleText =
+                nameOverride ||
+                ($item.find(".title .link").first().text() || "").trim();
+            const descriptionText = ($item.attr("data-project-description") || "").trim();
+            const toolsText = ($item.attr("data-project-tools") || "").trim();
+
+            if ($tag.length) {
+                $tag.text(tagText);
+            }
+            if ($title.length) {
+                $title.text(titleText);
+            }
+            if ($description.length) {
+                $description.text(descriptionText);
+            }
+            if ($tools.length) {
+                $tools.empty();
+                if (toolsText) {
+                    toolsText
+                        .split(",")
+                        .map((tool) => tool.trim())
+                        .filter(Boolean)
+                        .forEach((tool) => {
+                            const key = tool.toLowerCase();
+                            const iconSrc = toolIconMap[key];
+                            if (iconSrc) {
+                                const $icon = $("<img />", {
+                                    src: iconSrc,
+                                    alt: "",
+                                    decoding: "async",
+                                    loading: "lazy",
+                                    "aria-hidden": "true"
+                                });
+                                $("<span />", {
+                                    class: "project-video-modal__tool",
+                                    "aria-label": tool,
+                                    title: tool
+                                })
+                                    .append($icon)
+                                    .appendTo($tools);
+                                return;
+                            }
+
+                            $("<span />", {
+                                class: "project-video-modal__tool project-video-modal__tool--generic",
+                                role: "img",
+                                "aria-label": tool,
+                                title: tool
+                            })
+                                .append($("<i />", {
+                                    class: "icon-GearSix",
+                                    "aria-hidden": "true"
+                                }))
+                                .appendTo($tools);
+                        });
+                }
+            }
+
+            const labelText =
+                titleText ||
+                $trigger.attr("data-video-label") ||
+                $trigger.attr("aria-label") ||
+                defaultLabel;
+            $dialog.attr("aria-label", labelText);
+
+            return {
+                tagText,
+                titleText,
+                descriptionText,
+                toolsText,
+                labelText
+            };
+        };
+
         const configureVideo = ($trigger) => {
             const source = $trigger.attr("data-video-src");
+            if (!source) return false;
+
             const poster = $trigger.attr("data-video-poster") || "";
-            const label = $trigger.attr("data-video-label") || defaultLabel;
             const videoElement = $video.get(0);
             const sourceElement = $videoSource.get(0);
 
-            if (!videoElement || !sourceElement || !source) return;
+            if (!videoElement || !sourceElement) return false;
 
             if ((sourceElement.getAttribute("src") || "") !== source) {
                 sourceElement.setAttribute("src", source);
@@ -3434,38 +3616,67 @@
                 videoElement.removeAttribute("poster");
             }
 
-            $dialog.attr("aria-label", label);
+            resetImage();
+            setModalType("video");
+            return true;
+        };
+
+        const configureImage = ($trigger, meta) => {
+            const href = $trigger.attr("href");
+            if (!href || href.startsWith("#")) return false;
+
+            const altFallback =
+                ($trigger.find("img").first().attr("alt") || "").trim() ||
+                meta.titleText ||
+                meta.labelText ||
+                "Project preview";
+
+            $image.attr("src", href);
+            $image.attr("alt", altFallback);
+
+            resetVideo();
+            setModalType("image");
+            return true;
         };
 
         const openModal = ($trigger) => {
             lastFocusedElement = document.activeElement;
-            configureVideo($trigger);
+            const meta = setMeta($trigger);
+
+            const isVideo = configureVideo($trigger);
+            if (!isVideo) {
+                configureImage($trigger, meta);
+            }
+
             $modal.addClass("is-open").attr("aria-hidden", "false");
             $body.addClass("project-video-modal-open");
 
-            const videoElement = $video.get(0);
-            if (!videoElement) return;
+            if ($modal.hasClass("is-video")) {
+                const videoElement = $video.get(0);
+                if (!videoElement) return;
 
-            setTimeout(() => {
-                try {
-                    videoElement.currentTime = 0;
-                } catch (_error) {
-                    // Ignore metadata timing issues and continue opening the modal.
-                }
+                setTimeout(() => {
+                    try {
+                        videoElement.currentTime = 0;
+                    } catch (_error) {
+                        // Ignore metadata timing issues and continue opening the modal.
+                    }
 
-                const playResult = videoElement.play();
-                if (playResult && typeof playResult.catch === "function") {
-                    playResult.catch(() => {});
-                }
-            }, 60);
+                    const playResult = videoElement.play();
+                    if (playResult && typeof playResult.catch === "function") {
+                        playResult.catch(() => {});
+                    }
+                }, 60);
+            }
         };
 
         const closeModal = () => {
             if (!$modal.hasClass("is-open")) return;
 
-            $modal.removeClass("is-open").attr("aria-hidden", "true");
+            $modal.removeClass("is-open is-video is-image").attr("aria-hidden", "true");
             $body.removeClass("project-video-modal-open");
             resetVideo();
+            resetImage();
 
             if (
                 lastFocusedElement &&
@@ -3479,6 +3690,8 @@
             .off("click.handleProjectVideoModal")
             .on("click.handleProjectVideoModal", function(e) {
                 e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
                 openModal($(this));
             });
 
@@ -4312,8 +4525,11 @@
         }
 
         let triggerY = 0;
+        let currentVisibility = null;
 
         const setVisible = (isVisible) => {
+            if (currentVisibility === isVisible) return;
+            currentVisibility = isVisible;
             quickContact.classList.toggle("is-visible", isVisible);
         };
 
@@ -4331,6 +4547,12 @@
             }
             setVisible(window.scrollY >= triggerY);
         };
+        const scheduleUpdate = rafThrottle(update);
+        const refreshTrigger = () => {
+            computeTrigger();
+            update();
+        };
+        const scheduleRefreshTrigger = rafThrottle(refreshTrigger);
 
         computeTrigger();
         update();
@@ -4346,17 +4568,11 @@
         };
         requestAnimationFrame(settle);
 
-        window.addEventListener("scroll", update, {
+        window.addEventListener("scroll", scheduleUpdate, {
             passive: true
         });
-        window.addEventListener("resize", () => {
-            computeTrigger();
-            update();
-        });
-        window.addEventListener("load", () => {
-            computeTrigger();
-            update();
-        });
+        window.addEventListener("resize", scheduleRefreshTrigger);
+        window.addEventListener("load", scheduleRefreshTrigger);
     };
 
     const handleScrollTopButton = () => {
@@ -4365,8 +4581,11 @@
         if (!button || !contactSection) return;
 
         const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+        let currentVisibility = null;
 
         const setVisible = (isVisible) => {
+            if (currentVisibility === isVisible) return;
+            currentVisibility = isVisible;
             button.classList.toggle("is-visible", isVisible);
             button.setAttribute("aria-hidden", isVisible ? "false" : "true");
         };
@@ -4383,36 +4602,25 @@
         button.addEventListener("click", scrollToTop);
 
         const computeVisible = () => {
-            const rect = contactSection.getBoundingClientRect();
+            const scrollTop = window.scrollY || window.pageYOffset;
+            const docHeight = document.documentElement.scrollHeight;
             const viewportHeight =
                 window.innerHeight || document.documentElement.clientHeight;
-            return rect.top < viewportHeight && rect.bottom > 0;
+            const threshold = 4;
+            return scrollTop > 0 && scrollTop + viewportHeight >= docHeight - threshold;
         };
 
         const updateVisibility = () => {
             setVisible(computeVisible());
         };
+        const scheduleUpdateVisibility = rafThrottle(updateVisibility);
 
         updateVisibility();
 
-        if ("IntersectionObserver" in window) {
-            const observer = new IntersectionObserver(
-                (entries) => {
-                    entries.forEach((entry) => {
-                        setVisible(entry.isIntersecting);
-                    });
-                }, {
-                    root: null,
-                    threshold: 0.15,
-                }
-            );
-            observer.observe(contactSection);
-        } else {
-            window.addEventListener("scroll", updateVisibility, {
-                passive: true
-            });
-            window.addEventListener("resize", updateVisibility);
-        }
+        window.addEventListener("scroll", scheduleUpdateVisibility, {
+            passive: true
+        });
+        window.addEventListener("resize", scheduleUpdateVisibility);
     };
 
     /* handlePartnerLogoMask
@@ -5487,7 +5695,7 @@
         handlePartnerMarqueeReveal();
         initSkillsMarqueeTooltips();
         moveTestimonialNavOnMobile();
-        window.addEventListener("resize", moveTestimonialNavOnMobile);
+        window.addEventListener("resize", rafThrottle(moveTestimonialNavOnMobile));
         initAboutIntroCharHover();
         preventDefault();
         spliting();

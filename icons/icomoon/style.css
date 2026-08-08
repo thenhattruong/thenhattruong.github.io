@@ -146,12 +146,12 @@
 .icon-Zalo:before {
   content: "";
   display: inline-block;
-  width: 1em;
-  height: 1em;
+  width: 1.2em;
+  height: 1.2em;
   vertical-align: -0.125em;
   background-color: currentColor;
-  -webkit-mask: url("../../images/logo/Icon_of_Zalo.svg.png") center/contain no-repeat;
-  mask: url("../../images/logo/Icon_of_Zalo.svg.png") center/contain no-repeat;
+  -webkit-mask: url("../../images/logo/zalo-icon.png") center/contain no-repeat;
+  mask: url("../../images/logo/zalo-icon.png") center/contain no-repeat;
 }
 
 .icon-Mail:before {
