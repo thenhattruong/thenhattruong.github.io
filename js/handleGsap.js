@@ -1,4 +1,6 @@
 gsap.registerPlugin(ScrollTrigger);
+// Avoid full ScrollTrigger recalculation when the mobile address bar shows/hides.
+ScrollTrigger.config({ ignoreMobileResize: true });
 
 (function($) {
     let splitTextInstances = [];
@@ -139,14 +141,22 @@ gsap.registerPlugin(ScrollTrigger);
                     const isTestimonialFeedback =
                         $el.is("p.text-body-2") &&
                         $el.closest("#testimonial .testimonial-item").length > 0;
+                    // Per-word blur is expensive; skip it on mobile.
+                    const useBlur = !isMobile;
+                    const fromVars = {
+                        opacity: 0,
+                        y: isTestimonialFeedback ? 12 : 20,
+                    };
+                    const toBlur = {};
+                    if (useBlur) {
+                        fromVars.filter = isTestimonialFeedback ? "blur(6px)" : "blur(10px)";
+                        toBlur.filter = "blur(0px)";
+                        toBlur.clearProps = "filter";
+                    }
                     const tween = gsap.fromTo(
-                        split_type_set, {
-                            opacity: 0,
-                            filter: isTestimonialFeedback ? "blur(6px)" : "blur(10px)",
-                            y: isTestimonialFeedback ? 12 : 20,
-                        }, {
+                        split_type_set, fromVars, {
+                            ...toBlur,
                             opacity: 1,
-                            filter: "blur(0px)",
                             y: 0,
                             duration: isTestimonialFeedback ? 0.55 : 1,
                             stagger: isTestimonialFeedback ? 0.045 : 0.1,

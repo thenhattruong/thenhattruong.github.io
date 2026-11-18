@@ -5664,9 +5664,38 @@
             );
     };
 
+    /* handleBackgroundVideo
+  -------------------------------------------------------------------------*/
+    const handleBackgroundVideo = () => {
+        const video = document.querySelector(".bg-video");
+        if (!video) return;
+
+        const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+        const sync = () => {
+            if (document.hidden || motionQuery.matches) {
+                if (!video.paused) video.pause();
+                return;
+            }
+            if (video.paused) {
+                const playResult = video.play();
+                if (playResult && typeof playResult.catch === "function") {
+                    playResult.catch(() => {});
+                }
+            }
+        };
+
+        document.addEventListener("visibilitychange", sync);
+        if (typeof motionQuery.addEventListener === "function") {
+            motionQuery.addEventListener("change", sync);
+        }
+        sync();
+    };
+
     // Dom Ready
     $(function() {
         forceBackToHomeOnReload();
+        handleBackgroundVideo();
         headerFixed();
         handleAboutOnlyAtTop();
         syncUserBarCenter();

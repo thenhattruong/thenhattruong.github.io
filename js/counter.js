@@ -1,9 +1,9 @@
 function isElementInViewport($el) {
-    var top = $el.offset().top;
-    var bottom = top + $el.outerHeight();
-    var viewportTop = $(window).scrollTop();
-    var viewportBottom = viewportTop + $(window).height();
-    return bottom > viewportTop && top < viewportBottom;
+    var el = $el[0];
+    if (!el) return false;
+    var rect = el.getBoundingClientRect();
+    var viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+    return rect.bottom > 0 && rect.top < viewportHeight;
 }
 
 function normalizeCounterValue(rawValue) {
@@ -74,9 +74,10 @@ function checkCounters() {
         return;
     }
 
-    $(".counter-item").each(function() {
+    // Skip already-counted items before touching layout.
+    $(".counter-item:not(.counted)").each(function() {
         var $counter = $(this);
-        if (isElementInViewport($counter) && !$counter.hasClass("counted")) {
+        if (isElementInViewport($counter)) {
             $counter.addClass("counted");
 
             var $odometer = $counter.find(".odometer");
@@ -121,7 +122,14 @@ function checkCounters() {
 
 if ($(".counter-scroll").length > 0) {
     resetCountersToZero();
-    $(window).on("scroll", checkCounters);
+    var counterRafId = 0;
+    window.addEventListener("scroll", function() {
+        if (counterRafId) return;
+        counterRafId = window.requestAnimationFrame(function() {
+            counterRafId = 0;
+            checkCounters();
+        });
+    }, { passive: true });
     $(window).on("load", checkCounters);
     $(document).ready(checkCounters);
 }
