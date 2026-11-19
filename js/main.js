@@ -1090,7 +1090,7 @@
                     "Brand Identity & Visual Kit",
                 ],
                 portfolioCategories: [
-                    "3D MOTION COMERCIAL",
+                    "3D MOTION COMMERCIAL",
                     "MOTION GRAPHIC",
                     "BRANDING DESIGN",
                     "GRAPHIC DESIGN",
@@ -1772,15 +1772,26 @@
             const $container = $(this);
             const $spotlight = $container.find(".spotlight");
             $spotlight.css("opacity", "1");
-            $container.on("mousemove", function(e) {
-                const offset = $container.offset();
-                const relX = e.pageX - offset.left;
-                const relY = e.pageY - offset.top;
-                $spotlight.css({
-                    top: relY,
-                    left: relX,
+            if (!$spotlight.length) return;
+            const container = this;
+            const spotlightEls = $spotlight.toArray();
+            let lastX = 0;
+            let lastY = 0;
+            const update = rafThrottle(() => {
+                // Single layout read per frame instead of per mousemove.
+                const rect = container.getBoundingClientRect();
+                const relX = lastX - rect.left;
+                const relY = lastY - rect.top;
+                spotlightEls.forEach((el) => {
+                    el.style.top = `${relY}px`;
+                    el.style.left = `${relX}px`;
                 });
             });
+            container.addEventListener("mousemove", (e) => {
+                lastX = e.clientX;
+                lastY = e.clientY;
+                update();
+            }, { passive: true });
         });
     };
 
@@ -1832,9 +1843,17 @@
                 $item.removeClass("is-tilt-active");
             };
 
+            let pointerX = 0;
+            let pointerY = 0;
+            const applyPointer = rafThrottle(() => {
+                setTouchPoint(pointerX, pointerY);
+                setPortfolioTilt(pointerX, pointerY);
+            });
+
             $item.on("mousemove", function(e) {
-                setTouchPoint(e.clientX, e.clientY);
-                setPortfolioTilt(e.clientX, e.clientY);
+                pointerX = e.clientX;
+                pointerY = e.clientY;
+                applyPointer();
             });
 
             $item.on("touchstart touchmove", function(e) {
@@ -1849,6 +1868,7 @@
             });
 
             $item.on("mouseleave", function() {
+                applyPointer.cancel();
                 resetPortfolioTilt();
             });
 

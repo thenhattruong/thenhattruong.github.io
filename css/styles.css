@@ -1644,7 +1644,7 @@ body.intro-locked .intro-center-title {
 .intro-center-title__char {
   display: inline-block;
   transform-origin: 50% 72%;
-  will-change: transform, opacity, filter, color;
+  will-change: transform, opacity;
 }
 
 .intro-center-title__char.is-space {
@@ -2282,7 +2282,7 @@ body.intro-locked .intro-center-title {
   isolation: isolate;
   pointer-events: none;
   z-index: 1205;
-  will-change: transform, filter, left, top, opacity;
+  will-change: transform, opacity;
 }
 
 .header-avatar-ghost.avatar-bounce-plain::before,
@@ -2879,7 +2879,7 @@ body.intro-locked .intro-center-title {
   .header.header-fixed.style-1 .header-sidebar {
     border-radius: unset;
     background: var(--Bg-linear-2);
-    backdrop-filter: blur(112px);
+    backdrop-filter: blur(16px);
     border: none;
     margin-left: -15px;
     margin-right: -15px;
@@ -5300,7 +5300,7 @@ ANIMATION AREA CSS
   transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s ease, filter 0.35s ease, opacity 0.35s ease;
   isolation: isolate;
   transform-origin: right center;
-  will-change: transform, filter, opacity, box-shadow;
+  will-change: transform, opacity;
 }
 
 .user-bar>* {
@@ -5515,7 +5515,7 @@ ANIMATION AREA CSS
   white-space: nowrap;
   position: relative;
   transform-origin: 50% 50%;
-  will-change: transform, filter, text-shadow, letter-spacing, opacity;
+  will-change: transform, opacity;
 }
 
 .box-author .name .userbar-name-fill {
@@ -5526,7 +5526,7 @@ ANIMATION AREA CSS
 .box-author .name .userbar-name-fill__char {
   display: inline-block;
   min-width: 0.02em;
-  will-change: transform, opacity, filter, text-shadow;
+  will-change: auto;
 }
 
 .box-author .name .userbar-name-fill__char.is-space {
@@ -6196,7 +6196,7 @@ ANIMATION AREA CSS
   transform: perspective(1200px) rotateX(0deg) rotateY(0deg) translate3d(0, 0, 0);
   transform-style: preserve-3d;
   transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease, filter 0.3s ease;
-  will-change: transform, box-shadow, filter;
+  will-change: transform;
   isolation: isolate;
 }
 
@@ -7692,7 +7692,7 @@ ANIMATION AREA CSS
   backface-visibility: hidden;
   transform-origin: 50% 70%;
   color: #ffffff;
-  will-change: transform, filter, color;
+  will-change: transform, opacity;
   transition: transform var(--about-word-motion-duration) cubic-bezier(0.22, 1, 0.36, 1),
     color 0.32s ease, text-shadow var(--about-word-motion-duration) ease,
     filter var(--about-word-motion-duration) ease;
@@ -8863,5 +8863,14 @@ a[aria-controls="setting-menu"] {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* Mobile GPU relief: large glass panels over the playing background video
+   force a re-blur every video frame. */
+@media (max-width: 767px) {
+  .portfolio-item {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 }
